@@ -1,0 +1,1249 @@
+================================================================================
+  SYSTEMVERILOG DATA TYPES — COMPLETE CHEATSHEET
+  Spear & Tumbush "SystemVerilog for Verification" Chapter 2
+================================================================================
+
+TABLE OF CONTENTS
+  1.  logic Type
+  2.  2-State Data Types
+  3.  Fixed-Size Arrays
+  4.  Packed vs Unpacked Arrays
+  5.  Dynamic Arrays
+  6.  Queues
+  7.  Associative Arrays
+  8.  Array Methods (Reduction, Locator, Sorting)
+  9.  Choosing a Storage Type
+  10. typedef — Custom Types
+  11. Structs (Packed & Unpacked)
+  12. Unions
+  13. Packages
+  14. Type Conversion (Static & Dynamic Cast)
+  15. Streaming Operators
+  16. Enumerated Types
+  17. Constants
+  18. Strings
+  19. Expression Width Pitfalls
+  20. Scoreboard Pattern
+
+
+================================================================================
+1. logic TYPE (Section 2.1.1)
+================================================================================
+
+  logic REPLACES both 'reg' and 'wire' in almost all cases.
+  It is 4-state: can hold 0, 1, X (unknown), Z (high-impedance).
+
+  ONLY LIMITATION: cannot have multiple structural drivers.
+  For bidirectional buses, you still need wire/tri.
+
+  DECLARATION:
+    logic [7:0] data;          // 8-bit signal
+    logic       clk, rst_n;   // single-bit signals
+    logic [3:0] addr;
+
+  WHY USE IT:
+  - No more guessing between reg and wire
+  - If you accidentally connect two drivers, you get a COMPILE ERROR
+  - Works everywhere: assign statements, always blocks, module ports
+
+  EXAMPLE:
+    logic [7:0] data;
+    data = 8'hA5;                         // works in always/initial
+    assign data = some_signal;            // also works (but not both!)
+
+  TIP: The only time you use wire is for signals with MULTIPLE drivers
+  (like a shared bus). Everything else should be logic.
+
+
+================================================================================
+2. 2-STATE DATA TYPES (Section 2.1.2)
+================================================================================
+
+  SystemVerilog adds types that can only hold 0 or 1 (no X/Z).
+  Faster simulation, less memory usage.
+
+  ┌───────────┬──────┬────────┬────────────────────────┐
+  │ Type      │ Bits │ Signed │ Range                  │
+  ├───────────┼──────┼────────┼────────────────────────┤
+  │ bit       │  1   │   No   │ 0, 1                   │
+  │ byte      │  8   │   Yes  │ -128 to +127           │
+  │ shortint  │ 16   │   Yes  │ -32768 to +32767       │
+  │ int       │ 32   │   Yes  │ -2^31 to +2^31-1       │
+  │ longint   │ 64   │   Yes  │ -2^63 to +2^63-1       │
+  └───────────┴──────┴────────┴────────────────────────┘
+
+  EXAMPLES:
+    bit        flag = 1;
+    byte       b = 127;         // SIGNED! max is 127, NOT 255
+    int        count = 0;
+    shortint   offset = -100;
+    longint    big = 64'd1_000_000_000_000;
+
+  WARNING #1 — byte IS SIGNED:
+    byte b = 127;
+    b = b + 1;                  // b becomes -128, NOT 128!
+    // Use bit [7:0] for unsigned 8-bit values.
+
+  WARNING #2 — X/Z SILENTLY CONVERTED:
+    bit [3:0] safe;
+    safe = 4'bxxz1;             // becomes 4'b0001 — X/Z info LOST!
+    // ALWAYS connect 4-state (logic) to DUT ports, not 2-state.
+
+  CHECK FOR X/Z:
+    if ($isunknown(data_out))
+        $display("WARNING: X or Z detected at time %0t", $time);
+
+  WHEN TO USE:
+    - int:      loop counters, sizes, general testbench variables
+    - bit:      flags, enables, internal TB signals
+    - byte:     only if you specifically need signed 8-bit
+    - logic:    ALWAYS for DUT port connections (preserves X/Z)
+
+
+================================================================================
+3. FIXED-SIZE ARRAYS (Section 2.2)
+================================================================================
+
+  Size known at compile time. The most basic array type.
+
+  DECLARATION (C-style):
+    int arr[5];               // 5 elements: arr[0] to arr[4]
+    int matrix[3][4];         // 3 rows x 4 columns
+    logic [7:0] mem[1024];   // 1024-entry memory
+
+  ARRAY LITERALS (apostrophe + braces):
+    int scores[4] = '{10, 20, 30, 40};
+    int zeros[8]  = '{default: 0};        // all elements = 0
+    int grid[2][3] = '{ '{1,2,3}, '{4,5,6} };
+
+  $size() — GET ARRAY SIZE:
+    $display("size = %0d", $size(arr));   // 5
+
+  $clog2() — CEILING OF LOG2 (address width calculator):
+    $clog2(16) = 4      // need 4 bits to address 16 entries
+    $clog2(17) = 5      // need 5 bits to address 17 entries
+
+  FOR LOOP:
+    for (int i = 0; i < $size(arr); i++)
+        $display("arr[%0d] = %0d", i, arr[i]);
+
+  FOREACH LOOP (preferred — cleaner):
+    foreach (arr[i])
+        $display("arr[%0d] = %0d", i, arr[i]);
+
+  MULTI-DIMENSIONAL FOREACH — uses COMMA, not separate brackets:
+    foreach (matrix[i, j])                // NOT matrix[i][j]!
+        $display("matrix[%0d][%0d] = %0d", i, j, matrix[i][j]);
+
+    // You can omit dimensions:
+    foreach (matrix[i,])          // only outer loop
+        foreach (matrix[,j])      // only inner loop for current i
+
+  AGGREGATE COPY AND COMPARE:
+    int a[4] = '{1, 2, 3, 4};
+    int b[4];
+    b = a;                                // copy entire array
+    if (a == b) $display("Equal");        // compare (== and != only)
+
+    // NOTE: Cannot do aggregate arithmetic (a = b + c).
+    // Use foreach loops instead.
+
+  OUT-OF-BOUNDS READS:
+    // No crash! Returns default value:
+    //   4-state (logic) arrays → return X
+    //   2-state (int/bit) arrays → return 0
+
+  PRINTING WITH %p:
+    $display("arr = %p", arr);    // prints: '{10, 20, 30, 40}
+
+
+================================================================================
+4. PACKED vs UNPACKED ARRAYS (Section 2.2.6-2.2.8)
+================================================================================
+
+  UNPACKED ARRAY — dimensions AFTER the variable name:
+    bit [7:0] data [3];          // 3 separate bytes
+    //  data[0], data[1], data[2] each stored in own 32-bit word
+
+  PACKED ARRAY — dimensions BEFORE the variable name:
+    bit [3:0][7:0] word;         // 4 bytes = 32 contiguous bits
+    //  Stored as one 32-bit value, but accessible as bytes
+
+  PACKED ARRAY USAGE:
+    bit [3:0][7:0] word;
+    word = 32'hDEADBEEF;        // assign as one value
+    word[3] = 8'hFF;            // access byte 3
+    word[2][7] = 1'b1;          // access bit 7 of byte 2
+
+  MIXED PACKED + UNPACKED:
+    bit [3:0][7:0] memory [5];  // 5 unpacked entries, each 4 packed bytes
+    // memory[0] = 32-bit packed value
+    // memory[0][3] = byte 3 of entry 0
+    // memory[0][3][7] = bit 7 of byte 3 of entry 0
+
+  LAYOUT IN MEMORY:
+    Packed:   [byte3][byte2][byte1][byte0]  ← contiguous bits
+    Unpacked: [byte0]___[byte1]___[byte2]   ← separate words (gaps)
+
+  WHEN TO USE PACKED:
+    - Need to treat data as BOTH array AND single number
+    - Register fields, pixel data, instruction encoding
+    - Need @ (event control) on the array
+    - Need aggregate XOR/AND/OR on the bits
+
+  WHEN TO USE UNPACKED:
+    - Most testbench arrays
+    - Individual element access is the main use case
+    - Simple memories
+
+
+================================================================================
+5. DYNAMIC ARRAYS (Section 2.3)
+================================================================================
+
+  Size determined at RUNTIME. Must call new[] to allocate.
+
+  DECLARATION:
+    int dyn[];                   // empty brackets = dynamic
+
+  ALLOCATE:
+    dyn = new[5];                // allocate 5 elements
+    foreach (dyn[i]) dyn[i] = i;
+
+  RESIZE AND KEEP OLD VALUES:
+    dyn = new[10](dyn);          // grow to 10, copy existing 5 values
+
+  RESIZE WITHOUT KEEPING:
+    dyn = new[3];                // allocate 3, OLD VALUES LOST
+
+  SIZE AND DELETE:
+    $display("size = %0d", dyn.size());   // or $size(dyn)
+    dyn.delete();                          // free memory, size = 0
+
+  DYNAMIC LITERAL (let SV count elements for you):
+    int masks[] = '{8'hFF, 8'h0F, 8'hF0, 8'h33, 8'hCC};
+    // SV counts 5 elements — no manual counting mistakes!
+
+  COPY BETWEEN FIXED AND DYNAMIC:
+    int fixed_arr[5] = '{1, 2, 3, 4, 5};
+    int dyn_arr[];
+    dyn_arr = fixed_arr;          // auto-allocates and copies
+
+  MULTI-DIMENSIONAL DYNAMIC:
+    int md[][];                   // dynamic of dynamic
+    md = new[3];                  // allocate outer
+    foreach (md[i])
+        md[i] = new[i+1];        // each sub-array can be different size!
+
+  WHEN TO USE:
+    - Don't know number of transactions until runtime
+    - Variable-size packets
+    - Generic routines that accept any size array
+
+
+================================================================================
+6. QUEUES (Section 2.4) ★★★ MOST IMPORTANT FOR VERIFICATION ★★★
+================================================================================
+
+  Combines the best of linked lists and arrays.
+  - Like linked list: grow/shrink without expensive reallocation
+  - Like array: direct access to any element by index
+  NO new[] needed! Just start using it.
+
+  DECLARATION:
+    int q[$];                    // [$] = queue, starts empty
+
+  ADDING ELEMENTS:
+    q.push_back(10);             // append to end:    {10}
+    q.push_back(20);             //                   {10, 20}
+    q.push_front(5);             // prepend to front: {5, 10, 20}
+    q.insert(1, 15);             // insert at index:  {5, 15, 10, 20}
+
+  REMOVING ELEMENTS:
+    int val;
+    val = q.pop_front();         // remove & return first: val=5
+    val = q.pop_back();          // remove & return last: val=20
+    q.delete(1);                 // remove by index (no return value)
+
+  SIZE AND ACCESS:
+    q.size()                     // number of elements
+    q[0]                         // first element (read/write)
+    q[q.size()-1]                // last element
+
+  QUEUE LITERALS — NO APOSTROPHE (different from array literals!):
+    int q[$] = {1, 2, 3};       // queue literal
+    int a[3] = '{1, 2, 3};      // array literal — HAS apostrophe
+
+  CONCATENATION SYNTAX:
+    q = {q[0:1], 15, q[2:$]};   // insert 15 at position 2
+    q = {q, 99};                 // append 99
+    q = {99, q};                 // prepend 99
+
+  $ SHORTCUT:
+    q[0:$]                       // all elements
+    q[1:$]                       // all except first
+    q[$:2]                       // $ on left = minimum = 0
+
+  PERFORMANCE:
+    push/pop front/back = O(1)   — constant time, very fast
+    insert/delete middle = O(n)  — must shift elements
+
+  COPY FROM OTHER ARRAYS:
+    int fixed[4] = '{1, 2, 3, 4};
+    int q[$] = fixed;            // copy fixed array into queue
+
+  WHEN TO USE:
+    - Scoreboards (constantly adding/removing expected values)
+    - Transaction FIFOs
+    - Any collection that grows/shrinks during simulation
+    - Return type from array locator methods
+
+
+================================================================================
+7. ASSOCIATIVE ARRAYS (Section 2.5)
+================================================================================
+
+  Sparse storage — only allocates memory for entries you WRITE.
+  Like Python dict, Perl hash, C++ std::map.
+
+  DECLARATION:
+    int mem[int];                // indexed by int
+    int lookup[string];          // indexed by string
+    bit [7:0] sparse[bit[31:0]];// indexed by 32-bit address
+
+  WRITE AND READ:
+    mem[0]      = 100;
+    mem[1000]   = 200;
+    mem[999999] = 300;
+    // Only 3 entries allocated, NOT 999999!
+
+  METHODS:
+    mem.num()                    // number of entries (same as size())
+    mem.size()                   // same as num()
+    mem.exists(key)              // returns 1 if key was written, 0 if not
+    mem.delete(key)              // remove one entry
+    mem.delete()                 // remove ALL entries
+
+  ITERATION WITH FOREACH:
+    foreach (mem[addr])          // visits ONLY written entries
+        $display("mem[%0d] = %0d", addr, mem[addr]);
+
+  MANUAL ITERATION (first/next):
+    int key;
+    if (mem.first(key))
+        do
+            $display("mem[%0d] = %0d", key, mem[key]);
+        while (mem.next(key));
+
+  STRING-INDEXED (hash table):
+    int opcodes[string];
+    opcodes["ADD"]  = 8'h01;
+    opcodes["SUB"]  = 8'h02;
+    opcodes["LOAD"] = 8'h03;
+
+    if (opcodes.exists("ADD"))
+        $display("ADD = %0d", opcodes["ADD"]);
+
+  ARRAY LITERAL:
+    int aa[int] = '{0: 100, 5: 200, 99: 300};
+
+  DEFAULT VALUE ON UNWRITTEN READ:
+    - 4-state (logic): returns X
+    - 2-state (int/bit): returns 0
+    - Always use exists() before reading to be safe
+
+  AVOID WILDCARD INDEX: int wild[*];
+    // Not recommended — ambiguous iterator type in foreach
+
+  WHEN TO USE:
+    - Sparse memory models (multi-GB address space, few entries)
+    - Content-addressable memories (CAM)
+    - Lookup tables with string keys (opcode decoding)
+    - Any non-contiguous index pattern
+
+
+================================================================================
+8. ARRAY METHODS (Section 2.6) ★★★ CRITICAL FOR INTERVIEWS ★★★
+================================================================================
+
+  Work on ALL unpacked array types: fixed, dynamic, queue, associative.
+
+  ─── 8a. REDUCTION METHODS (Section 2.6.1) ───
+
+    int arr[5] = '{1, 2, 3, 4, 5};
+
+    arr.sum()                    // 15 — sum of all elements
+    arr.product()                // 120 — product of all elements
+    arr.xor()                    // XOR of all elements
+    arr.and()                    // AND of all elements
+    arr.or()                     // OR of all elements
+
+    // Random element from queue or dynamic array:
+    arr[$urandom_range(arr.size()-1)]
+
+    // WARNING: sum of single-bit array returns single bit!
+    //   bit flags[4] = '{1, 1, 1, 1};
+    //   flags.sum()              // = 0 (overflow in 1-bit!)
+    //   flags.sum with (int'(item))  // = 4 (correct: cast to wider)
+
+  ─── 8b. LOCATOR METHODS (Section 2.6.2) ───
+
+    int arr[6] = '{3, 9, 1, 8, 4, 2};
+    int result[$];               // locator methods return QUEUES
+
+    // min / max / unique:
+    result = arr.min();          // {1}
+    result = arr.max();          // {9}
+    result = arr.unique();       // removes duplicates
+
+    // find — with condition ('item' = each element):
+    result = arr.find with (item > 5);         // {9, 8}
+    result = arr.find_index with (item > 5);   // {1, 3} — returns INDICES
+    result = arr.find_first with (item > 5);   // {9} — first match only
+    result = arr.find_last with (item > 5);    // {8} — last match only
+
+    result = arr.find_first_index with (item > 5);  // {1}
+    result = arr.find_last_index with (item > 5);   // {3}
+
+    // Custom iterator name:
+    result = arr.find(x) with (x > 5);        // 'x' instead of 'item'
+
+    // sum with condition — POWERFUL ONE-LINERS:
+    int count = arr.sum with (int'(item > 5));         // 2 (count matches)
+    int total = arr.sum with ((item > 5) ? item : 0);  // 17 (sum of matches)
+    int total2 = arr.sum with (item < 8 ? item : 0);   // sum items < 8
+
+    // NOTE: find_index returns queue of type int, NOT integer.
+    // Wrong: integer idx[$] = arr.find_index with (...);
+    // Right: int idx[$] = arr.find_index with (...);
+
+  ─── 8c. SORTING METHODS (Section 2.6.3) ───
+
+    int arr[6] = '{3, 9, 1, 8, 4, 2};
+
+    arr.sort();                  // ascending:  {1, 2, 3, 4, 8, 9}
+    arr.rsort();                 // descending: {9, 8, 4, 3, 2, 1}
+    arr.reverse();               // flip:       {2, 4, 8, 3, 9, 1}
+    arr.shuffle();               // random:     {4, 1, 8, 2, 9, 3}
+
+    // IMPORTANT: These modify the array IN PLACE (unlike locator methods)
+
+    // Sort structs by field:
+    typedef struct { string name; int score; } student_t;
+    student_t students[3];
+    students.sort with (item.score);      // sort ascending by score
+    students.rsort with (item.name);      // sort descending by name
+
+    // Only fixed, dynamic, queues can be sorted — NOT associative.
+
+  ─── 8d. SCOREBOARD WITH LOCATOR METHODS (Section 2.6.4) ───
+
+    typedef struct { int addr; int data; } packet_t;
+    packet_t scoreboard[$];
+
+    // Add expected:
+    scoreboard.push_back('{addr: 32'hA000, data: 42});
+
+    // Check received:
+    function void check(int addr, int data);
+        int idx[$] = scoreboard.find_index with (item.addr == addr);
+        if (idx.size() == 0)
+            $error("Unexpected packet at addr 0x%0h", addr);
+        else if (idx.size() == 1) begin
+            assert(scoreboard[idx[0]].data == data);
+            scoreboard.delete(idx[0]);
+        end else
+            $warning("Multiple matches for addr 0x%0h", addr);
+    endfunction
+
+
+================================================================================
+9. CHOOSING A STORAGE TYPE (Section 2.7)
+================================================================================
+
+  ┌──────────────────────────┬─────────────────────────┐
+  │ Use Case                 │ Best Type               │
+  ├──────────────────────────┼─────────────────────────┤
+  │ Fixed-size packet buffer │ Fixed array             │
+  │ Variable-size packets    │ Dynamic array           │
+  │ Scoreboard / FIFO       │ Queue                   │
+  │ Sparse memory (>1M)     │ Associative [int]       │
+  │ Opcode lookup by name   │ Associative [string]    │
+  │ Content-addressable mem  │ Associative array       │
+  │ Sorted data (predictable)│ Queue                  │
+  │ Sorted data (random)    │ Associative array       │
+  └──────────────────────────┴─────────────────────────┘
+
+  PERFORMANCE:
+    Fixed/Dynamic: O(1) random access — fastest
+    Queue: O(1) push/pop ends, O(n) insert middle
+    Associative: O(log n) — slowest but most flexible
+
+  MEMORY:
+    - Use 2-state types over 4-state to save memory
+    - Sizes that are multiples of 32 bits avoid wasted space
+    - Packed arrays eliminate gaps between elements
+    - Associative arrays have pointer overhead per element
+
+  DATA ACCESS PATTERNS:
+    - Data arrives all at once → fixed/dynamic array
+    - Data dribbles in → queue (efficient append)
+    - Non-contiguous indices → associative array
+
+
+================================================================================
+10. typedef — CREATING NEW TYPES (Section 2.8)
+================================================================================
+
+  Create reusable type aliases. Use suffix conventions:
+    _t for general types
+    _s for structs
+    _e for enums
+    _u for unions
+
+  BASIC TYPES:
+    typedef logic [31:0] word_t;
+    typedef bit   [31:0] uint;            // unsigned 32-bit (very useful!)
+    typedef logic [7:0]  byte_t;
+
+    word_t data = 32'hDEADBEEF;
+    uint   count = 32'd4_000_000_000;     // works! unsigned, no overflow
+
+  ARRAY TYPES — subscript goes on the NEW name:
+    typedef int fixed5_t[5];
+    fixed5_t my_arr = '{1, 2, 3, 4, 5};
+
+  ASSOCIATIVE ARRAY INDEX TYPE:
+    typedef bit [63:0] addr_t;
+    int mem[addr_t];                      // 64-bit indexed assoc array
+
+  TIP: Put typedefs in a PACKAGE so they can be shared across files.
+
+  RECOMMENDED UINT:
+    typedef bit [31:0] uint;
+    // Most testbench values (field length, transaction count) are
+    // positive. Signed int can cause subtle bugs. Use uint.
+
+
+================================================================================
+11. STRUCTS — USER-DEFINED STRUCTURES (Section 2.9)
+================================================================================
+
+  Group related signals into one type. Like C structs.
+
+  ─── UNPACKED STRUCT (most common in testbenches) ───
+
+    typedef struct {
+        logic [7:0]  addr;
+        logic [31:0] data;
+        logic        wr_en;
+    } bus_txn_s;                          // suffix _s
+
+    bus_txn_s txn;
+    txn.addr  = 8'hFF;                   // access by field name
+    txn.data  = 32'hDEADBEEF;
+    txn.wr_en = 1'b1;
+
+    // Initialize with struct literal:
+    bus_txn_s txn2 = '{addr: 8'h00, data: 32'h0, wr_en: 1'b0};
+    // Or positional:
+    bus_txn_s txn3 = '{8'h00, 32'h0, 1'b0};
+
+  ─── PACKED STRUCT (contiguous bits) ───
+
+    typedef struct packed {
+        logic [3:0] opcode;
+        logic [3:0] operand;
+    } instruction_s;                     // total = 8 bits
+
+    instruction_s instr;
+    instr = 8'hA5;                       // assign as single value
+    instr.opcode = 4'hB;                 // OR access individual fields
+    // Packed struct acts as BOTH a struct AND a bit vector!
+
+  ─── PACKED vs UNPACKED ───
+
+    Packed:
+    - Stored as contiguous bits (no gaps)
+    - Can assign/compare as a single vector
+    - Use for: register fields, instruction encoding, pixel data
+    - Elements must be integral types (logic, bit, etc.)
+
+    Unpacked:
+    - Each field stored in its own word
+    - More flexible (any types allowed)
+    - Use for: testbench data grouping
+
+  TIP FROM THE BOOK:
+    Use CLASSES (Chapter 5) instead of structs for testbenches.
+    Classes add: methods, constrained randomization, inheritance.
+    Structs are best for synthesizable RTL data types.
+
+
+================================================================================
+12. UNIONS (Section 2.9.3)
+================================================================================
+
+  Multiple views of the same memory location.
+  Convention: suffix _u
+
+    typedef union packed {
+        logic [31:0] raw;                // view as 32-bit value
+        struct packed {
+            logic [7:0] byte3;
+            logic [7:0] byte2;
+            logic [7:0] byte1;
+            logic [7:0] byte0;
+        } bytes;                         // view as 4 bytes
+    } reg32_u;
+
+    reg32_u r;
+    r.raw = 32'hDEADBEEF;
+    $display("byte0 = 0x%h", r.bytes.byte0);  // EF
+    $display("byte3 = 0x%h", r.bytes.byte3);  // DE
+
+  USE CASES:
+    - Register with multiple interpretations (based on opcode)
+    - Integer vs floating-point view of same bits
+
+  TIP: Don't overuse unions just to save memory. The book recommends
+  using a class with a "kind" discriminant variable instead (Section 8.4.4).
+  If you just need array + all bits, use a packed array.
+
+
+================================================================================
+13. PACKAGES (Section 2.10)
+================================================================================
+
+  Share types, parameters, and functions across files.
+  THIS IS HOW UVM WORKS — all base classes live in packages.
+
+  CREATING A PACKAGE:
+    package my_bus_pkg;
+        typedef logic [31:0] data_t;
+        typedef enum logic [1:0] {RD, WR, IDLE_CMD, ERR} cmd_e;
+        parameter int TIMEOUT = 1000;
+
+        function automatic int calc_crc(input logic [7:0] data[]);
+            // ...
+        endfunction
+    endpackage
+
+  IMPORTING:
+    import my_bus_pkg::*;           // wildcard — import all symbols
+    import my_bus_pkg::data_t;      // specific — import one symbol
+    my_bus_pkg::TIMEOUT             // scope operator — no import needed
+
+  RULES:
+    - Packages can contain: types, parameters, functions, classes
+    - Packages CANNOT have hierarchical references to outside signals
+    - Packages are completely standalone (no outside dependencies)
+    - Local variables SHADOW imported names
+    - Use pkg::symbol to access a shadowed name
+
+  EXAMPLE — Multiple packages:
+    package abc_pkg;
+        parameter int WIDTH = 8;
+        typedef logic [WIDTH-1:0] abc_data_t;
+        string message = "ABC";
+    endpackage
+
+    package xyz_pkg;
+        parameter int TIMEOUT = 500;
+    endpackage
+
+    module my_tb;
+        import abc_pkg::*;              // import everything from ABC
+        import xyz_pkg::TIMEOUT;        // import just TIMEOUT from XYZ
+        string message = "local";       // shadows abc_pkg::message
+
+        initial begin
+            $display(abc_pkg::message); // "ABC" (explicit scope)
+            $display(message);          // "local" (local shadows import)
+            $display("%0d", TIMEOUT);   // 500 (from xyz_pkg)
+        end
+    endmodule
+
+
+================================================================================
+14. TYPE CONVERSION (Section 2.11)
+================================================================================
+
+  ─── STATIC CAST: type'(expression) ───
+    No bounds checking. Use when you know it's safe.
+
+    int i = 42;
+    real r = real'(i);            // 42.0
+    int j = int'(3.7);           // 3 (truncated)
+
+    // Widen a value:
+    bit [3:0] small = 4'hF;
+    bit [7:0] big = 8'(small);   // 8'h0F (zero-extended)
+
+    // Enum cast:
+    state_e s = state_e'(3);     // force int to enum (no checking!)
+
+  ─── DYNAMIC CAST: $cast() ───
+    With bounds checking. Use for enums and class handles.
+
+    // As function — returns 1 on success, 0 on failure:
+    state_e s;
+    if ($cast(s, 3))             // success, s = EXECUTE
+        $display("OK: %s", s.name());
+    if (!$cast(s, 99))           // failure, s unchanged
+        $display("FAIL: 99 is not a valid state");
+
+    // As task — prints error on failure:
+    $cast(s, 3);                 // if it fails, prints runtime error
+
+  ─── IMPLICIT CONVERSIONS ───
+    SV automatically converts between:
+    - Different vector widths (truncation or zero-extension)
+    - int and real
+    - signed and unsigned (be careful!)
+
+    logic [7:0]  small = 8'hFF;
+    logic [15:0] big = small;    // 16'h00FF (zero-extended)
+    small = 16'h1234;            // 8'h34 (truncated to lower bits)
+
+  WHEN TO USE WHICH:
+    static cast:  widen/narrow values, float<->int, int->enum (if trusted)
+    dynamic cast: int->enum (untrusted), parent->child class handle
+
+
+================================================================================
+15. STREAMING OPERATORS (Section 2.12)
+================================================================================
+
+  Pack/unpack data between different representations.
+  >> streams left-to-right, << streams right-to-left.
+
+  BASIC EXAMPLE:
+    int h = 32'h0123_4567;
+    byte bytes[4];
+
+    // Unpack word into byte array (big-endian):
+    {>>{bytes}} = h;
+    // bytes = {8'h01, 8'h23, 8'h45, 8'h67}
+
+    // Pack byte array back into word:
+    int rebuilt = {>>{bytes}};
+    // rebuilt = 32'h01234567
+
+  LITTLE-ENDIAN (reverse byte order):
+    {<<byte{bytes}} = h;
+    // bytes = {8'h67, 8'h45, 8'h23, 8'h01}
+
+  STRUCT <-> BYTE ARRAY (packet serialization):
+    typedef struct packed { logic [7:0] addr; logic [7:0] data; } pkt_s;
+    pkt_s p = '{addr: 8'hAB, data: 8'hCD};
+    byte stream[];
+    stream = {>> {p}};           // serialize struct to bytes
+    {>> {p}} = stream;           // deserialize bytes back to struct
+
+  CONVERT BETWEEN QUEUE TYPES:
+    byte byte_q[$] = {8'h01, 8'h02, 8'h03, 8'h04};
+    int  word_q[$];
+    word_q = {>> {byte_q}};      // pack 4 bytes into 1 int
+
+  COMMON PITFALL:
+    [256] means [0:255], NOT [255:0]
+    Streaming to/from arrays with different dimension directions
+    can scramble the order. Be careful with subscript directions!
+
+
+================================================================================
+16. ENUMERATED TYPES (Section 2.13)
+================================================================================
+
+  Named constants — cleaner than `define or magic numbers.
+  Convention: suffix _e for enum type names.
+
+  DECLARATION (always use typedef!):
+    typedef enum logic [2:0] {
+        IDLE    = 3'b000,
+        FETCH   = 3'b001,
+        DECODE  = 3'b010,
+        EXECUTE = 3'b011,
+        DONE    = 3'b100
+    } state_e;
+
+    state_e current, next_state;
+    current = IDLE;
+
+  WITHOUT EXPLICIT VALUES (auto-increment from 0):
+    typedef enum { RED, GREEN, BLUE } color_e;
+    // RED=0, GREEN=1, BLUE=2
+
+  ★ ALWAYS DEFINE A VALUE FOR 0! ★
+    typedef enum { FIRST=1, SECOND=2 } bad_e;  // BAD!
+    bad_e x;      // x = 0 — not FIRST or SECOND! Silent bug.
+
+    typedef enum { NONE=0, FIRST=1, SECOND=2 } good_e; // GOOD!
+
+  .name() — GET STRING REPRESENTATION:
+    $display("State: %s", current.name());    // "IDLE"
+
+  NAVIGATION METHODS:
+    current.first()              // first member (IDLE)
+    current.last()               // last member (DONE)
+    current.next()               // next member
+    current.next(2)              // skip 2 ahead
+    current.prev()               // previous member
+    current.prev(3)              // skip 3 back
+    // next() and prev() WRAP AROUND at boundaries!
+
+  ITERATING ALL VALUES (use do..while, NOT for):
+    state_e s = s.first();
+    do begin
+        $display("%s = %0d", s.name(), s);
+        s = s.next();
+    end while (s != s.first());  // stops when it wraps
+
+    // WARNING: for loop with enum variable = INFINITE LOOP!
+    // next() always returns a valid value, so loop never exits.
+
+  TYPE CONVERSION:
+    int x = current;             // enum -> int: IMPLICIT (always OK)
+    // current = 3;              // int -> enum: COMPILE ERROR!
+    current = state_e'(3);       // static cast (no checking)
+    $cast(current, 3);           // dynamic cast (with checking)
+
+  SCOPING:
+    Enum constants (IDLE, FETCH, etc.) follow VARIABLE scoping rules.
+    If you use the same name in two enums, they must be in different
+    scopes (modules, packages, classes, functions).
+
+
+================================================================================
+17. CONSTANTS (Section 2.14)
+================================================================================
+
+  VERILOG MACROS (global text substitution):
+    `define BUS_WIDTH 32
+    `define DATA_TYPE logic [`BUS_WIDTH-1:0]
+    // Pros: global, works for bit-fields and type definitions
+    // Cons: global scope causes conflicts, requires ` prefix
+
+  PARAMETERS (can be overridden):
+    parameter int WIDTH = 8;
+    parameter real PI = 3.14159;
+    // Can be overridden when instantiating a module
+
+  LOCALPARAM (cannot be overridden):
+    localparam int DEPTH = 2**WIDTH;
+    // Derived constants that shouldn't change
+
+  CONST (run-time constant):
+    const string HEADER = "=== TEST START ===";
+    // Assigned once when block is entered, then immutable
+
+  RECOMMENDATION:
+    Use localparam in packages instead of `define for most constants.
+    This gives you proper scoping without global name pollution.
+
+
+================================================================================
+18. STRINGS (Section 2.15)
+================================================================================
+
+  Variable-length, dynamically allocated. No null terminator.
+  Individual characters are type byte.
+
+  DECLARATION AND ASSIGNMENT:
+    string name = "Yuval";
+    string greeting;
+
+  CONCATENATION:
+    greeting = {name, " - Hello!"};   // curly braces
+
+  METHODS:
+    name.len()                   // 5 — string length
+    name.toupper()               // "YUVAL" — uppercase copy
+    name.tolower()               // "yuval" — lowercase copy
+    name.getc(0)                 // 'Y' — char at index (returns byte)
+    name.putc(0, "Z")            // name becomes "Zuval" — modify char
+    name.substr(0, 2)            // "Yuv" — substring (inclusive both ends)
+
+  $sformatf — RETURNS A FORMATTED STRING (extremely useful!):
+    string msg = $sformatf("Error at addr 0x%0h, time %0t", addr, $time);
+    $display(msg);
+    // Much better than old $sformat which needs a temp variable
+
+  COMPARISON:
+    if (s1 == s2)                // equality: returns 1 or 0
+    s1.compare(s2)               // like C strcmp: returns -1, 0, or +1
+                                 //   -1: s1 < s2
+                                 //    0: s1 == s2
+                                 //   +1: s1 > s2
+
+  NOTE: $psprintf() does the same as $sformatf() but is non-standard
+  (not in LRM). Most vendors support it, but use $sformatf() instead.
+
+
+================================================================================
+19. EXPRESSION WIDTH PITFALLS (Section 2.16)
+================================================================================
+
+  One of the biggest sources of bugs in Verilog/SystemVerilog!
+  The width of an expression depends on its CONTEXT.
+
+  THE PROBLEM:
+    bit a = 1'b1;
+    bit b = 1'b1;
+    $display(a + b);             // 0! (1-bit + 1-bit = 1-bit overflow)
+
+  FIX 1 — Assign to wider variable:
+    bit [7:0] c;
+    c = a + b;                   // 2 (8-bit context forces wider calc)
+
+  FIX 2 — Cast to wider type:
+    $display(2'(a) + b);         // 2 (cast a to 2 bits)
+
+  FIX 3 — Add wider zero:
+    $display(a + b + 2'b0);      // 2 (2'b0 forces 2-bit minimum width)
+
+  GENERAL RULE:
+    SystemVerilog uses enough precision to avoid overflow when it
+    can detect the context:
+    - Addition of 8-bit values: uses 9-bit precision
+    - Multiplication of 8-bit values: uses 16-bit precision
+    BUT when context is only 1-bit (like standalone bit variables),
+    it doesn't extend. Always be explicit about widths!
+
+
+================================================================================
+20. SCOREBOARD PATTERN — PUTTING IT ALL TOGETHER
+================================================================================
+
+  The fundamental verification pattern. You'll use this EVERYWHERE.
+
+  CONCEPT:
+    1. Before/when DUT processes a transaction, add EXPECTED result to scoreboard
+    2. When DUT produces output, SEARCH scoreboard for matching expected
+    3. If found: compare data, remove from scoreboard → PASS
+    4. If not found → ERROR (unexpected output)
+    5. At end of test: scoreboard should be empty (all expected received)
+
+  WITH STRUCT + ARRAY LOCATOR METHODS:
+    typedef struct { int addr; int data; } packet_t;
+    packet_t sb[$];                        // scoreboard queue
+
+    // Producer: add expected
+    sb.push_back('{addr: 32'hA000, data: 42});
+    sb.push_back('{addr: 32'hB000, data: 99});
+
+    // Checker: verify received
+    task check_packet(int rx_addr, int rx_data);
+        int idx[$] = sb.find_index with (item.addr == rx_addr);
+
+        if (idx.size() == 0) begin
+            $error("Unexpected packet at addr 0x%0h", rx_addr);
+        end else if (idx.size() == 1) begin
+            if (sb[idx[0]].data != rx_data)
+                $error("Data mismatch: expected %0d, got %0d",
+                    sb[idx[0]].data, rx_data);
+            else
+                $display("PASS: addr=0x%0h data=%0d", rx_addr, rx_data);
+            sb.delete(idx[0]);             // remove matched entry
+        end else begin
+            $warning("Multiple matches for addr 0x%0h", rx_addr);
+        end
+    endtask
+
+    // End-of-test check:
+    final begin
+        if (sb.size() > 0)
+            $error("%0d packets never received!", sb.size());
+    end
+
+  SIMPLE VERSION (parallel queues, no structs):
+    int sb_addr[$], sb_data[$];
+
+    // Add expected:
+    sb_addr.push_back(32'hA000);
+    sb_data.push_back(42);
+
+    // Check received:
+    foreach (sb_addr[i]) begin
+        if (sb_addr[i] == rx_addr) begin
+            assert(sb_data[i] == rx_data);
+            sb_addr.delete(i);
+            sb_data.delete(i);
+            break;
+        end
+    end
+
+
+================================================================================
+  QUICK REFERENCE TABLE — WHEN TO USE WHAT
+================================================================================
+
+  ┌────────────────────────────┬─────────────────────┐
+  │ Situation                  │ Use This            │
+  ├────────────────────────────┼─────────────────────┤
+  │ DUT signal/port            │ logic               │
+  │ Loop counter, size         │ int                 │
+  │ Flag, enable               │ bit                 │
+  │ Fixed-size buffer          │ Fixed array         │
+  │ Variable-size transactions │ Dynamic array       │
+  │ Scoreboard, FIFO          │ Queue [$]           │
+  │ Sparse memory model        │ Associative [int]   │
+  │ Hash/dictionary lookup     │ Associative [string]│
+  │ Group signals (RTL)        │ struct (packed)     │
+  │ Group data (testbench)     │ class (Chapter 5)   │
+  │ State machines, opcodes    │ enum                │
+  │ Shared definitions         │ package             │
+  │ Reusable type names        │ typedef             │
+  │ Named constant             │ localparam          │
+  │ Run-time constant          │ const               │
+  └────────────────────────────┴─────────────────────┘
+
+
+================================================================================
+21. INITIALIZATION & METHODS — COMPLETE REFERENCE BY TYPE
+================================================================================
+
+  Every data type, how to declare it, how to initialize it, and every
+  method/operation it supports.
+
+  ─── SCALARS ───────────────────────────────────────────────────────
+
+    // 4-state (can hold X/Z)
+    logic             flag;                  // default = X
+    logic             flag = 1'b0;
+    logic [7:0]       data = 8'hFF;
+    logic [7:0]       data = '0;             // all zeros
+    logic [7:0]       data = '1;             // all ones
+    logic [7:0]       data = 'x;             // all X
+
+    // 2-state (0/1 only — no X/Z)
+    bit               b = 1;                 // default = 0
+    bit [7:0]         b = 8'hAB;
+    byte              b = -1;                // 8-bit SIGNED, default = 0
+    byte              b = 8'sd127;           // signed literal
+    shortint          s = -100;              // 16-bit signed
+    int               i = 42;               // 32-bit signed
+    longint           l = 64'd999_999_999;  // 64-bit signed
+    real              r = 3.14;             // 64-bit floating point
+    string            s = "hello";          // dynamic string
+
+    // Unsigned equivalents (use typedef):
+    typedef bit [7:0]  ubyte_t;              // unsigned 8-bit
+    typedef bit [31:0] uint_t;               // unsigned 32-bit
+
+  ─── FIXED-SIZE ARRAYS ─────────────────────────────────────────────
+
+    DECLARE + INIT:
+      int arr[5];                            // default all 0
+      int arr[5] = '{0, 1, 2, 3, 4};        // explicit values
+      int arr[5] = '{default: -1};           // all elements = -1
+      int arr[5] = '{5{7}};                  // all elements = 7
+      int matrix[2][3] = '{ '{1,2,3}, '{4,5,6} };
+
+    METHODS / OPERATIONS:
+      $size(arr)              // number of elements (5)
+      $left(arr)              // left bound (0)
+      $right(arr)             // right bound (4)
+      $low(arr)               // lowest index (0)
+      $high(arr)              // highest index (4)
+      $dimensions(arr)        // number of dimensions (1)
+      arr = other_arr;        // aggregate copy (same size)
+      arr == other_arr        // aggregate compare (== and != only)
+
+    ARRAY METHODS (require xsim / commercial sim):
+      arr.sum()               // sum of all elements
+      arr.product()           // product of all elements
+      arr.xor() / .and() / .or()
+      arr.min()               // returns queue with min value
+      arr.max()               // returns queue with max value
+      arr.unique()            // returns queue of unique values
+      arr.find with (item > 5)
+      arr.find_index with (item > 5)
+      arr.find_first with (item > 5)
+      arr.find_last with (item > 5)
+      arr.find_first_index with (item > 5)
+      arr.find_last_index with (item > 5)
+      arr.sort()              // ascending, in-place
+      arr.rsort()             // descending, in-place
+      arr.reverse()           // reverse order, in-place
+      arr.shuffle()           // randomize order, in-place
+
+    NOTE: locator methods (min, max, find, unique) return a QUEUE
+    whose element type MATCHES the source array:
+      int arr[5];
+      int result[$] = arr.min();       // OK: int -> int
+      // byte result[$] = arr.min();   // ERROR: type mismatch!
+      // EXCEPT find_index — always returns int[$]:
+      int idx[$] = arr.find_index with (item > 5);
+
+  ─── DYNAMIC ARRAYS ────────────────────────────────────────────────
+
+    DECLARE + INIT:
+      int dyn[];                             // empty (size 0)
+      int dyn[] = '{1, 2, 3};               // SV counts = 3 elements
+      int dyn[] = new[5];                    // allocate 5 (all 0)
+
+    METHODS:
+      dyn.size()              // current number of elements
+      dyn = new[10];          // allocate 10, OLD VALUES LOST
+      dyn = new[10](dyn);    // resize to 10, KEEP old values
+      dyn.delete();           // free memory, size becomes 0
+
+    ARRAY METHODS: same as fixed-size arrays (sum, min, find, sort, etc.)
+
+    COPY:
+      int fixed[3] = '{1,2,3};
+      int dyn[];
+      dyn = fixed;            // auto-allocate + copy
+      dyn = new[3](fixed);    // same thing, explicit
+
+  ─── QUEUES ────────────────────────────────────────────────────────
+
+    DECLARE + INIT:
+      int    q[$];                           // empty queue (most common)
+      int    q[$] = '{1, 2, 3};             // initialized with 3 elements
+      byte   q[$] = '{2, -1, 127};          // byte queue (SIGNED!)
+      string q[$] = '{"hello", "world"};    // string queue
+
+    METHODS:
+      q.size()                // number of elements
+      q.push_back(val)        // append to end           O(1)
+      q.push_front(val)       // prepend to front        O(1)
+      q.pop_back()            // remove & return last    O(1)
+      q.pop_front()           // remove & return first   O(1)
+      q.insert(idx, val)      // insert at index         O(n)
+      q.delete(idx)           // remove by index         O(n)
+      q.delete()              // remove ALL elements     O(1)
+
+    CONCATENATION (alternative to push/pop):
+      q = {q, 99};            // append 99
+      q = {99, q};            // prepend 99
+      q = {q[0:1], 15, q[2:$]};  // insert 15 at position 2
+
+    ARRAY METHODS: same as fixed (sum, min, find, sort, etc.)
+
+    IMPORTANT — RETURN TYPE MUST MATCH:
+      byte q[$] = '{2, -1, 127};
+      byte res[$];                  // MUST be byte, not int!
+      res = q.min();                // '{-1}
+      res = q.max();                // '{127}
+      res = q.find with (item > 0); // '{2, 127}
+      int idx[$];                   // find_index always returns int[$]
+      idx = q.find_index with (item < 0);  // '{1}
+
+  ─── ASSOCIATIVE ARRAYS ───────────────────────────────────────────
+
+    DECLARE + INIT:
+      int mem[int];                          // int-indexed, starts empty
+      int lookup[string];                    // string-indexed
+      bit [23:0] sparse[bit[19:0]];          // custom index width
+      int aa[int] = '{0: 100, 5: 200};       // literal initialization
+
+    METHODS:
+      mem.num()               // number of stored entries (same as size)
+      mem.size()              // same as num()
+      mem.exists(key)         // 1 if key exists, 0 if not
+      mem.delete(key)         // remove single entry
+      mem.delete()            // remove ALL entries
+      mem.first(var)          // put first key into var, returns 1/0
+      mem.last(var)           // put last key into var, returns 1/0
+      mem.next(var)           // put next key into var, returns 1/0
+      mem.prev(var)           // put prev key into var, returns 1/0
+
+    ITERATION:
+      foreach (mem[key])                     // visits only stored entries
+          $display("mem[%0d] = %0d", key, mem[key]);
+
+      // Manual traversal:
+      int k;
+      if (mem.first(k)) do
+          $display("mem[%0d] = %0d", k, mem[k]);
+      while (mem.next(k));
+
+    NOTE: Associative arrays can NOT be sorted (sort/rsort/shuffle).
+          But locator methods (find, min, max) DO work.
+
+  ─── ENUMS ─────────────────────────────────────────────────────────
+
+    DECLARE + INIT:
+      typedef enum logic [2:0] {IDLE, RUN, DONE} state_e;
+      state_e s;                             // default = IDLE (0)
+      state_e s = RUN;                       // explicit
+
+    METHODS:
+      s.name()                // "IDLE" — string name
+      s.first()               // first enum member (IDLE)
+      s.last()                // last enum member (DONE)
+      s.next()                // next member (wraps around)
+      s.next(N)               // skip N forward
+      s.prev()                // previous member (wraps around)
+      s.prev(N)               // skip N backward
+      s.num()                 // number of members (3)
+
+    CONVERSION:
+      int i = s;              // enum -> int: implicit OK
+      s = state_e'(2);        // int -> enum: static cast (no check)
+      $cast(s, 2);            // int -> enum: dynamic cast (with check)
+
+  ─── STRINGS ───────────────────────────────────────────────────────
+
+    DECLARE + INIT:
+      string s;                              // empty ""
+      string s = "hello";
+      string s = {"hello", " ", "world"};    // concatenation
+
+    METHODS:
+      s.len()                 // length (5 for "hello")
+      s.toupper()             // "HELLO" — returns new string
+      s.tolower()             // "hello" — returns new string
+      s.getc(idx)             // char at index (returns byte)
+      s.putc(idx, c)          // replace char at index
+      s.substr(lo, hi)        // substring (inclusive both ends)
+      s.compare(other)        // -1/0/+1 like C strcmp
+      s.icompare(other)       // case-insensitive compare
+      s.atoi()                // string -> integer ("42" -> 42)
+      s.atoreal()             // string -> real ("3.14" -> 3.14)
+      s.atohex()              // hex string -> int ("FF" -> 255)
+      s.atobin()              // binary string -> int ("1010" -> 10)
+      s.atooct()              // octal string -> int ("77" -> 63)
+
+    FORMATTING:
+      string msg = $sformatf("addr=0x%0h data=%0d", addr, data);
+
+  ─── STRUCTS ───────────────────────────────────────────────────────
+
+    DECLARE + INIT:
+      typedef struct {
+          int addr;
+          int data;
+      } packet_t;
+
+      packet_t p;                            // default: all fields = 0
+      packet_t p = '{addr: 32'hA000, data: 42};    // named fields
+      packet_t p = '{32'hA000, 42};                 // positional
+      packet_t p = '{default: 0};                   // all fields = 0
+
+    PACKED STRUCT:
+      typedef struct packed {
+          logic [3:0] opcode;
+          logic [3:0] operand;
+      } instr_t;
+
+      instr_t i = 8'hA5;             // assign as single 8-bit value
+      i.opcode = 4'hB;               // OR access fields
+
+    METHODS: none — structs have no built-in methods.
+      Use field access (p.addr, p.data) and aggregate assign/compare.
+
+    QUEUE OF STRUCTS (scoreboard pattern):
+      packet_t sb[$];
+      sb.push_back('{addr: 32'hA000, data: 42});
+      sb.sort with (item.addr);       // sort by field
+
+
+================================================================================
+  END OF CHEATSHEET
+  Next: Chapter 5 (Classes) — where these data types become class members
+  and you add OOP: methods, inheritance, polymorphism, randomization.
+================================================================================
