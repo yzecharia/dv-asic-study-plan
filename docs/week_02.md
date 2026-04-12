@@ -213,7 +213,8 @@ Write a testbench that:
 ## Checklist
 
 ### Verification Track
-- [ ] Read Spear ch.8 §§ 8.6–8.10 (advanced OOP: $cast, parameterized classes, callbacks)
+- [x] Read Spear ch.8 §§ 8.6–8.8 (abstract classes, $cast, callbacks, parameterized classes)
+- [ ] Read Spear ch.8 §§ 8.9–8.10 (static members with inheritance, callbacks advanced)
 - [ ] Read Spear ch.6 (Randomization)
 - [ ] Skimmed Spear ch.7 (Threads & IPC)
 - [ ] Watched Verification Academy constrained random module
@@ -226,8 +227,8 @@ Write a testbench that:
 - [ ] Can answer all self-check questions
 
 ### Design Track
-- [ ] Reviewed Pong Chu ch.4-5 (sequential circuits, FSMs)
+- [x] Reviewed Pong Chu ch.4-5 (sequential circuits, FSMs)
 - [ ] Read Cliff Cummings FSM paper
 - [ ] Read Cliff Cummings nonblocking assignments paper
-- [ ] Completed Design HW1 (Parameterized counter)
-- [ ] Completed Design HW2 (Synchronous FIFO)
+- [x] Completed Design HW1 (Parameterized counter)
+- [x] Completed Design HW2 (Synchronous FIFO)
