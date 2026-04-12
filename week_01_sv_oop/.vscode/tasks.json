@@ -4,7 +4,7 @@
     {
       "label": "0a. Check Syntax (RTL Only)",
       "type": "shell",
-      "command": "iverilog -g2012 -t null rtl/*.sv",
+      "command": "iverilog -g2012 -t null $(find rtl -name '*.sv')",
       "group": "build",
       "presentation": { "clear": true, "reveal": "silent" },
       "problemMatcher": {
@@ -21,7 +21,7 @@
     {
       "label": "0b. Check Syntax (RTL + TB)",
       "type": "shell",
-      "command": "MOD=\"${fileBasenameNoExtension}\"; MOD=\"${MOD%_tb}\"; iverilog -g2012 -t null rtl/*.sv tb/${MOD}_tb.sv",
+      "command": "MOD=\"${fileBasenameNoExtension}\"; MOD=\"${MOD%_tb}\"; iverilog -g2012 -t null $(find rtl -name '*.sv') tb/${MOD}_tb.sv",
       "group": "build",
       "presentation": { "clear": true, "reveal": "silent" },
       "problemMatcher": {
@@ -38,7 +38,7 @@
     {
       "label": "1. Compile for Simulation (Icarus)",
       "type": "shell",
-      "command": "MOD=\"${fileBasenameNoExtension}\"; MOD=\"${MOD%_tb}\"; mkdir -p build waves && iverilog -g2012 -o build/${MOD}.out rtl/*.sv tb/${MOD}_tb.sv",
+      "command": "MOD=\"${fileBasenameNoExtension}\"; MOD=\"${MOD%_tb}\"; mkdir -p build waves && iverilog -g2012 -o build/${MOD}.out $(find rtl -name '*.sv') tb/${MOD}_tb.sv",
       "group": "build",
       "presentation": { "clear": true, "group": "sim" },
       "problemMatcher": {
@@ -69,7 +69,7 @@
     {
       "label": "4. Generate JSON (Yosys)",
       "type": "shell",
-      "command": "MOD=\"${fileBasenameNoExtension}\"; MOD=\"${MOD%_tb}\"; mkdir -p build .yosys_tmp && for f in rtl/*.sv; do sed '/^[[:space:]]*timeunit/d;/^[[:space:]]*timeprecision/d' \"$f\" > \".yosys_tmp/$(basename $f)\"; done && yosys -p \"read_verilog -sv .yosys_tmp/*.sv; prep -top ${MOD}; write_json build/${MOD}.json\" && rm -rf .yosys_tmp",
+      "command": "MOD=\"${fileBasenameNoExtension}\"; MOD=\"${MOD%_tb}\"; mkdir -p build .yosys_tmp && for f in $(find rtl -name '*.sv'); do sed '/^[[:space:]]*timeunit/d;/^[[:space:]]*timeprecision/d' \"$f\" > \".yosys_tmp/$(basename $f)\"; done && yosys -p \"read_verilog -sv .yosys_tmp/*.sv; prep -top ${MOD}; write_json build/${MOD}.json\" && rm -rf .yosys_tmp",
       "dependsOn": "0a. Check Syntax (RTL Only)",
       "presentation": { "clear": true, "group": "rtl" },
       "problemMatcher": {
@@ -219,6 +219,30 @@
       "label": "🔬 FLOW: XSIM RTL+TB (Full SV — RTL + TB via Vivado)",
       "dependsOn": [
         "X2. xsim: Compile + Run RTL + TB"
+      ],
+      "group": "build"
+    },
+    {
+      "label": "X3. xsim: Compile RTL Only",
+      "type": "shell",
+      "command": "${workspaceFolder}/../run_xsim.sh ${file}",
+      "group": "build",
+      "presentation": { "clear": true, "group": "xsim" },
+      "problemMatcher": {
+        "owner": "xsim",
+        "fileLocation": ["relative", "${workspaceFolder}"],
+        "pattern": {
+          "regexp": "^ERROR:\\s+\\[\\w+ \\d+-\\d+\\]\\s+(.*?)\\s+\\[(.+?):(\\d+)\\]",
+          "message": 1,
+          "file": 2,
+          "line": 3
+        }
+      }
+    },
+    {
+      "label": "🔬 FLOW: XSIM RTL (Compile + Elaborate RTL via Vivado)",
+      "dependsOn": [
+        "X3. xsim: Compile RTL Only"
       ],
       "group": "build"
     }
