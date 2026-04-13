@@ -213,8 +213,7 @@ Write a testbench that:
 ## Checklist
 
 ### Verification Track
-- [x] Read Spear ch.8 §§ 8.6–8.8 (abstract classes, $cast, callbacks, parameterized classes)
-- [ ] Read Spear ch.8 §§ 8.9–8.10 (static members with inheritance, callbacks advanced)
+- [x] Read Spear ch.8 §§ 8.6–8.10 (abstract classes, $cast, callbacks, parameterized classes, static members)
 - [ ] Read Spear ch.6 (Randomization)
 - [ ] Skimmed Spear ch.7 (Threads & IPC)
 - [ ] Watched Verification Academy constrained random module
