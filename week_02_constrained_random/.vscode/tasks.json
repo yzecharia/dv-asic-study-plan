@@ -177,7 +177,7 @@
     {
       "label": "X1. xsim: Compile + Run TB Only",
       "type": "shell",
-      "command": "${workspaceFolder}/../run_xsim_auto.sh ${file}",
+      "command": "SV_SEED=${input:svSeed} ${workspaceFolder}/../run_xsim_auto.sh ${file}",
       "group": "build",
       "presentation": { "clear": true, "group": "xsim" },
       "problemMatcher": {
@@ -194,7 +194,7 @@
     {
       "label": "X2. xsim: Compile + Run RTL + TB",
       "type": "shell",
-      "command": "MOD=\"${fileBasenameNoExtension}\"; MOD=\"${MOD%_tb}\"; ${workspaceFolder}/../run_xsim.sh -top ${MOD}_tb rtl/${MOD}.sv tb/${MOD}_tb.sv",
+      "command": "MOD=\"${fileBasenameNoExtension}\"; MOD=\"${MOD%_tb}\"; SV_SEED=${input:svSeed} ${workspaceFolder}/../run_xsim.sh -top ${MOD}_tb rtl/${MOD}.sv tb/${MOD}_tb.sv",
       "group": "build",
       "presentation": { "clear": true, "group": "xsim" },
       "problemMatcher": {
@@ -245,6 +245,14 @@
         "X3. xsim: Compile RTL Only"
       ],
       "group": "build"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "svSeed",
+      "type": "promptString",
+      "description": "SV random seed (leave empty for default)",
+      "default": ""
     }
   ]
 }

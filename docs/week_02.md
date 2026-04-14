@@ -215,7 +215,7 @@ Write a testbench that:
 ### Verification Track
 - [x] Read Spear ch.8 §§ 8.6–8.10 (abstract classes, $cast, callbacks, parameterized classes, static members)
 - [x] Read Spear ch.6 (Randomization)
-- [ ] Skimmed Spear ch.7 (Threads & IPC)
+- [x] Skimmed Spear ch.7 (Threads & IPC)
 - [ ] Watched Verification Academy constrained random module
 - [ ] Watched VA "Design Patterns" OOP lessons
 - [ ] Read ChipVerify randomization + constraints pages
