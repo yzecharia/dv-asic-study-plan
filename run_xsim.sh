@@ -100,7 +100,12 @@ for f in "${REL_FILES[@]}"; do
     XVLOG_CMDS+="xvlog --sv /work/$f && "
 done
 
-SIM_CMD="${XVLOG_CMDS}xelab ${TOP_MODULE} -s sim --debug off && xsim sim --runall; EXIT=\$?; rm -rf /work/xsim.dir /work/xvlog.pb /work/xvlog.log /work/xelab.pb /work/xelab.log /work/xsim.log /work/xsim.jou /work/.Xil 2>/dev/null; exit \$EXIT"
+SEED_FLAG=""
+if [[ -n "${SV_SEED:-}" ]]; then
+    SEED_FLAG=" -sv_seed ${SV_SEED}"
+fi
+
+SIM_CMD="${XVLOG_CMDS}xelab ${TOP_MODULE} -s sim --debug off && xsim sim --runall${SEED_FLAG}; EXIT=\$?; rm -rf /work/xsim.dir /work/xvlog.pb /work/xvlog.log /work/xelab.pb /work/xelab.log /work/xsim.log /work/xsim.jou /work/.Xil 2>/dev/null; exit \$EXIT"
 
 # ── Print info ─────────────────────────────────────────────────────────────
 echo -e "${CYAN}╔══════════════════════════════════════════════════════╗${NC}"
