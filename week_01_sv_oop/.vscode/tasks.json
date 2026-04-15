@@ -177,7 +177,7 @@
     {
       "label": "X1. xsim: Compile + Run TB Only",
       "type": "shell",
-      "command": "${workspaceFolder}/../run_xsim_auto.sh ${file}",
+      "command": "SV_SEED=${input:svSeed} ${workspaceFolder}/../run_xsim_auto.sh ${file}",
       "group": "build",
       "presentation": { "clear": true, "group": "xsim" },
       "problemMatcher": {
@@ -194,7 +194,7 @@
     {
       "label": "X2. xsim: Compile + Run RTL + TB",
       "type": "shell",
-      "command": "MOD=\"${fileBasenameNoExtension}\"; MOD=\"${MOD%_tb}\"; ${workspaceFolder}/../run_xsim.sh -top ${MOD}_tb rtl/${MOD}.sv tb/${MOD}_tb.sv",
+      "command": "MOD=\"${fileBasenameNoExtension}\"; MOD=\"${MOD%_tb}\"; SV_SEED=${input:svSeed} ${workspaceFolder}/../run_xsim.sh -top ${MOD}_tb rtl/${MOD}.sv tb/${MOD}_tb.sv",
       "group": "build",
       "presentation": { "clear": true, "group": "xsim" },
       "problemMatcher": {
@@ -245,6 +245,59 @@
         "X3. xsim: Compile RTL Only"
       ],
       "group": "build"
+    },
+    {
+      "label": "Y1. Yosys: Synthesize + Optimize (FSM)",
+      "type": "shell",
+      "command": "MOD=\"${fileBasenameNoExtension}\"; MOD=\"${MOD%_tb}\"; mkdir -p build .yosys_tmp && for f in $(find rtl -name '*.sv'); do sed '/^[[:space:]]*timeunit/d;/^[[:space:]]*timeprecision/d' \"$f\" > \".yosys_tmp/$(basename $f)\"; done && yosys -p \"read_verilog -sv .yosys_tmp/*.sv; hierarchy -top ${MOD}; proc; opt; fsm_detect; fsm_extract; fsm_opt; fsm_recode -encoding ${input:fsmEncoding}; opt; clean; stat; write_json build/${MOD}_opt.json\" && rm -rf .yosys_tmp",
+      "group": "build",
+      "presentation": { "clear": true, "group": "synth" },
+      "problemMatcher": {
+        "owner": "yosys",
+        "fileLocation": ["relative", "${workspaceFolder}"],
+        "pattern": {
+          "regexp": "^ERROR:\\s+(.*\\.sv):(\\d+):\\s+(.*)$",
+          "file": 1,
+          "line": 2,
+          "message": 3
+        }
+      }
+    },
+    {
+      "label": "Y2. Generate Optimized SVG",
+      "type": "shell",
+      "command": "MOD=\"${fileBasenameNoExtension}\"; MOD=\"${MOD%_tb}\"; mkdir -p schematics && netlistsvg build/${MOD}_opt.json -o schematics/${MOD}_opt.svg && sed -i '' 's/<svg /<svg style=\"background:white\" /' schematics/${MOD}_opt.svg",
+      "dependsOn": "Y1. Yosys: Synthesize + Optimize (FSM)",
+      "presentation": { "group": "synth" }
+    },
+    {
+      "label": "Y3. Open Optimized Schematic",
+      "type": "shell",
+      "command": "MOD=\"${fileBasenameNoExtension}\"; MOD=\"${MOD%_tb}\"; open schematics/${MOD}_opt.svg",
+      "dependsOn": "Y2. Generate Optimized SVG",
+      "presentation": { "reveal": "silent" }
+    },
+    {
+      "label": "⚡ FLOW: SYNTH (Yosys Optimize + Schematic)",
+      "dependsOn": [
+        "Y3. Open Optimized Schematic"
+      ],
+      "group": "build"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "svSeed",
+      "type": "promptString",
+      "description": "SV random seed (leave empty for default)",
+      "default": ""
+    },
+    {
+      "id": "fsmEncoding",
+      "type": "pickString",
+      "description": "FSM state encoding",
+      "options": ["auto", "one-hot", "binary", "none"],
+      "default": "auto"
     }
   ]
 }
