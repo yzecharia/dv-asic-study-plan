@@ -216,18 +216,18 @@ Write a testbench that:
 - [x] Read Spear ch.8 §§ 8.6–8.10 (abstract classes, $cast, callbacks, parameterized classes, static members)
 - [x] Read Spear ch.6 (Randomization)
 - [x] Skimmed Spear ch.7 (Threads & IPC)
-- [ ] Watched Verification Academy constrained random module
-- [ ] Watched VA "Design Patterns" OOP lessons
-- [ ] Read ChipVerify randomization + constraints pages
-- [ ] Completed HW1 (10 constraint exercises)
-- [ ] Completed HW2 (Packet generator with complex constraints)
-- [ ] Completed HW3 (FIFO transaction generator)
-- [ ] Completed HW4 (Pre/post randomize hooks)
-- [ ] Can answer all self-check questions
+- [x] Watched Verification Academy constrained random module
+- [x] Watched VA "Design Patterns" OOP lessons
+- [x] Read ChipVerify randomization + constraints pages
+- [x] Completed HW1 (10 constraint exercises)
+- [x] Completed HW2 (Packet generator with complex constraints)
+- [x] Completed HW3 (FIFO transaction generator)
+- [x] Completed HW4 (Pre/post randomize hooks)
+- [x] Can answer all self-check questions
 
 ### Design Track
 - [x] Reviewed Pong Chu ch.4-5 (sequential circuits, FSMs)
-- [ ] Read Cliff Cummings FSM paper
-- [ ] Read Cliff Cummings nonblocking assignments paper
+- [x] Read Cliff Cummings FSM paper
+- [x] Read Cliff Cummings nonblocking assignments paper
 - [x] Completed Design HW1 (Parameterized counter)
 - [x] Completed Design HW2 (Synchronous FIFO)
