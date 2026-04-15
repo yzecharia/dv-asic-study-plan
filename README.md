@@ -15,8 +15,8 @@ I am doing this on my own as an autodidact alongside my job search, building in 
 | Week | Verification Track | Design Track | Status |
 |------|-------------------|--------------|--------|
 | 1 | SV OOP (Classes, Inheritance, Polymorphism) | — | Done |
-| 2 | Constrained Random Verification | Counter, Sync FIFO, FSM coding | In progress |
-| 3 | Functional Coverage & SVA | Traffic Light FSM, Handshake protocol | Not started |
+| 2 | Constrained Random Verification | Counter, Sync FIFO, FSM coding | Done |
+| 3 | Functional Coverage & SVA | Traffic Light FSM, Handshake protocol | In progress |
 | 4 | UVM Architecture & Components | ALU DUT, SV Interfaces | Not started |
 | 5 | UVM Sequences & Config DB | DUT-to-UVM integration (tb_top) | Not started |
 | 6 | UVM Full Testbench | Register File RTL | Not started |
