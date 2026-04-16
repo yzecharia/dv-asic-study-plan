@@ -230,5 +230,5 @@ Run until 100% coverage. Print final coverage report.
 ### Design Track
 - [x] Read Cummings FSM coding styles paper
 - [x] Completed Design HW1 (Traffic light FSM)
-- [ ] Completed Design HW2 (Valid/ready handshake module)
+- [x] Completed Design HW2 (Valid/ready handshake module)
 - [ ] Used handshake module as DUT for SVA homework (HW3)
