@@ -217,7 +217,7 @@ Run until 100% coverage. Print final coverage report.
 ## Checklist
 
 ### Verification Track
-- [ ] Read Spear ch.9 (Functional Coverage)
+- [x] Read Spear ch.9 (Functional Coverage)
 - [ ] Read an SVA reference (Sutherland handbook OR Cummings papers OR VA+ChipVerify assertion lessons)
 - [ ] Watched Verification Academy coverage + SVA modules
 - [ ] Read ChipVerify covergroup, assertions, concurrent assertions pages
