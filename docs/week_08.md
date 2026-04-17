@@ -13,6 +13,7 @@ Every real CPU is pipelined. Understanding pipeline hazards (data, control, stru
   - Forwarding (bypassing)
   - Stalls (load-use hazard)
   - Control hazards: branch prediction, pipeline flush
+- **Dally & Harting ch.23**: "Pipelines" — pipeline theory, throughput vs latency, pipeline hazards and interlocks. Gives a more general treatment of pipelining beyond just CPUs — applicable to any datapath.
 - **Patterson & Hennessy** (optional, deeper): Chapter 4 "The Processor"
 
 ### Videos
