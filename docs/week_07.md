@@ -19,9 +19,11 @@ You already have `DDCA_RISCV` on your machine — this week you either extend it
 - **Harris & Harris lecture videos** if available from your university
 
 ### Reading (Design Best Practices)
+- **Dally & Harting ch.17**: "Factoring Finite-State Machines" — decomposing complex FSMs into smaller, manageable pieces. Directly applicable to the CPU control unit.
+- **Dally & Harting ch.18**: "Microcode" — microprogrammed control vs hardwired control. Understanding the tradeoff between the two approaches for instruction decoding.
+- **Dally & Harting ch.9**: "Combinational Examples" — worked examples of combinational design including decoders and control logic.
 - **Cliff Cummings** *"Full Case Parallel Case"* — understanding synthesis pragmas for case statements (critical for decoders)
 - **Cliff Cummings** *"Coding And Scripting Techniques for FSM Designs with Synthesis-Optimized, Glitch-Free Outputs"*
-- Review your Pong Chu book chapters on FSMs — the CPU control unit is a complex FSM
 
 ### Reference
 - RISC-V Green Card (instruction reference sheet) — Google "RISC-V reference card PDF"

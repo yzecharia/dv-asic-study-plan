@@ -206,9 +206,16 @@ Make sure transactions flow from monitor through the analysis port to the scoreb
 
 ---
 
-## Design Track: Connect DUT to UVM
+## Design Track: Memory Design & UVM Integration
 
-This week the design track is about integration — connecting your ALU DUT (from Week 4) into the UVM testbench using proper SV interfaces.
+This week has two design focuses: (1) connecting your ALU DUT into UVM, and (2) learning memory design — RAMs, ROMs, and dual-port memories that appear in every chip.
+
+### Reading (Design)
+- **Dally & Harting ch.16**: "Datapath Sequential Logic" — counters, shift registers, LFSRs, FIFOs, and datapath design patterns. Covers the sequential building blocks for memories and arbiters.
+- **Dally & Harting ch.25**: "Memory Systems" — SRAM, DRAM, caches (direct-mapped, set-associative), memory hierarchy. Read this before building the cache HW.
+- **Dally & Harting ch.24**: "Interconnect" — buses, arbitration schemes (fixed-priority, round-robin, weighted), crossbars. Directly relevant to your round-robin arbiter HW.
+- **Cliff Cummings** *"Simulation and Synthesis Techniques for Asynchronous FIFO Design"* (SNUG 2002) — the canonical paper on async FIFO design with Gray code pointers. Read the theory now, build it in Week 6.
+- **ChipVerify**: https://www.chipverify.com/verilog/verilog-single-port-ram — RAM design patterns
 
 ### Design HW1: Top-Level Testbench Module
 Write the `tb_top.sv` that instantiates the DUT, interface, and runs UVM:
@@ -246,6 +253,115 @@ endmodule
 
 This is the standard pattern for every UVM testbench — learn it well.
 
+### Design HW2: True Dual-Port RAM
+Design a dual-port RAM — the core building block inside caches, FIFOs, and register files:
+
+```systemverilog
+module dual_port_ram #(
+    parameter DATA_WIDTH = 8,
+    parameter ADDR_WIDTH = 4,      // 16 entries
+    parameter DEPTH = 2**ADDR_WIDTH
+)(
+    input  logic                  clk,
+    // Port A (read/write)
+    input  logic                  en_a,
+    input  logic                  wr_en_a,
+    input  logic [ADDR_WIDTH-1:0] addr_a,
+    input  logic [DATA_WIDTH-1:0] wr_data_a,
+    output logic [DATA_WIDTH-1:0] rd_data_a,
+    // Port B (read/write)
+    input  logic                  en_b,
+    input  logic                  wr_en_b,
+    input  logic [ADDR_WIDTH-1:0] addr_b,
+    input  logic [DATA_WIDTH-1:0] wr_data_b,
+    output logic [DATA_WIDTH-1:0] rd_data_b
+);
+    // Key behaviors:
+    // - Both ports can read simultaneously from different addresses
+    // - Both ports can write simultaneously to different addresses
+    // - Simultaneous write to SAME address: port A wins (or flag collision)
+    // - Read-during-write to same address: return NEW data (write-first)
+    //
+    // Industry note: this should infer BRAM on FPGAs — use `logic` array,
+    // not `reg`, and follow Xilinx/Intel RAM coding guidelines
+endmodule
+```
+
+Write a testbench:
+1. Write from port A, read from port B (and vice versa)
+2. Simultaneous reads from both ports to different addresses
+3. Write collision: both ports write same address — verify port A wins
+4. Read-during-write: write via A, read same address via B on same cycle
+
+### Design HW3: Round-Robin Arbiter
+Upgrade from Week 3's fixed-priority arbiter to a fair round-robin arbiter:
+
+```systemverilog
+module round_robin_arbiter #(
+    parameter NUM_REQ = 4
+)(
+    input  logic                clk, rst_n,
+    input  logic [NUM_REQ-1:0]  request,
+    output logic [NUM_REQ-1:0]  grant,
+    output logic                grant_valid
+);
+    // Rules:
+    // - After granting request N, the next grant starts searching from N+1
+    // - Wraps around: after request 3, search starts from request 0
+    // - Uses a rotating priority mask to track the "last served" requester
+    //
+    // This is the most common arbiter in real SoCs — bus arbiters, NoC routers,
+    // memory controllers all use variants of round-robin
+endmodule
+```
+
+Write a testbench:
+1. All 4 requests active continuously — verify each gets served in order (0,1,2,3,0,1,...)
+2. Some requests drop out — verify remaining requests still get fair access
+3. Single requester — verify it gets immediate grant every cycle
+4. Add SVA: grant is always one-hot or zero; no starvation (every active request gets served within NUM_REQ cycles)
+
+### Design HW4: Simple Direct-Mapped Cache Structure
+Design the data structure of a direct-mapped cache — you'll use this concept in Week 7-8 CPU work:
+
+```systemverilog
+module direct_mapped_cache #(
+    parameter ADDR_WIDTH  = 32,
+    parameter DATA_WIDTH  = 32,
+    parameter CACHE_LINES = 16,    // number of cache lines
+    parameter LINE_SIZE   = 4      // words per line
+)(
+    input  logic                  clk, rst_n,
+    input  logic                  rd_en,
+    input  logic                  wr_en,
+    input  logic [ADDR_WIDTH-1:0] addr,
+    input  logic [DATA_WIDTH-1:0] wr_data,
+    output logic [DATA_WIDTH-1:0] rd_data,
+    output logic                  hit,
+    output logic                  miss
+);
+    // Structure per cache line:
+    //   [valid] [tag] [data_word_0] [data_word_1] ... [data_word_N]
+    //
+    // Address decomposition:
+    //   [tag | index | offset]
+    //   - offset: selects word within line (log2(LINE_SIZE) bits)
+    //   - index: selects cache line (log2(CACHE_LINES) bits)
+    //   - tag: remaining upper bits
+    //
+    // Hit logic: valid[index] && (tag_store[index] == addr.tag)
+    //
+    // Focus on the READ path and hit/miss detection this week.
+    // Don't worry about write-back/write-through policies — just write-through.
+endmodule
+```
+
+Write a testbench:
+1. Write to address, read it back — verify hit
+2. Read from unloaded address — verify miss
+3. Read from two addresses that map to the same index (conflict miss)
+4. Verify tag comparison logic
+
 ---
 
 ## Checklist
@@ -261,4 +377,9 @@ This is the standard pattern for every UVM testbench — learn it well.
 - [ ] Can answer all self-check questions
 
 ### Design Track
+- [ ] Read Dally ch.16 (datapath sequential logic), ch.24 (interconnect), ch.25 (memory systems)
+- [ ] Read Cummings async FIFO paper (theory — build in Week 6)
 - [ ] Completed Design HW1 (tb_top.sv connecting DUT to UVM via interface)
+- [ ] Completed Design HW2 (True dual-port RAM)
+- [ ] Completed Design HW3 (Round-robin arbiter)
+- [ ] Completed Design HW4 (Direct-mapped cache structure)

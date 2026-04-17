@@ -43,8 +43,11 @@ UVM (Universal Verification Methodology) is the industry standard. Every DV job 
 Starting from Week 4, your design work feeds directly into your UVM testbench. The ALU you build this week is the DUT you'll verify through Weeks 4-6.
 
 ### Reading (Design)
-- **Stuart Sutherland** *"RTL Modeling with SystemVerilog for Simulation and Synthesis"* — chapters on `always_comb`, `always_ff`, `interface` (available as free excerpts online)
+- **Dally & Harting ch.10**: "Arithmetic Circuits" — adders (ripple carry, carry select), subtractors, comparators, multipliers (shift-add). Core chapter for this week's ALU and multiplier HW.
+- **Dally & Harting ch.12**: "Fast Arithmetic Circuits" — carry-lookahead adders, fast multipliers, barrel shifters. Explains the circuits behind your barrel shifter HW.
+- **Dally & Harting ch.13**: "Arithmetic Examples" — worked design examples combining arithmetic blocks.
 - **ChipVerify**: https://www.chipverify.com/systemverilog/systemverilog-interface
+- **Cliff Cummings** *"Synthesis Coding Styles for Efficient Designs"* — how your RTL maps to actual hardware gates
 
 ### Design HW1: ALU DUT
 Design the ALU that your UVM testbench will verify:
@@ -94,6 +97,59 @@ endinterface
 ```
 
 This interface is what your UVM driver and monitor will use via `virtual alu_if` handles passed through `uvm_config_db`.
+
+### Design HW3: Sequential Shift-Add Multiplier
+Design a multiplier that computes the product over multiple cycles — this is how real hardware multipliers work when area is constrained:
+
+```systemverilog
+module shift_add_multiplier #(
+    parameter WIDTH = 8
+)(
+    input  logic                  clk, rst_n,
+    input  logic                  start,
+    input  logic [WIDTH-1:0]      multiplicand,
+    input  logic [WIDTH-1:0]      multiplier,
+    output logic [2*WIDTH-1:0]    product,
+    output logic                  done,
+    output logic                  busy
+);
+    // Algorithm:
+    // 1. Load multiplier into shift register
+    // 2. For each bit of multiplier:
+    //    - If bit is 1, add shifted multiplicand to accumulator
+    //    - Shift multiplicand left by 1
+    //    - Shift multiplier right by 1
+    // 3. After WIDTH cycles, product is ready
+    //
+    // Industry practice: use an FSM (IDLE -> COMPUTE -> DONE)
+    // Bonus: add support for signed multiplication (Booth's algorithm)
+endmodule
+```
+
+Write a testbench:
+- Test corner cases: 0×N, 1×N, N×N, MAX×MAX
+- Compare result against `*` operator for 100 random inputs
+- Verify timing: exactly WIDTH clock cycles to compute
+
+### Design HW4: Barrel Shifter
+Design a single-cycle barrel shifter — used inside ALUs and floating-point units:
+
+```systemverilog
+module barrel_shifter #(
+    parameter WIDTH = 32
+)(
+    input  logic [WIDTH-1:0]         data_in,
+    input  logic [$clog2(WIDTH)-1:0] shift_amount,
+    input  logic [1:0]               shift_type,  // 00=SLL, 01=SRL, 10=SRA
+    output logic [WIDTH-1:0]         data_out
+);
+    // Implement using cascaded MUX layers (log2(WIDTH) stages)
+    // Each stage shifts by 1, 2, 4, 8, 16 positions
+    // SRA: fill with sign bit instead of zero
+endmodule
+```
+
+This is the same structure used in your RISC-V ALU (Week 7). Write a testbench verifying all three shift types with various shift amounts.
 
 ---
 
@@ -255,6 +311,9 @@ Run and verify the override works — you should see "FAST driver running" even 
 - [ ] Can answer all self-check questions
 
 ### Design Track
+- [ ] Read Dally ch.10 (arithmetic circuits) and ch.12 (fast arithmetic / barrel shifter)
 - [ ] Read about SV interfaces and modports
 - [ ] Completed Design HW1 (ALU DUT with registered outputs)
 - [ ] Completed Design HW2 (SV interface with modports + clocking block)
+- [ ] Completed Design HW3 (Sequential shift-add multiplier)
+- [ ] Completed Design HW4 (Barrel shifter)

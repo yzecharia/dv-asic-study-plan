@@ -191,9 +191,17 @@ This simulates real DV work — coverage closure is what you'll spend most of yo
 
 ---
 
-## Design Track: Register File
+## Design Track: Register File, Clock Domain Crossing & Async FIFO
 
-Week 6 HW3 already asks you to design a register file. Here are the industry design guidelines:
+Week 6 has three design focuses: (1) the register file that feeds into your UVM testbench, (2) clock domain crossing — the single most common source of silicon bugs, and (3) the async FIFO — which combines CDC with the FIFO you already know.
+
+### Reading (Design)
+- **Dally & Harting ch.15**: "Timing Constraints" — setup time, hold time, clock skew, timing analysis. Read this before the timing exercise (Design HW4).
+- **Dally & Harting ch.28**: "Metastability and Synchronization Failure" — the physics of metastability, MTBF calculation, why synchronizers work. Essential background for CDC.
+- **Dally & Harting ch.29**: "Synchronizer Design" — 2-FF synchronizers, synchronizer architectures, design guidelines. Directly maps to Design HW2.
+- **Cliff Cummings** *"Clock Domain Crossing (CDC) Design & Verification Techniques Using SystemVerilog"* (SNUG 2008) — **essential reading**. This paper is cited in every CDC interview question. Covers metastability, 2-FF synchronizer, pulse synchronizer, gray code.
+- **Cliff Cummings** *"Simulation and Synthesis Techniques for Asynchronous FIFO Design"* (SNUG 2002) — you read the theory in Week 5, now build it.
+- **ChipVerify**: https://www.chipverify.com/verilog/verilog-clock-domain-crossing
 
 ### Design Notes for the Register File
 - **x0 hardwired to zero** — this is a RISC-V convention; any write to x0 is ignored, reads always return 0
@@ -201,6 +209,99 @@ Week 6 HW3 already asks you to design a register file. Here are the industry des
 - **Write-first behavior**: if you read and write the same register on the same cycle, the read should return the NEW value (forwarding within the register file)
 - **Use `always_ff`** for the write port, **`always_comb`** for read ports
 - This register file will be reused in your RISC-V CPU (Weeks 7-8)
+
+### Design HW1: Register File
+Build the register file as part of verification HW3, but design it as a standalone, well-tested module first. See HW3 verification spec above for the interface.
+
+### Design HW2: 2-FF Synchronizer & Pulse Synchronizer
+These are the fundamental CDC building blocks. Every ASIC has hundreds of them.
+
+```systemverilog
+// Part A: Basic 2-FF synchronizer (for slow-changing signals)
+module sync_2ff #(
+    parameter WIDTH = 1
+)(
+    input  logic             clk_dst,    // destination clock
+    input  logic             rst_n,
+    input  logic [WIDTH-1:0] data_in,    // from source clock domain
+    output logic [WIDTH-1:0] data_out    // synchronized to clk_dst
+);
+    // Two back-to-back flip-flops
+    // The first FF may go metastable — the second FF resolves it
+    // ONLY use for signals that change slowly (level signals, not pulses)
+endmodule
+
+// Part B: Pulse synchronizer (for single-cycle pulses across domains)
+module pulse_sync (
+    input  logic clk_src, clk_dst, rst_n,
+    input  logic pulse_in,    // single-cycle pulse in clk_src domain
+    output logic pulse_out    // single-cycle pulse in clk_dst domain
+);
+    // Method: toggle a flag in source domain, synchronize the toggle to
+    // destination domain, detect edges on the synchronized toggle
+    //
+    // This handles the case where clk_src pulse is too short for clk_dst
+    // to sample directly
+endmodule
+```
+
+Write a testbench with two clock domains (e.g., 100 MHz and 37 MHz — intentionally non-integer ratio):
+1. Drive level signal changes through 2-FF sync, verify they arrive (with 2-cycle latency)
+2. Drive single-cycle pulses through pulse sync, verify each pulse arrives exactly once
+3. Drive pulses very close together — verify none are lost
+
+### Design HW3: Asynchronous FIFO
+The crowning achievement of CDC design. Asked about in nearly every ASIC interview:
+
+```systemverilog
+module async_fifo #(
+    parameter DATA_WIDTH = 8,
+    parameter ADDR_WIDTH = 4    // DEPTH = 2^ADDR_WIDTH (must be power of 2!)
+)(
+    // Write domain
+    input  logic                  wr_clk, wr_rst_n,
+    input  logic                  wr_en,
+    input  logic [DATA_WIDTH-1:0] wr_data,
+    output logic                  full,
+    // Read domain
+    input  logic                  rd_clk, rd_rst_n,
+    input  logic                  rd_en,
+    output logic [DATA_WIDTH-1:0] rd_data,
+    output logic                  empty
+);
+    // Key design elements:
+    // 1. Dual-port RAM for storage (from Week 5 Design HW2)
+    // 2. Write pointer (binary) in write clock domain
+    // 3. Read pointer (binary) in read clock domain
+    // 4. Gray code conversion: binary -> gray for crossing domains
+    //    gray = binary ^ (binary >> 1)
+    // 5. Synchronize gray-coded write pointer to read domain (2-FF)
+    // 6. Synchronize gray-coded read pointer to write domain (2-FF)
+    // 7. Full detection: compare synced read pointer with write pointer
+    //    Full when gray_wr_ptr == {~gray_rd_sync[MSB:MSB-1], gray_rd_sync[MSB-2:0]}
+    // 8. Empty detection: compare synced write pointer with read pointer
+    //    Empty when gray_rd_ptr == gray_wr_sync
+    //
+    // IMPORTANT: depth MUST be power of 2 for gray code to work correctly
+endmodule
+```
+
+Write a testbench with asymmetric clocks (e.g., write at 100 MHz, read at 33 MHz):
+1. Fill the FIFO completely — verify full flag
+2. Drain completely — verify empty flag and data integrity (FIFO order)
+3. Continuous write + read at different rates — verify no data corruption
+4. Stress test: write bursts faster than read can drain
+
+### Design HW4: Timing Analysis Exercise (Pen & Paper)
+No RTL for this one — work through these on paper or a whiteboard. Understanding timing is critical for interviews:
+
+1. **Setup & hold calculation**: Given Tclk=10ns, Tsetup=0.5ns, Thold=0.3ns, Tcq=0.8ns, and combinational delay=7ns: What is the slack? Can the design meet timing?
+
+2. **Critical path identification**: Draw the datapath of your Week 4 ALU (inputs -> mux -> adder -> output register). Label each component's delay. What's the critical path? What's the maximum clock frequency?
+
+3. **Pipelining for timing**: Take the multiplier from Week 4 HW3. If it were combinational (single cycle), the critical path would be WIDTH stages of add+shift. Show how breaking it into a multi-cycle design trades latency for throughput.
+
+4. **Metastability MTBF**: Given a synchronizer with Tsetup=0.5ns, Tw=0.3ns (metastability window), clock=200MHz, input change rate=50MHz: Calculate MTBF with 1-FF vs 2-FF synchronizer. Why is 2-FF sufficient?
 
 ---
 
@@ -218,5 +319,11 @@ Week 6 HW3 already asks you to design a register file. Here are the industry des
 - [ ] **MILESTONE: You can build a UVM testbench from scratch!**
 
 ### Design Track
-- [ ] Register file RTL written with industry practices (part of HW3)
-- [ ] Register file handles x0=0 and write-first correctly
+- [ ] Read Dally ch.15 (timing constraints), ch.28 (metastability), ch.29 (synchronizer design)
+- [ ] Read Cummings CDC paper (SNUG 2008)
+- [ ] Read Cummings async FIFO paper (SNUG 2002)
+- [ ] Completed Design HW1 (Register file with x0=0 and write-first)
+- [ ] Completed Design HW2 (2-FF synchronizer + pulse synchronizer)
+- [ ] Completed Design HW3 (Asynchronous FIFO with gray code pointers)
+- [ ] Completed Design HW4 (Timing analysis pen-and-paper exercise)
+- [ ] **MILESTONE: You understand CDC — the #1 source of silicon bugs!**

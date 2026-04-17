@@ -41,8 +41,11 @@ Every DV interview asks about coverage and assertions. This is non-negotiable kn
 ## Design Track: FSM Design & Handshake Protocols
 
 ### Reading (Design)
+- **Dally & Harting ch.8**: "Combinational Building Blocks" — encoders, decoders, priority logic, multiplexers, arbiters. This chapter covers the exact building blocks you'll design this week.
+- **Dally & Harting ch.14**: "Sequential Logic" — flip-flops, registers, shift registers, counters. Fundamentals for all sequential design.
 - **Cliff Cummings** *"State Machine Coding Styles for Synthesis"* — 1-block, 2-block, and 3-block FSM styles
 - **ChipVerify FSM page**: https://www.chipverify.com/verilog/verilog-fsm
+- **ChipVerify**: https://www.chipverify.com/verilog/verilog-priority-encoder — arbiter/encoder design patterns
 
 ### Design HW1: Traffic Light Controller FSM
 Design a 3-state FSM for a traffic intersection:
@@ -87,6 +90,58 @@ module handshake_sender (
 ```
 
 This is the exact protocol used by AXI, so getting it right now saves you trouble in Week 10.
+
+### Design HW3: Fixed-Priority Arbiter
+Design a 4-input fixed-priority arbiter — a fundamental building block in bus systems and NoCs:
+
+```systemverilog
+module fixed_priority_arbiter #(
+    parameter NUM_REQ = 4
+)(
+    input  logic                clk, rst_n,
+    input  logic [NUM_REQ-1:0]  request,      // request lines
+    output logic [NUM_REQ-1:0]  grant,         // one-hot grant
+    output logic                grant_valid    // at least one grant active
+);
+    // Rules:
+    // - Request 0 has highest priority, request N-1 has lowest
+    // - Exactly one grant bit set per cycle (one-hot)
+    // - Grant is combinational (no latency)
+    // - If no requests, grant_valid is low
+```
+
+Write a testbench that:
+1. Asserts all 4 requests simultaneously — verify grant goes to request 0
+2. De-assert request 0 — grant moves to request 1
+3. Test all priority orderings
+4. Add SVA: grant is always one-hot or zero
+
+### Design HW4: Parameterized Shift Register
+Design a versatile shift register used in serial protocols, FIFOs, and DSP:
+
+```systemverilog
+module shift_register #(
+    parameter WIDTH = 8,
+    parameter DIRECTION = "LEFT"  // "LEFT" or "RIGHT"
+)(
+    input  logic             clk, rst_n,
+    input  logic             shift_en,     // enable shifting
+    input  logic             load,         // parallel load
+    input  logic [WIDTH-1:0] data_in,      // parallel input
+    input  logic             serial_in,    // serial input bit
+    output logic [WIDTH-1:0] data_out,     // parallel output
+    output logic             serial_out    // serial output bit
+);
+    // Features:
+    // - Parallel load overrides shift
+    // - serial_out is MSB (left shift) or LSB (right shift)
+    // - serial_in feeds the vacated bit position
+```
+
+Write a testbench that:
+1. Loads 0xA5, shifts left 8 times, captures serial output — should reconstruct 0xA5
+2. Tests right-shift mode similarly
+3. Verifies load overrides an in-progress shift
 
 ---
 
@@ -218,7 +273,7 @@ Run until 100% coverage. Print final coverage report.
 
 ### Verification Track
 - [x] Read Spear ch.9 (Functional Coverage)
-- [ ] Read an SVA reference (Sutherland handbook OR Cummings papers OR VA+ChipVerify assertion lessons)
+- [x] Read an SVA reference (Cummings SNUG-2009 "SVA Design Tricks and Bind Files" — ch.1-4)
 - [ ] Watched Verification Academy coverage + SVA modules
 - [ ] Read ChipVerify covergroup, assertions, concurrent assertions pages
 - [ ] Completed HW1 (FIFO coverage)
@@ -231,4 +286,7 @@ Run until 100% coverage. Print final coverage report.
 - [x] Read Cummings FSM coding styles paper
 - [x] Completed Design HW1 (Traffic light FSM)
 - [x] Completed Design HW2 (Valid/ready handshake module)
+- [ ] Read Dally ch.8 (combinational building blocks) and ch.14 (sequential logic)
+- [ ] Completed Design HW3 (Fixed-priority arbiter)
+- [ ] Completed Design HW4 (Parameterized shift register)
 - [ ] Used handshake module as DUT for SVA homework (HW3)

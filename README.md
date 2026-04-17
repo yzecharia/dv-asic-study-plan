@@ -16,10 +16,10 @@ I am doing this on my own as an autodidact alongside my job search, building in 
 |------|-------------------|--------------|--------|
 | 1 | SV OOP (Classes, Inheritance, Polymorphism) | — | Done |
 | 2 | Constrained Random Verification | Counter, Sync FIFO, FSM coding | Done |
-| 3 | Functional Coverage & SVA | Traffic Light FSM, Handshake protocol | In progress |
-| 4 | UVM Architecture & Components | ALU DUT, SV Interfaces | Not started |
-| 5 | UVM Sequences & Config DB | DUT-to-UVM integration (tb_top) | Not started |
-| 6 | UVM Full Testbench | Register File RTL | Not started |
+| 3 | Functional Coverage & SVA | FSM, Handshake, Arbiter, Shift Register | In progress |
+| 4 | UVM Architecture & Components | ALU, SV Interfaces, Multiplier, Barrel Shifter | Not started |
+| 5 | UVM Sequences & Config DB | Dual-Port RAM, Round-Robin Arbiter, Cache | Not started |
+| 6 | UVM Full Testbench | Register File, CDC, Async FIFO, Timing | Not started |
 | 7 | — | RISC-V Single-Cycle CPU | Not started |
 | 8 | — | RISC-V Pipelined CPU + Hazards | Not started |
 | 9 | — | UART TX/RX Design | Not started |
@@ -61,8 +61,8 @@ Build output (`build/`, `waves/`, `*.out`, `*.jou`, `*.log`, `.Xil/`, `xsim.dir/
 
 | Phase | Weeks | Verification | Design |
 |-------|-------|-------------|--------|
-| **1 — SV Fundamentals** | 1-3 | OOP, CRV, coverage, SVA | Counter, FIFO, FSMs, handshake protocol |
-| **2 — UVM** | 4-6 | UVM architecture, sequences, config DB, full testbench | ALU, SV interfaces, register file |
+| **1 — SV Fundamentals** | 1-3 | OOP, CRV, coverage, SVA | Counter, FIFO, FSMs, handshake, arbiter, shift register |
+| **2 — UVM** | 4-6 | UVM architecture, sequences, config DB, full testbench | ALU, multiplier, barrel shifter, dual-port RAM, round-robin arbiter, cache, register file, CDC, async FIFO |
 | **3 — CPU Architecture** | 7-8 | — | Single-cycle & pipelined RISC-V RV32I CPU |
 | **4 — Protocols** | 9-10 | — | UART, SPI, AXI-Lite |
 | **5 — Portfolio Projects** | 11-12 | Full UVM testbenches for UART & FIFO | RTL cleanup & documentation |
@@ -75,10 +75,11 @@ Build output (`build/`, `waves/`, `*.out`, `*.jou`, `*.log`, `.Xil/`, `xsim.dir/
 |------|----------|
 | *SystemVerilog for Verification* — Spear & Tumbush (3rd ed) | SV for verification (weeks 1-3) |
 | *A Practical Guide to Adopting the UVM* — Rosenberg & Meade (2nd ed) | UVM (weeks 4-6) |
+| *Digital Design: A Systems Approach* — Dally & Harting | **Primary design textbook** — combinational blocks, arithmetic, sequential logic, timing, CDC, memory, pipelines, interconnect (weeks 3-8) |
 | *Digital Design and Computer Architecture: RISC-V* — Harris & Harris | CPU design (weeks 7-8) |
-| *FPGA Prototyping with Verilog Examples* — Pong P. Chu | RTL design reference (supplementary) |
+| *FPGA Prototyping by SystemVerilog Examples* — Pong P. Chu | RTL design reference, UART (weeks 2, 9) |
 
-Key papers (free): **Cliff Cummings** — FSM coding styles, nonblocking assignments, clock domain crossing.
+Key papers (free): **Cliff Cummings** — FSM coding styles, nonblocking assignments, clock domain crossing (CDC), async FIFO design, synthesis coding styles. These papers are industry gold — read all of them.
 
 Plus free online resources: **Verification Academy**, **ChipVerify**, **EDA Playground**, **Nandland**, and the **RISC-V spec**.
 
