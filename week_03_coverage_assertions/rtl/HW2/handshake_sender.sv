@@ -33,7 +33,7 @@ module handshake_sender(
         end else begin
             state <= next;
             if ((state == IDLE) && send)
-                data_out <= data_in;         // latch data_in to data_out
+                data_out <= data_in;        
         end
     end
 

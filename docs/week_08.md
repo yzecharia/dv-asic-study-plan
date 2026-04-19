@@ -76,11 +76,11 @@ module forwarding_unit (
     output logic [1:0] forward_a,    // 00=reg, 01=WB, 10=MEM
     output logic [1:0] forward_b     // 00=reg, 01=WB, 10=MEM
 );
-    // Forwarding logic:
-    // EX hazard:  forward from MEM stage if rd_mem matches rs1/rs2
-    // MEM hazard: forward from WB stage if rd_wb matches rs1/rs2
-    // Priority:   EX hazard takes precedence over MEM hazard
-    // Exception:  never forward from x0
+    // TODO: decide when to forward and from where.
+    // Questions to answer as you design:
+    //   - Which stage's result is "newer" — MEM or WB?
+    //   - What happens when both stages write the same register?
+    //   - Why does x0 need special handling?
 endmodule
 ```
 
@@ -111,10 +111,10 @@ module hazard_detection_unit (
     input  logic       mem_read_ex,  // is EX stage a load?
     output logic       stall         // insert bubble
 );
-    // Stall if: EX stage is a load AND its rd matches ID stage rs1 or rs2
-    assign stall = mem_read_ex &&
-                   ((rd_ex == rs1_id) || (rd_ex == rs2_id)) &&
-                   (rd_ex != 5'b0);
+    // Derive the stall condition. Think about:
+    //   - When is the EX-stage instruction actually a load?
+    //   - When does its destination register collide with either ID source?
+    //   - Why must you special-case x0?
 endmodule
 ```
 

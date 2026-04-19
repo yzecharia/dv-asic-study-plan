@@ -34,120 +34,53 @@ Sequences are how you generate stimulus in UVM. The sequencer-driver handshake i
 ### HW1: Three Types of Sequences
 Using the ALU environment from Week 4, write three sequences:
 
-**Directed sequence** — tests specific known cases:
-```systemverilog
-class alu_directed_seq extends uvm_sequence #(alu_transaction);
-    `uvm_object_utils(alu_directed_seq)
+**Directed sequence** — `alu_directed_seq extends uvm_sequence #(alu_transaction)`
+Inside `body()`, drive ~10 specific, known test vectors using the
+`start_item()` / `finish_item()` handshake. Suggested cases:
+- 0 + 0 = 0
+- FF + 1 = overflow
+- FF AND 0F = 0F
+- A XOR A = 0
+- ... pick 6 more that exercise each operation's edges
 
-    virtual task body();
-        alu_transaction txn;
+**Random sequence** — `alu_random_seq extends uvm_sequence #(alu_transaction)`
+Parameterize with a `rand int unsigned num_txns` (e.g., 10..100). In `body()`,
+loop `num_txns` times and randomize each transaction before sending it.
 
-        // Test 1: 0 + 0 = 0
-        txn = alu_transaction::type_id::create("txn");
-        start_item(txn);
-        txn.operand_a = 0; txn.operand_b = 0; txn.operation = ADD;
-        finish_item(txn);
-
-        // Test 2: FF + 1 = overflow
-        // Test 3: FF AND 0F = 0F
-        // Test 4: A XOR A = 0
-        // ... add 6 more directed test vectors
-    endtask
-endclass
-```
-
-**Random sequence** — generates N random transactions:
-```systemverilog
-class alu_random_seq extends uvm_sequence #(alu_transaction);
-    `uvm_object_utils(alu_random_seq)
-    rand int unsigned num_txns;
-    constraint c_num { num_txns inside {[10:100]}; }
-
-    virtual task body();
-        for (int i = 0; i < num_txns; i++) begin
-            alu_transaction txn = alu_transaction::type_id::create($sformatf("txn_%0d", i));
-            start_item(txn);
-            assert(txn.randomize());
-            finish_item(txn);
-        end
-    endtask
-endclass
-```
-
-**Error injection sequence** — intentionally creates illegal/edge cases:
-```systemverilog
-class alu_error_seq extends uvm_sequence #(alu_transaction);
-    // Generate sequences that test:
-    // - Max values (FF op FF)
-    // - Min values (00 op 00)
-    // - Same operands (A op A)
-    // - Back-to-back transactions with no delay
-endclass
-```
+**Error injection sequence** — `alu_error_seq extends uvm_sequence #(alu_transaction)`
+Targets illegal / edge-case scenarios:
+- Max values (FF op FF)
+- Min values (00 op 00)
+- Same operands (A op A)
+- Back-to-back transactions with no delay
 
 Run all three from the test and verify they drive correctly.
 
 ### HW2: Virtual Sequence
 Create a scenario where you have TWO agents (e.g., an ALU agent and a memory agent):
 
-```systemverilog
-class top_virtual_seq extends uvm_sequence;
-    `uvm_object_utils(top_virtual_seq)
-
-    // Handles to sub-sequencers
-    uvm_sequencer #(alu_transaction) alu_sqr;
-    uvm_sequencer #(mem_transaction) mem_sqr;
-
-    virtual task body();
-        alu_random_seq alu_seq = alu_random_seq::type_id::create("alu_seq");
-        mem_write_seq  mem_seq = mem_write_seq::type_id::create("mem_seq");
-
-        // Run both in parallel using fork-join
-        fork
-            alu_seq.start(alu_sqr);
-            mem_seq.start(mem_sqr);
-        join
-    endtask
-endclass
-```
+Write a `top_virtual_seq extends uvm_sequence`. It needs:
+- handles to both sub-sequencers (an ALU sequencer and a memory sequencer)
+- a `body()` task that runs a sequence on each sub-sequencer in parallel
+  (hint: `fork ... join` with `seq.start(sqr)` calls)
 
 The virtual sequence coordinates stimulus across multiple agents — this is how complex tests are written in real projects.
 
 ### HW3: Config DB Exercise
 Parameterize your environment using `uvm_config_db`:
 
-From the **test level**, configure:
-```systemverilog
-class configurable_test extends uvm_test;
-    virtual function void build_phase(uvm_phase phase);
-        super.build_phase(phase);
+From the **test level**, in `build_phase`, you should pass three things down
+into the env *before* creating it:
+- the virtual interface (typed `virtual alu_if`) destined for the driver
+- an `int` telling the sequencer how many transactions to run
+- a `uvm_active_passive_enum` telling the agent whether to be ACTIVE or PASSIVE
 
-        // Pass virtual interface to driver
-        uvm_config_db#(virtual alu_if)::set(this, "env.agent.driver", "vif", alu_vif);
+All three go via `uvm_config_db#(T)::set(...)`. Think carefully about the
+scope (`this` and the path string) so each value lands at the right component.
 
-        // Pass number of transactions to sequence
-        uvm_config_db#(int)::set(this, "env.agent.sequencer", "num_transactions", 500);
-
-        // Pass agent mode (ACTIVE or PASSIVE)
-        uvm_config_db#(uvm_active_passive_enum)::set(this, "env.agent", "is_active", UVM_ACTIVE);
-
-        env = alu_env::type_id::create("env", this);
-    endfunction
-endclass
-```
-
-In the **agent/driver**, retrieve:
-```systemverilog
-class alu_driver extends uvm_driver #(alu_transaction);
-    virtual alu_if vif;
-
-    virtual function void build_phase(uvm_phase phase);
-        super.build_phase(phase);
-        if (!uvm_config_db#(virtual alu_if)::get(this, "", "vif", vif))
-            `uvm_fatal("NOVIF", "Virtual interface not found in config DB!")
-    endfunction
-endclass
-```
+In the **agent/driver**, retrieve the corresponding value with
+`uvm_config_db#(T)::get(...)`. If the `get` fails, raise a `uvm_fatal` —
+silently running without an interface is a classic UVM footgun.
 
 Write two different tests that pass different configurations:
 - `small_test`: 10 transactions, directed sequence
@@ -158,39 +91,13 @@ Run both using `+UVM_TESTNAME=small_test` and `+UVM_TESTNAME=stress_test`.
 ### HW4: TLM Connection — Monitor to Scoreboard
 Implement the TLM connection properly:
 
-```systemverilog
-// In monitor: analysis port sends observed transactions
-class alu_monitor extends uvm_monitor;
-    uvm_analysis_port #(alu_transaction) ap;
-
-    virtual task run_phase(uvm_phase phase);
-        forever begin
-            alu_transaction txn;
-            // ... observe DUT signals on interface ...
-            // ... create transaction from observed values ...
-            ap.write(txn);  // broadcast to all subscribers
-        end
-    endtask
-endclass
-
-// In scoreboard: analysis imp receives transactions
-class alu_scoreboard extends uvm_scoreboard;
-    uvm_analysis_imp #(alu_transaction, alu_scoreboard) imp;
-
-    virtual function void write(alu_transaction txn);
-        // Check: does txn.result match expected result?
-        // Compute expected result here (reference model)
-        // Compare and report pass/fail
-    endfunction
-endclass
-
-// In agent: connect monitor's port to scoreboard's imp
-class alu_env extends uvm_env;
-    virtual function void connect_phase(uvm_phase phase);
-        agent.monitor.ap.connect(scoreboard.imp);
-    endfunction
-endclass
-```
+Three pieces to wire up:
+- **Monitor** — owns a `uvm_analysis_port #(alu_transaction)`. In `run_phase`,
+  observes the interface, builds a transaction, and `ap.write(txn)`s it.
+- **Scoreboard** — owns a `uvm_analysis_imp #(alu_transaction, alu_scoreboard)`.
+  Implements a `write()` function that compares against a reference model.
+- **Env** — in `connect_phase`, connect the monitor's analysis port to the
+  scoreboard's imp.
 
 Make sure transactions flow from monitor through the analysis port to the scoreboard. Print messages at each stage to verify.
 
