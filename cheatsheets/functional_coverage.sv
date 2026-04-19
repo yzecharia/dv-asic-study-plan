@@ -1,1 +1,1 @@
-../week_03_coverage_assertions/tb/CH9/cheatsheet_ch9.sv
+../week_03_coverage_assertions/learning/ch9_coverage/cheatsheet_ch9.sv
