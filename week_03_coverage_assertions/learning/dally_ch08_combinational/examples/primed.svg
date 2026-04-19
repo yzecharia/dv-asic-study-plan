@@ -1,0 +1,124 @@
+<svg style="background:white" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:s="https://github.com/nturley/netlistsvg" width="560" height="135">
+  <style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }</style>
+  <g s:type="or" transform="translate(246,17.5)" s:width="30" s:height="25" id="cell_$or$.yosys_tmp/primed.sv:7$2">
+    <s:alias val="$or"/>
+    <s:alias val="$logic_or"/>
+    <s:alias val="$_OR_"/>
+    <path d="M0,25 L0,25 L15,25 A15 12.5 0 0 0 15,0 L0,0" class="cell_$or$.yosys_tmp/primed.sv:7$2"/>
+    <path d="M0,0 A30 25 0 0 1 0,25" class="cell_$or$.yosys_tmp/primed.sv:7$2"/>
+    <g s:x="3" s:y="5" s:pid="A"/>
+    <g s:x="3" s:y="20" s:pid="B"/>
+    <g s:x="30" s:y="12.5" s:pid="Y"/>
+  </g>
+  <g s:type="or" transform="translate(311,25)" s:width="30" s:height="25" id="cell_$or$.yosys_tmp/primed.sv:7$3">
+    <s:alias val="$or"/>
+    <s:alias val="$logic_or"/>
+    <s:alias val="$_OR_"/>
+    <path d="M0,25 L0,25 L15,25 A15 12.5 0 0 0 15,0 L0,0" class="cell_$or$.yosys_tmp/primed.sv:7$3"/>
+    <path d="M0,0 A30 25 0 0 1 0,25" class="cell_$or$.yosys_tmp/primed.sv:7$3"/>
+    <g s:x="3" s:y="5" s:pid="A"/>
+    <g s:x="3" s:y="20" s:pid="B"/>
+    <g s:x="30" s:y="12.5" s:pid="Y"/>
+  </g>
+  <g s:type="or" transform="translate(376,32.5)" s:width="30" s:height="25" id="cell_$or$.yosys_tmp/primed.sv:7$4">
+    <s:alias val="$or"/>
+    <s:alias val="$logic_or"/>
+    <s:alias val="$_OR_"/>
+    <path d="M0,25 L0,25 L15,25 A15 12.5 0 0 0 15,0 L0,0" class="cell_$or$.yosys_tmp/primed.sv:7$4"/>
+    <path d="M0,0 A30 25 0 0 1 0,25" class="cell_$or$.yosys_tmp/primed.sv:7$4"/>
+    <g s:x="3" s:y="5" s:pid="A"/>
+    <g s:x="3" s:y="20" s:pid="B"/>
+    <g s:x="30" s:y="12.5" s:pid="Y"/>
+  </g>
+  <g s:type="or" transform="translate(441,40)" s:width="30" s:height="25" id="cell_$or$.yosys_tmp/primed.sv:7$5">
+    <s:alias val="$or"/>
+    <s:alias val="$logic_or"/>
+    <s:alias val="$_OR_"/>
+    <path d="M0,25 L0,25 L15,25 A15 12.5 0 0 0 15,0 L0,0" class="cell_$or$.yosys_tmp/primed.sv:7$5"/>
+    <path d="M0,0 A30 25 0 0 1 0,25" class="cell_$or$.yosys_tmp/primed.sv:7$5"/>
+    <g s:x="3" s:y="5" s:pid="A"/>
+    <g s:x="3" s:y="20" s:pid="B"/>
+    <g s:x="30" s:y="12.5" s:pid="Y"/>
+  </g>
+  <g s:type="generic" transform="translate(102,22)" s:width="30" s:height="40" id="cell_d">
+    <text x="15" y="-4" class="nodelabel cell_d" s:attribute="ref">$paramod$26516756ea60ca7f31f02c88792fdba96b9b8c36\decoder</text>
+    <rect width="30" height="20" s:generic="body" class="cell_d"/>
+    <g transform="translate(0,10)" s:x="0" s:y="10" s:pid="in0" id="port_d~d_in">
+      <text x="-3" y="-4" class="inputPortLabel cell_d">d_in</text>
+    </g>
+    <g transform="translate(30,10)" s:x="30" s:y="10" s:pid="out0" id="port_d~d_out">
+      <text x="5" y="-4" style="fill:#000; stroke:none" class="cell_d">d_out</text>
+    </g>
+  </g>
+  <g s:type="inputExt" transform="translate(12,22.5)" s:width="30" s:height="20" id="cell_d_in">
+    <text x="15" y="-4" class="nodelabel cell_d_in" s:attribute="ref">d_in</text>
+    <s:alias val="$_inputExt_"/>
+    <path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_d_in"/>
+    <g s:x="28" s:y="10" s:pid="Y"/>
+  </g>
+  <g s:type="outputExt" transform="translate(506,42.5)" s:width="30" s:height="20" id="cell_isprime">
+    <text x="15" y="-4" class="nodelabel cell_isprime" s:attribute="ref">isprime</text>
+    <s:alias val="$_outputExt_"/>
+    <path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_isprime"/>
+    <g s:x="0" s:y="10" s:pid="A"/>
+  </g>
+  <g s:type="split" transform="translate(199,12)" s:width="5" s:height="40" id="cell_$split$,14,6,7,9,15,11,16,13,">
+    <rect width="5" height="100" class="splitjoinBody" s:generic="body"/>
+    <s:alias val="$_split_"/>
+    <g s:x="0" s:y="20" s:pid="in"/>
+    <g transform="translate(4,10)" s:x="4" s:y="10" s:pid="out0">
+      <text x="5" y="-4">1</text>
+    </g>
+    <g transform="translate(4,30)" s:x="4" s:y="10" s:pid="out0">
+      <text x="5" y="-4">2</text>
+    </g>
+    <g transform="translate(4,50)" s:x="4" s:y="10" s:pid="out0">
+      <text x="5" y="-4">3</text>
+    </g>
+    <g transform="translate(4,70)" s:x="4" s:y="10" s:pid="out0">
+      <text x="5" y="-4">5</text>
+    </g>
+    <g transform="translate(4,90)" s:x="4" s:y="10" s:pid="out0">
+      <text x="5" y="-4">7</text>
+    </g>
+  </g>
+  <line x1="204" x2="249" y1="22.5" y2="22.5" class="net_6"/>
+  <line x1="204" x2="221" y1="42.5" y2="42.5" class="net_7"/>
+  <line x1="221" x2="221" y1="42.5" y2="37.5" class="net_7"/>
+  <line x1="221" x2="249" y1="37.5" y2="37.5" class="net_7"/>
+  <line x1="276" x2="314" y1="30" y2="30" class="net_8"/>
+  <line x1="204" x2="286" y1="62.5" y2="62.5" class="net_9"/>
+  <line x1="286" x2="286" y1="62.5" y2="45" class="net_9"/>
+  <line x1="286" x2="314" y1="45" y2="45" class="net_9"/>
+  <line x1="341" x2="379" y1="37.5" y2="37.5" class="net_10"/>
+  <line x1="204" x2="351" y1="82.5" y2="82.5" class="net_11"/>
+  <line x1="351" x2="351" y1="82.5" y2="52.5" class="net_11"/>
+  <line x1="351" x2="379" y1="52.5" y2="52.5" class="net_11"/>
+  <line x1="406" x2="444" y1="45" y2="45" class="net_12"/>
+  <line x1="203.5" x2="203.5" y1="103" y2="122" class="net_13"/>
+  <line x1="203.5" x2="416" y1="122" y2="122" class="net_13"/>
+  <line x1="416" x2="416" y1="122" y2="60" class="net_13"/>
+  <line x1="416" x2="444" y1="60" y2="60" class="net_13"/>
+  <line x1="40" x2="102" y1="32.5" y2="32.5" class="net_2,3,4"/>
+  <line x1="471" x2="506" y1="52.5" y2="52.5" class="net_5"/>
+  <line x1="133" x2="199" y1="32.5" y2="32.5" class="net_14,6,7,9,15,11,16,13"/>
+</svg>

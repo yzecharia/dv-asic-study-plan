@@ -4,7 +4,7 @@
     {
       "label": "0a. Check Syntax (RTL Only)",
       "type": "shell",
-      "command": "iverilog -g2012 -t null $(find homework -name '*.sv' -not -name '*_tb.sv')",
+      "command": "iverilog -g2012 -t null $(find ${fileDirname} -name '*.sv' -not -name '*_tb.sv')",
       "group": "build",
       "presentation": { "clear": true, "reveal": "silent" },
       "problemMatcher": {
@@ -21,7 +21,7 @@
     {
       "label": "0b. Check Syntax (RTL + TB)",
       "type": "shell",
-      "command": "MOD=\"${fileBasenameNoExtension}\"; MOD=\"${MOD%_tb}\"; iverilog -g2012 -t null $(find homework -name '*.sv' -not -name '*_tb.sv') tb/${MOD}_tb.sv",
+      "command": "MOD=\"${fileBasenameNoExtension}\"; MOD=\"${MOD%_tb}\"; iverilog -g2012 -t null $(find ${fileDirname} -name '*.sv' -not -name '*_tb.sv') tb/${MOD}_tb.sv",
       "group": "build",
       "presentation": { "clear": true, "reveal": "silent" },
       "problemMatcher": {
@@ -38,7 +38,7 @@
     {
       "label": "1. Compile for Simulation (Icarus)",
       "type": "shell",
-      "command": "MOD=\"${fileBasenameNoExtension}\"; MOD=\"${MOD%_tb}\"; mkdir -p build waves && iverilog -g2012 -o build/${MOD}.out $(find homework -name '*.sv' -not -name '*_tb.sv') tb/${MOD}_tb.sv",
+      "command": "MOD=\"${fileBasenameNoExtension}\"; MOD=\"${MOD%_tb}\"; mkdir -p build waves && iverilog -g2012 -o build/${MOD}.out $(find ${fileDirname} -name '*.sv' -not -name '*_tb.sv') tb/${MOD}_tb.sv",
       "group": "build",
       "presentation": { "clear": true, "group": "sim" },
       "problemMatcher": {
@@ -69,7 +69,7 @@
     {
       "label": "4. Generate JSON (Yosys)",
       "type": "shell",
-      "command": "MOD=\"${fileBasenameNoExtension}\"; MOD=\"${MOD%_tb}\"; mkdir -p build .yosys_tmp && for f in $(find homework -name '*.sv' -not -name '*_tb.sv'); do sed '/^[[:space:]]*timeunit/d;/^[[:space:]]*timeprecision/d' \"$f\" > \".yosys_tmp/$(basename $f)\"; done && yosys -p \"read_verilog -sv .yosys_tmp/*.sv; prep -top ${MOD}; write_json build/${MOD}.json\" && rm -rf .yosys_tmp",
+      "command": "MOD=\"${fileBasenameNoExtension}\"; MOD=\"${MOD%_tb}\"; rm -rf .yosys_tmp && mkdir -p build .yosys_tmp && for f in $(find ${fileDirname} -name '*.sv' -not -name '*_tb.sv'); do sed '/^[[:space:]]*timeunit/d;/^[[:space:]]*timeprecision/d' \"$f\" > \".yosys_tmp/$(basename $f)\"; done && yosys -p \"read_verilog -sv .yosys_tmp/*.sv; prep -top ${MOD}; write_json build/${MOD}.json\" && rm -rf .yosys_tmp",
       "dependsOn": "0a. Check Syntax (RTL Only)",
       "presentation": { "clear": true, "group": "rtl" },
       "problemMatcher": {
@@ -249,7 +249,7 @@
     {
       "label": "Y1. Yosys: Synthesize + Optimize (FSM)",
       "type": "shell",
-      "command": "MOD=\"${fileBasenameNoExtension}\"; MOD=\"${MOD%_tb}\"; mkdir -p build .yosys_tmp && for f in $(find homework -name '*.sv' -not -name '*_tb.sv'); do sed '/^[[:space:]]*timeunit/d;/^[[:space:]]*timeprecision/d' \"$f\" > \".yosys_tmp/$(basename $f)\"; done && yosys -p \"read_verilog -sv .yosys_tmp/*.sv; hierarchy -top ${MOD}; proc; opt; fsm_detect; fsm_extract; fsm_opt; fsm_recode -encoding ${input:fsmEncoding}; opt; clean; stat; write_json build/${MOD}_opt.json\" && rm -rf .yosys_tmp",
+      "command": "MOD=\"${fileBasenameNoExtension}\"; MOD=\"${MOD%_tb}\"; rm -rf .yosys_tmp && mkdir -p build .yosys_tmp && for f in $(find ${fileDirname} -name '*.sv' -not -name '*_tb.sv'); do sed '/^[[:space:]]*timeunit/d;/^[[:space:]]*timeprecision/d' \"$f\" > \".yosys_tmp/$(basename $f)\"; done && yosys -p \"read_verilog -sv .yosys_tmp/*.sv; hierarchy -top ${MOD}; proc; opt; fsm_detect; fsm_extract; fsm_opt; fsm_recode -encoding ${input:fsmEncoding}; opt; clean; stat; write_json build/${MOD}_opt.json\" && rm -rf .yosys_tmp",
       "group": "build",
       "presentation": { "clear": true, "group": "synth" },
       "problemMatcher": {
