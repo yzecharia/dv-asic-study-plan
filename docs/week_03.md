@@ -258,7 +258,7 @@ Run until 100% coverage. Print final coverage report.
 - [ ] Watched Verification Academy coverage + SVA modules
 - [x] Read ChipVerify covergroup, assertions, concurrent assertions pages
 - [x] Completed HW1 (FIFO coverage)
-- [ ] Completed HW2 (Cross coverage)
+- [x] Completed HW2 (Cross coverage)
 - [x] Completed HW3 (SVA handshake assertions)
 - [ ] Completed HW4 (Combined coverage + assertions testbench)
 - [ ] Can answer all self-check questions
