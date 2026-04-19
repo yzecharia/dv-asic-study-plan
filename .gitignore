@@ -6,4 +6,6 @@
 xsim.dir/
 build/
 .Xil/
-week_03_coverage_assertions/tb/examples/mailbox_example.sv
+xsim.covdb/
+*.covinfo
+week_03_coverage_assertions/learning/misc/mailbox_example.sv
