@@ -1,0 +1,1 @@
+../week_03_coverage_assertions/tb/assertions/cheatsheet_sva.sv

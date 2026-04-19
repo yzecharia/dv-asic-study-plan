@@ -154,29 +154,20 @@ Write a covergroup that covers:
 
 ```
 covergroup fifo_cg @(posedge clk);
-    // 1. coverpoint for data_count with bins:
-    //    - bin "empty_state": data_count == 0
-    //    - bin "low":  data_count inside {[1:4]}
-    //    - bin "mid":  data_count inside {[5:10]}
-    //    - bin "high": data_count inside {[11:14]}
-    //    - bin "full_state": data_count == 15
+    // TODO: implement the coverpoints below.
     //
-    // 2. coverpoint for operation:
-    //    - bin "write_only": wr_en && !rd_en
-    //    - bin "read_only":  !wr_en && rd_en
-    //    - bin "both":       wr_en && rd_en
-    //    - bin "idle":       !wr_en && !rd_en
+    // 1. coverpoint for data_count — bin the 0..15 range into meaningful states:
+    //    empty / low / mid / high / full
+    //
+    // 2. coverpoint for operation — four cases built from wr_en & rd_en:
+    //    write_only, read_only, both, idle
     //
     // 3. Cross coverage: data_count_level X operation
     //    (this catches: "did we test writing when FIFO is full?")
     //
-    // 4. Transition coverage on data_count:
-    //    - bins "fill_up":   (0 => 1), (1 => 2), ..., (14 => 15)
-    //    - bins "drain":     (15 => 14), ..., (1 => 0)
+    // 4. Transition coverage on data_count (fill-up and drain sequences)
     //
-    // 5. coverpoint for error flags:
-    //    - overflow occurred
-    //    - underflow occurred
+    // 5. coverpoint for error flags: overflow / underflow
 endgroup
 ```
 
@@ -187,15 +178,11 @@ Create a scenario with a memory controller:
 
 ```
 // Signals: operation (READ/WRITE), address_region (LOW/MID/HIGH), burst_size (1/4/8/16)
-// Cross all three: you need to verify every combination was tested
-// That's 2 x 3 x 4 = 24 bins
-
-covergroup mem_cg @(posedge clk);
-    cp_op:     coverpoint operation { bins read = {READ}; bins write = {WRITE}; }
-    cp_region: coverpoint addr_region { bins low = {LOW}; bins mid = {MID}; bins high = {HIGH}; }
-    cp_burst:  coverpoint burst_size { bins b1 = {1}; bins b4 = {4}; bins b8 = {8}; bins b16 = {16}; }
-    cx_all:    cross cp_op, cp_region, cp_burst;
-endgroup
+// You need to verify every combination — 2 x 3 x 4 = 24 bins.
+//
+// TODO: write a covergroup `mem_cg` that samples @(posedge clk) and contains:
+//   - a coverpoint for each signal (with the bins above)
+//   - a single `cross` covering all three
 ```
 
 Write a testbench that:
@@ -214,21 +201,15 @@ Rules:
 - `ready` can be asserted independently of `valid`
 
 ```
-// Write these 5 assertions:
-// 1. valid_must_hold: valid stays high until ready
-//    assert property (@(posedge clk) $rose(valid) |-> valid throughout (ready [->1]));
+// Write these 5 assertions (names are suggestions, feel free to rename):
+// 1. valid_must_hold:    valid stays high until ready
+// 2. data_stable:        data doesn't change while waiting
+// 3. handshake_complete: transaction happens when both high (use cover property)
+// 4. cool_down:          valid drops after transaction
+// 5. no_unknown:         valid and ready are never X or Z
 //
-// 2. data_stable: data doesn't change while waiting
-//    assert property (@(posedge clk) (valid && !ready) |=> $stable(data));
-//
-// 3. handshake_complete: transaction happens when both high
-//    (cover property to observe this)
-//
-// 4. cool_down: valid drops after transaction
-//    assert property (@(posedge clk) (valid && ready) |=> !valid);
-//
-// 5. no_unknown: valid and ready are never X or Z
-//    assert property (@(posedge clk) !$isunknown({valid, ready, data}));
+// TODO: implement each as `assert property (...)` or `cover property (...)`.
+// Remember: wrap with `disable iff (!rst_n)` to ignore reset cycles.
 ```
 
 Write a testbench that:

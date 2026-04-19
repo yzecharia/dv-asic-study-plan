@@ -35,92 +35,32 @@ This is where everything comes together. You'll build a complete, working UVM te
 ### HW1: Scoreboard with Reference Model for ALU
 Build a scoreboard that checks every ALU transaction against a reference model:
 
-```systemverilog
-class alu_scoreboard extends uvm_scoreboard;
-    `uvm_component_utils(alu_scoreboard)
+Scaffolding for `alu_scoreboard extends uvm_scoreboard`:
+- Register with the factory via ``` `uvm_component_utils ```
+- Expose a `uvm_analysis_imp #(alu_transaction, alu_scoreboard)` so the monitor can push to it
+- Track `pass_count` and `fail_count`
 
-    uvm_analysis_imp #(alu_transaction, alu_scoreboard) imp;
-
-    int pass_count = 0;
-    int fail_count = 0;
-
-    virtual function void write(alu_transaction txn);
-        bit [8:0] expected;
-
-        // Reference model — compute expected result
-        case (txn.operation)
-            ADD: expected = txn.operand_a + txn.operand_b;
-            SUB: expected = txn.operand_a - txn.operand_b;
-            AND: expected = txn.operand_a & txn.operand_b;
-            OR:  expected = txn.operand_a | txn.operand_b;
-            XOR: expected = txn.operand_a ^ txn.operand_b;
-        endcase
-
-        if (txn.result === expected) begin
-            pass_count++;
-            `uvm_info("SCB", $sformatf("PASS: %s", txn.convert2string()), UVM_HIGH)
-        end else begin
-            fail_count++;
-            `uvm_error("SCB", $sformatf("FAIL: got %0h, expected %0h | %s",
-                txn.result, expected, txn.convert2string()))
-        end
-    endfunction
-
-    virtual function void report_phase(uvm_phase phase);
-        `uvm_info("SCB", $sformatf("RESULTS: %0d passed, %0d failed out of %0d total",
-            pass_count, fail_count, pass_count + fail_count), UVM_LOW)
-        if (fail_count > 0)
-            `uvm_error("SCB", "TEST FAILED — there were mismatches!")
-        else
-            `uvm_info("SCB", "TEST PASSED — all transactions matched!", UVM_LOW)
-    endfunction
-endclass
-```
+You need to implement:
+- **`write(alu_transaction txn)`** — the TLM hook. Inside, build a small
+  reference model (a `case` on `txn.operation`) that computes the expected
+  result from `operand_a`/`operand_b`. Compare against `txn.result`, bump the
+  counters, and `` `uvm_info `` / `` `uvm_error `` as appropriate.
+- **`report_phase`** — print the final pass/fail tally and raise a
+  `` `uvm_error `` if any transaction mismatched.
 
 ### HW2: Functional Coverage in UVM
 Add a coverage collector component to your environment:
 
-```systemverilog
-class alu_coverage extends uvm_subscriber #(alu_transaction);
-    `uvm_component_utils(alu_coverage)
-
-    alu_transaction txn;
-
-    covergroup alu_cg;
-        cp_operation: coverpoint txn.operation;
-        cp_a: coverpoint txn.operand_a {
-            bins zero = {0};
-            bins low = {[1:63]};
-            bins mid = {[64:191]};
-            bins high = {[192:254]};
-            bins max = {255};
-        }
-        cp_b: coverpoint txn.operand_b {
-            bins zero = {0};
-            bins low = {[1:63]};
-            bins mid = {[64:191]};
-            bins high = {[192:254]};
-            bins max = {255};
-        }
-        cx_op_a: cross cp_operation, cp_a;
-        cx_op_b: cross cp_operation, cp_b;
-    endgroup
-
-    function new(string name, uvm_component parent);
-        super.new(name, parent);
-        alu_cg = new();
-    endfunction
-
-    virtual function void write(alu_transaction t);
-        txn = t;
-        alu_cg.sample();
-    endfunction
-
-    virtual function void report_phase(uvm_phase phase);
-        `uvm_info("COV", $sformatf("Coverage: %.2f%%", alu_cg.get_coverage()), UVM_LOW)
-    endfunction
-endclass
-```
+Build `alu_coverage extends uvm_subscriber #(alu_transaction)` with:
+- An internal `alu_transaction txn` handle that the covergroup can sample from
+- A `covergroup alu_cg` containing:
+  - a coverpoint on `txn.operation`
+  - coverpoints on `operand_a` and `operand_b`, each partitioned into
+    meaningful regions (think: zero / low / mid / high / max)
+  - cross coverpoints between operation and each operand
+- Constructor creates the covergroup
+- Override `write()` to update `txn` and call `alu_cg.sample()`
+- Override `report_phase` to print final coverage with `get_coverage()`
 
 Connect it in the env alongside the scoreboard. Run until coverage >95%.
 
