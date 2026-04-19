@@ -257,7 +257,7 @@ Run until 100% coverage. Print final coverage report.
 - [x] Read an SVA reference (Cummings SNUG-2009 "SVA Design Tricks and Bind Files" — ch.1-4)
 - [ ] Watched Verification Academy coverage + SVA modules
 - [x] Read ChipVerify covergroup, assertions, concurrent assertions pages
-- [ ] Completed HW1 (FIFO coverage)
+- [x] Completed HW1 (FIFO coverage)
 - [ ] Completed HW2 (Cross coverage)
 - [x] Completed HW3 (SVA handshake assertions)
 - [ ] Completed HW4 (Combined coverage + assertions testbench)
