@@ -256,10 +256,10 @@ Run until 100% coverage. Print final coverage report.
 - [x] Read Spear ch.9 (Functional Coverage)
 - [x] Read an SVA reference (Cummings SNUG-2009 "SVA Design Tricks and Bind Files" — ch.1-4)
 - [ ] Watched Verification Academy coverage + SVA modules
-- [ ] Read ChipVerify covergroup, assertions, concurrent assertions pages
+- [x] Read ChipVerify covergroup, assertions, concurrent assertions pages
 - [ ] Completed HW1 (FIFO coverage)
 - [ ] Completed HW2 (Cross coverage)
-- [ ] Completed HW3 (SVA handshake assertions)
+- [x] Completed HW3 (SVA handshake assertions)
 - [ ] Completed HW4 (Combined coverage + assertions testbench)
 - [ ] Can answer all self-check questions
 
@@ -270,4 +270,4 @@ Run until 100% coverage. Print final coverage report.
 - [ ] Read Dally ch.8 (combinational building blocks) and ch.14 (sequential logic)
 - [ ] Completed Design HW3 (Fixed-priority arbiter)
 - [ ] Completed Design HW4 (Parameterized shift register)
-- [ ] Used handshake module as DUT for SVA homework (HW3)
+- [x] Used handshake module as DUT for SVA homework (HW3)
