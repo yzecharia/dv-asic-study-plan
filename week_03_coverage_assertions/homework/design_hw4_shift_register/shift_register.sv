@@ -17,6 +17,15 @@ module shift_register #(
     output logic             serial_out
 );
 
-    // TODO: implement
+    always_ff @(posedge clk, negedge rst_n) begin
+        if (~rst_n) data_out <= '0;
+        else if (load) data_out <= data_in;
+        else if (shift_en) begin
+            if (DIRECTION == "LEFT") data_out <= {data_out[WIDTH-2:0], serial_in};
+            else data_out <= {serial_in, data_out[WIDTH-1:1]};
+        end
+    end
+
+    assign serial_out = (DIRECTION == "LEFT") ? data_out[WIDTH-1] : data_out[0];
 
 endmodule
