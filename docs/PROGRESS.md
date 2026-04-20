@@ -10,7 +10,7 @@ Update this file as you go. Show it to Claude anytime to pick up where you left 
 
 ### Week 1 - SV OOP
 - [x] Read Spear ch.1-2 (Data Types, OOP Basics)
-- [ ] Verification Academy: "SystemVerilog OOP" module
+- [x] Verification Academy: "SystemVerilog OOP" module
 - [x] ChipVerify: Classes, Inheritance, Polymorphism pages
 - [x] HW1: Packet class with randomize
 - [x] HW2: Transaction class hierarchy (base + read/write)
@@ -19,7 +19,7 @@ Update this file as you go. Show it to Claude anytime to pick up where you left 
 
 ### Week 2 - Constrained Random
 - [x] Read Spear ch.4-6 (Randomization, Coverage intro)
-- [ ] Verification Academy: "Constrained Random" module
+- [x] Verification Academy: "Constrained Random" module
 - [x] ChipVerify: rand, constraint, dist, solve...before pages
 - [x] HW1: 10 constraint blocks with distribution prediction
 - [x] HW2: Packet generator with complex constraints
@@ -28,7 +28,7 @@ Update this file as you go. Show it to Claude anytime to pick up where you left 
 
 ### Week 3 - Coverage & Assertions
 - [x] Read Spear ch.9 (Functional Coverage) + Cummings SNUG-2009 SVA paper
-- [ ] Verification Academy: "Functional Coverage" + "SVA" modules
+- [x] Verification Academy: "Functional Coverage" + "SVA" modules
 - [x] ChipVerify: covergroup, coverpoint, cross, SVA pages
 - [x] HW1: Covergroup for FIFO states (full/empty/overflow/underflow)
 - [x] HW2: Cross coverage exercise
