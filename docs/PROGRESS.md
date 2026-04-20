@@ -2,41 +2,41 @@
 
 Update this file as you go. Show it to Claude anytime to pick up where you left off.
 
-**Last updated:** ___________
+**Last updated:** 2026-04-20
 
 ---
 
 ## Phase 1: SystemVerilog for Verification (Weeks 1-3)
 
 ### Week 1 - SV OOP
-- [ ] Read Spear ch.1-2 (Data Types, OOP Basics)
+- [x] Read Spear ch.1-2 (Data Types, OOP Basics)
 - [ ] Verification Academy: "SystemVerilog OOP" module
-- [ ] ChipVerify: Classes, Inheritance, Polymorphism pages
-- [ ] HW1: Packet class with randomize
-- [ ] HW2: Transaction class hierarchy (base + read/write)
-- [ ] HW3: Deep copy vs shallow copy exercise
-- [ ] HW4: Virtual methods exercise
+- [x] ChipVerify: Classes, Inheritance, Polymorphism pages
+- [x] HW1: Packet class with randomize
+- [x] HW2: Transaction class hierarchy (base + read/write)
+- [x] HW3: Deep copy vs shallow copy exercise
+- [x] HW4: Virtual methods exercise
 
 ### Week 2 - Constrained Random
-- [ ] Read Spear ch.4-6 (Randomization, Coverage intro)
+- [x] Read Spear ch.4-6 (Randomization, Coverage intro)
 - [ ] Verification Academy: "Constrained Random" module
-- [ ] ChipVerify: rand, constraint, dist, solve...before pages
-- [ ] HW1: 10 constraint blocks with distribution prediction
-- [ ] HW2: Packet generator with complex constraints
-- [ ] HW3: Randomized FIFO transaction generator
-- [ ] HW4: Pre/post randomize hooks exercise
+- [x] ChipVerify: rand, constraint, dist, solve...before pages
+- [x] HW1: 10 constraint blocks with distribution prediction
+- [x] HW2: Packet generator with complex constraints
+- [x] HW3: Randomized FIFO transaction generator
+- [x] HW4: Pre/post randomize hooks exercise
 
 ### Week 3 - Coverage & Assertions
-- [ ] Read Spear ch.7-9 (Functional Coverage, Assertions)
+- [x] Read Spear ch.9 (Functional Coverage) + Cummings SNUG-2009 SVA paper
 - [ ] Verification Academy: "Functional Coverage" + "SVA" modules
-- [ ] ChipVerify: covergroup, coverpoint, cross, SVA pages
-- [ ] HW1: Covergroup for FIFO states (full/empty/overflow/underflow)
-- [ ] HW2: Cross coverage exercise
-- [ ] HW3: 5 SVA assertions for handshake protocol
+- [x] ChipVerify: covergroup, coverpoint, cross, SVA pages
+- [x] HW1: Covergroup for FIFO states (full/empty/overflow/underflow)
+- [x] HW2: Cross coverage exercise
+- [x] HW3: 5 SVA assertions for handshake protocol
 - [ ] HW4: Assertion + coverage combined testbench for simple counter
-- [ ] Design: Read Dally ch.8 (combinational building blocks) and ch.14 (sequential logic)
-- [ ] Design HW3: Fixed-priority arbiter
-- [ ] Design HW4: Parameterized shift register
+- [x] Design: Read Dally ch.8 (combinational building blocks) and ch.14 (sequential logic)
+- [x] Design HW3: Fixed-priority arbiter
+- [x] Design HW4: Parameterized shift register
 
 ---
 
