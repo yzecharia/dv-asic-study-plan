@@ -6,15 +6,16 @@ Sequences are how you generate stimulus in UVM. The sequencer-driver handshake i
 ## What to Study
 
 ### Reading
-- **Salemi *The UVM Primer* ch.6-8** (primary): sequences, config DB, virtual sequences
-  - `uvm_sequence` and `uvm_sequence_item`
-  - `body()` task — the sequence execution
-  - `start_item()` / `finish_item()` handshake
-  - Sequence library, virtual sequences
-  - `uvm_config_db#(T)::set()` / `::get()`
-  - Passing virtual interfaces, parameterizing components from the test level
-- **Rosenberg & Meade ch.5-7** (reference, optional): deeper treatment of the same topics for industry-style patterns
-- **Verification Academy UVM Cookbook** (free, online): best resource for sequence variants and config_db patterns — search it whenever stuck
+- **Salemi *The UVM Primer*** (primary):
+  - **ch.15 Talking to Multiple Objects**
+  - **ch.16 Using Analysis Ports in a Testbench** ⭐
+  - **ch.17 Interthread Communication**
+  - **ch.18 Put and Get Ports in Action**
+  - **ch.21 UVM Transactions** ⭐
+  - **ch.22 UVM Agents** ⭐
+  - **ch.23 UVM Sequences** ⭐ (the core of this week)
+- **Verification Academy UVM Cookbook** (free, online): **essential** this week for `uvm_config_db` patterns — Salemi's coverage of config_db is light. Search: "Configuration", "config_db", "Virtual Sequences"
+- **Rosenberg & Meade ch.5-7** (reference, optional): deeper industry patterns for sequences and config DB
 
 ### Videos (Verification Academy)
 - "UVM Sequences" course
@@ -274,7 +275,8 @@ Write a testbench:
 ## Checklist
 
 ### Verification Track
-- [ ] Read Salemi *UVM Primer* ch.6-8 (Rosenberg ch.5-7 optional reference)
+- [ ] Read Salemi *UVM Primer* ch.15-18, 21-23 (analysis ports, transactions, agents, sequences)
+- [ ] Verification Academy UVM Cookbook: config_db section
 - [ ] Watched Verification Academy Sequences + Config DB modules
 - [ ] Read ChipVerify sequence, sequencer, config_db pages
 - [ ] Completed HW1 (Three sequence types)

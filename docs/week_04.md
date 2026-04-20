@@ -6,13 +6,18 @@ UVM (Universal Verification Methodology) is the industry standard. Every DV job 
 ## What to Study
 
 ### Reading
-- **Salemi *The UVM Primer* ch.1-5** (primary): step-by-step introduction
-  - Why UVM exists, what problems it solves
-  - First UVM testbench: building up from nothing
-  - `uvm_component` hierarchy, phases (`build_phase`, `connect_phase`, `run_phase`, `report_phase`)
-  - `uvm_object` vs `uvm_component`
-  - Factory pattern: `type_id::create()` vs `new()`, factory overrides
-- **Rosenberg & Meade ch.1-4** (reference, optional this week): deeper treatment of the same topics — dip in if Salemi is unclear or you want industry-depth framing
+- **Salemi *The UVM Primer*** (primary — uses TinyALU as the running DUT):
+  - **ch.1 Introduction** (quick read)
+  - **ch.2-3 Conventional TB + SV Interfaces/BFM** (skim — you already know this)
+  - **ch.4-8 OOP review** (skim fast — you have this from weeks 1-2)
+  - **ch.9 The Factory Pattern** ⭐ (read carefully — core UVM abstraction)
+  - **ch.10 An Object-Oriented Testbench** (bridges OOP → UVM)
+  - **ch.11 UVM Tests** ⭐
+  - **ch.12 UVM Components** ⭐
+  - **ch.13 UVM Environments** ⭐
+  - **ch.14 A New Paradigm**
+- **Videos**: companion videos at [uvmprimer.com](http://uvmprimer.com), one per chapter
+- **Rosenberg & Meade ch.1-4** (reference, optional): deeper treatment if you want industry-depth framing
 - **Verification Academy UVM Cookbook** (free, online): topic-indexed recipes — bookmark and search when stuck
 
 ### Videos (Verification Academy)
@@ -300,7 +305,7 @@ Run and verify the override works — you should see "FAST driver running" even 
 ## Checklist
 
 ### Verification Track
-- [ ] Read Salemi *UVM Primer* ch.1-5 (Rosenberg ch.1-4 optional reference)
+- [ ] Read Salemi *UVM Primer* ch.9-14 (factory, OO TB, UVM tests/components/environments; skim ch.1-8 OOP review)
 - [ ] Watched Verification Academy UVM Basics + Components
 - [ ] Read ChipVerify UVM introduction, architecture, component, factory pages
 - [ ] Set up EDA Playground account and ran a "Hello UVM" example
