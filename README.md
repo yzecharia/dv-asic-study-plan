@@ -74,7 +74,9 @@ Build output (`build/`, `waves/`, `*.out`, `*.jou`, `*.log`, `.Xil/`, `xsim.dir/
 | Book | Used For |
 |------|----------|
 | *SystemVerilog for Verification* — Spear & Tumbush (3rd ed) | SV for verification (weeks 1-3) |
-| *A Practical Guide to Adopting the UVM* — Rosenberg & Meade (2nd ed) | UVM (weeks 4-6) |
+| *The UVM Primer* — Ray Salemi | UVM fundamentals — primary (weeks 4-5) |
+| *A Practical Guide to Adopting the UVM* — Rosenberg & Meade (2nd ed) | UVM production patterns — reference (week 6) |
+| [Verification Academy UVM Cookbook](https://verificationacademy.com/cookbook) (free) | UVM reference throughout weeks 4-6 |
 | *Digital Design: A Systems Approach* — Dally & Harting | **Primary design textbook** — combinational blocks, arithmetic, sequential logic, timing, CDC, memory, pipelines, interconnect (weeks 3-8) |
 | *Digital Design and Computer Architecture: RISC-V* — Harris & Harris | CPU design (weeks 7-8) |
 | *FPGA Prototyping by SystemVerilog Examples* — Pong P. Chu | RTL design reference, UART (weeks 2, 9) |

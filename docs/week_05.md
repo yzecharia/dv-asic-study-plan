@@ -6,15 +6,15 @@ Sequences are how you generate stimulus in UVM. The sequencer-driver handshake i
 ## What to Study
 
 ### Reading
-- **Rosenberg & Meade ch.5-6**: "Sequences", "Sequencer-Driver"
+- **Salemi *The UVM Primer* ch.6-8** (primary): sequences, config DB, virtual sequences
   - `uvm_sequence` and `uvm_sequence_item`
   - `body()` task — the sequence execution
   - `start_item()` / `finish_item()` handshake
   - Sequence library, virtual sequences
-- **Rosenberg & Meade ch.7**: "Configuration"
-  - `uvm_config_db#(T)::set()` and `::get()`
-  - Passing virtual interfaces
-  - Parameterizing components from test level
+  - `uvm_config_db#(T)::set()` / `::get()`
+  - Passing virtual interfaces, parameterizing components from the test level
+- **Rosenberg & Meade ch.5-7** (reference, optional): deeper treatment of the same topics for industry-style patterns
+- **Verification Academy UVM Cookbook** (free, online): best resource for sequence variants and config_db patterns — search it whenever stuck
 
 ### Videos (Verification Academy)
 - "UVM Sequences" course
@@ -274,7 +274,7 @@ Write a testbench:
 ## Checklist
 
 ### Verification Track
-- [ ] Read Rosenberg ch.5-7
+- [ ] Read Salemi *UVM Primer* ch.6-8 (Rosenberg ch.5-7 optional reference)
 - [ ] Watched Verification Academy Sequences + Config DB modules
 - [ ] Read ChipVerify sequence, sequencer, config_db pages
 - [ ] Completed HW1 (Three sequence types)

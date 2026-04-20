@@ -6,14 +6,14 @@ UVM (Universal Verification Methodology) is the industry standard. Every DV job 
 ## What to Study
 
 ### Reading
-- **Rosenberg & Meade ch.1-2**: "UVM Introduction", "UVM Overview"
+- **Salemi *The UVM Primer* ch.1-5** (primary): step-by-step introduction
   - Why UVM exists, what problems it solves
-  - Phases: `build_phase`, `connect_phase`, `run_phase`, `report_phase`
-- **Rosenberg & Meade ch.3-4**: "Components", "Factory"
-  - `uvm_component` hierarchy
+  - First UVM testbench: building up from nothing
+  - `uvm_component` hierarchy, phases (`build_phase`, `connect_phase`, `run_phase`, `report_phase`)
   - `uvm_object` vs `uvm_component`
-  - Factory pattern: `type_id::create()` vs `new()`
-  - Factory overrides
+  - Factory pattern: `type_id::create()` vs `new()`, factory overrides
+- **Rosenberg & Meade ch.1-4** (reference, optional this week): deeper treatment of the same topics — dip in if Salemi is unclear or you want industry-depth framing
+- **Verification Academy UVM Cookbook** (free, online): topic-indexed recipes — bookmark and search when stuck
 
 ### Videos (Verification Academy)
 - "UVM Basics" course — start from lesson 1
@@ -300,7 +300,7 @@ Run and verify the override works — you should see "FAST driver running" even 
 ## Checklist
 
 ### Verification Track
-- [ ] Read Rosenberg ch.1-4
+- [ ] Read Salemi *UVM Primer* ch.1-5 (Rosenberg ch.1-4 optional reference)
 - [ ] Watched Verification Academy UVM Basics + Components
 - [ ] Read ChipVerify UVM introduction, architecture, component, factory pages
 - [ ] Set up EDA Playground account and ran a "Hello UVM" example

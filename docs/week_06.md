@@ -6,12 +6,14 @@ This is where everything comes together. You'll build a complete, working UVM te
 ## What to Study
 
 ### Reading
-- **Rosenberg & Meade ch.8-10**: "Scoreboard", "Coverage", "Reporting"
+- **Rosenberg & Meade ch.8-10** (primary this week): "Scoreboard", "Coverage", "Reporting"
   - Reference models inside scoreboard
   - Functional coverage integration in UVM
   - UVM reporting: `uvm_info`, `uvm_warning`, `uvm_error`, `uvm_fatal`
   - Verbosity control
   - End-of-test mechanism: `phase.raise_objection()` / `phase.drop_objection()`
+  - *Note*: Rosenberg is the main book this week — Salemi's primer covers scoreboard at a high level in his later chapters but Rosenberg's production-patterns treatment is what you want now
+- **Verification Academy UVM Cookbook** (free, online): scoreboard and coverage recipes — still the best single reference
 
 ### Videos (Verification Academy)
 - "UVM Scoreboard" course

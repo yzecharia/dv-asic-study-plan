@@ -43,7 +43,7 @@ Update this file as you go. Show it to Claude anytime to pick up where you left 
 ## Phase 2: UVM (Weeks 4-6)
 
 ### Week 4 - UVM Architecture
-- [ ] Read Rosenberg ch.1-4 (UVM intro, components, factory)
+- [ ] Read Salemi *UVM Primer* ch.1-5 (Rosenberg ch.1-4 optional reference)
 - [ ] Verification Academy: "UVM Basics" module
 - [ ] ChipVerify: uvm_component, uvm_object, factory pages
 - [ ] HW1: Draw UVM testbench architecture from memory
@@ -55,7 +55,7 @@ Update this file as you go. Show it to Claude anytime to pick up where you left 
 - [ ] Design HW4: Barrel shifter
 
 ### Week 5 - Sequences & Config DB
-- [ ] Read Rosenberg ch.5-7 (Sequences, Config DB, TLM)
+- [ ] Read Salemi *UVM Primer* ch.6-8 (Rosenberg ch.5-7 optional reference)
 - [ ] Verification Academy: "UVM Sequences" + "Config DB" modules
 - [ ] ChipVerify: sequence, sequencer, config_db pages
 - [ ] HW1: Write 3 sequences (directed, random, error injection)
