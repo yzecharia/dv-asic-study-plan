@@ -268,6 +268,6 @@ Run until 100% coverage. Print final coverage report.
 - [x] Completed Design HW1 (Traffic light FSM)
 - [x] Completed Design HW2 (Valid/ready handshake module)
 - [ ] Read Dally ch.8 (combinational building blocks) and ch.14 (sequential logic)
-- [ ] Completed Design HW3 (Fixed-priority arbiter)
+- [x] Completed Design HW3 (Fixed-priority arbiter)
 - [ ] Completed Design HW4 (Parameterized shift register)
 - [x] Used handshake module as DUT for SVA homework (HW3)

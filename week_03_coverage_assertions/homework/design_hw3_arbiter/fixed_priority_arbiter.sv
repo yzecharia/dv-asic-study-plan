@@ -6,7 +6,7 @@
 //   - grant_valid = OR of grant bits
 
 module fixed_priority_arbiter #(
-    parameter NUM_REQ = 4
+    parameter int NUM_REQ = 4
 )(
     input  logic                clk, rst_n,
     input  logic [NUM_REQ-1:0]  request,
@@ -14,6 +14,21 @@ module fixed_priority_arbiter #(
     output logic                grant_valid
 );
 
-    // TODO: implement
+        // TODO: implement
+    logic [NUM_REQ-1:0] c;
+    always_comb begin
+        c[0] = 1'b1;
+        for (int i = 1; i < NUM_REQ; i++)
+            c[i] = c[i-1] & ~request[i-1];
+    end
 
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (~rst_n) begin
+            grant <= '0;
+        end else begin
+            grant <= c & request;
+        end
+    end
+
+    assign grant_valid = |grant;
 endmodule
