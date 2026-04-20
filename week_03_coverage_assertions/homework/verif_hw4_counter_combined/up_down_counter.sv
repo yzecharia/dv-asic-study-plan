@@ -9,5 +9,12 @@ module up_down_counter (
 );
 
     // TODO: implement
+    always_ff @(posedge clk, negedge rst_n) begin
+        if (~rst_n) count_out <= '0;
+        else if (load) count_out <= data_in;
+        else if (up) count_out <= count_out + 1;
+        else if (down) count_out <= count_out - 1;
+    end
+
 
 endmodule

@@ -133,6 +133,18 @@ Write a clear `$display` in each method so the output makes the difference obvio
 4. What happens if you assign one class handle to another without deep copy?
 5. What are static class members used for? Give an example.
 
+### Answers
+
+1. **`virtual` vs non-virtual methods**: Non-virtual methods are resolved at compile time based on the handle's declared type (static dispatch). Virtual methods are resolved at runtime based on the actual object type (dynamic dispatch). Virtual enables polymorphism — a base-class handle pointing to a derived object calls the derived class's override. Essential for UVM, where the factory creates objects accessed through base-class handles.
+
+2. **`$cast`**: Performs a runtime downcast — converting a base-class handle to a derived-class handle, with a runtime check that the object actually IS that derived type. Returns 1 on success, 0 on type mismatch. Use `if ($cast(target, source))` when you pull a base-class item from a queue (e.g., a scoreboard) and need derived-class fields/methods.
+
+3. **Dynamic arrays/queues over fixed**: A testbench rarely knows the size up front — number of transactions, test duration, etc. Dynamic arrays (`[]`) size at runtime. Queues (`[$]`) additionally support efficient push/pop/insert, making them ideal for scoreboards and reference models. Fixed arrays waste memory for the worst case and force rewrites when spec grows.
+
+4. **Assigning class handles without deep copy**: Both handles point to the **same object** — any modification through one is visible through the other. That's a reference copy, not a duplicate. For an independent copy, use a user-defined `copy()` method that clones all fields. Common bug: writing `tx2 = tx1` expecting a duplicate, then mutating `tx2` and corrupting `tx1`.
+
+5. **Static class members**: Shared across all instances of the class — one storage per class, not per object. Used for class-wide counters, unique IDs, or singleton patterns. Example: a `static int next_id = 0;` that each constructor increments gives every transaction a unique ID without passing an ID generator around.
+
 ---
 
 ## Checklist

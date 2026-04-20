@@ -248,6 +248,22 @@ Run until 100% coverage. Print final coverage report.
 5. What are `illegal_bins` and `ignore_bins`? When would you use each?
 6. How do you handle coverage for very large state spaces (e.g., 32-bit address)?
 
+### Answers
+
+1. **Code vs functional coverage**: Code coverage is tool-generated and automatic — measures which RTL lines, branches, expressions, and toggles were exercised ("did stimulus touch every line?"). Functional coverage is user-defined via `covergroup` — measures which spec-level scenarios were tested ("did stimulus exercise every feature the spec cares about?"). Both matter, but **functional coverage is the signoff gate** — you can hit 100% code coverage without ever testing important features, but you can't hit 100% functional coverage without exercising every bin you declared.
+
+2. **What cross coverage gives you**: Individual coverpoints tell you each variable's values were hit independently. Cross coverage tells you whether specific **combinations** of values fired together. Example: you might have 100% coverage on `wr_en` and on `fifo_full` separately, but a cross catches whether you ever tested `wr_en=1` **while** `fifo_full=1` — the overflow corner. Bugs live in combinations, not in individual values.
+
+3. **`|->` vs `|=>`**: Both are implication operators. `|->` (overlapping) — if the antecedent is true at cycle N, the consequent is checked **at cycle N** (same cycle). `|=>` (non-overlapping) — consequent is checked **at cycle N+1**. Use `|=>` for registered outputs where the effect appears one cycle after the trigger; use `|->` for combinational relationships that should be true simultaneously.
+
+4. **`cover property` vs `assert property`**: `assert property` fails the simulation when the property is violated — it's a correctness check. `cover property` doesn't fail anything — it just records whether the scenario occurred. Use `cover` for **coverage goals** like "did the back-to-back transaction pattern happen?" — you want to know it happened, but not hitting it isn't a design bug, just an untested path.
+
+5. **`illegal_bins` vs `ignore_bins`**: Both remove bins from the coverage goal, but they have different semantics:
+   - **`illegal_bins`**: if hit, the simulator raises an error. Assertion-like — "this should never happen, and if it does, the DUT is broken." Example: counter reading 17 when max is 15.
+   - **`ignore_bins`**: silently drops hits — removes the bin from the denominator so 100% is reachable. Use for combinations that are structurally impossible but aren't bugs (e.g., `burst=16 × region=LOW` when the region is too small to hold a 16-beat burst).
+
+6. **Coverage for large state spaces (e.g., 32-bit)**: You can't bin 2³² values. Reduce the space by: (1) **binning by region** — divide the range into a handful of meaningful categories (e.g., low/mid/high address quadrants, or specific memory-map regions); (2) using **`option.auto_bin_max`** to let the tool subdivide automatically; (3) **targeting interesting edges** — only bin the corners that matter (0, max, boundary crossings, specific addresses); (4) combining with **`illegal_bins`** for unmapped space and **`ignore_bins`** for regions you're not testing. The goal is a coverage model that reflects the *interesting* states, not every raw value.
+
 ---
 
 ## Checklist
@@ -260,8 +276,8 @@ Run until 100% coverage. Print final coverage report.
 - [x] Completed HW1 (FIFO coverage)
 - [x] Completed HW2 (Cross coverage)
 - [x] Completed HW3 (SVA handshake assertions)
-- [ ] Completed HW4 (Combined coverage + assertions testbench)
-- [ ] Can answer all self-check questions
+- [x] Completed HW4 (Combined coverage + assertions testbench)
+- [x] Can answer all self-check questions
 
 ### Design Track
 - [x] Read Cummings FSM coding styles paper

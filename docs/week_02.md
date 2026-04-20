@@ -208,6 +208,25 @@ Write a testbench that:
 5. Why is `post_randomize()` useful for verification?
 6. What's the difference between `dist` with `:=` vs `:/`?
 
+### Answers
+
+1. **`rand` vs `randc`**: `rand` is uniformly random — consecutive calls may repeat values. `randc` (cyclic) produces a random permutation of the value space — every value appears exactly once before any repeats. Use `randc` to guarantee hitting all values quickly (e.g., small enum state spaces); use `rand` for most cases. `randc` is expensive for large state spaces because the solver tracks history.
+
+2. **`solve x before y`**: Without it, the constraint solver treats all variables equally — every legal `(x, y)` combination gets equal probability. With `solve x before y`, the solver first picks `x` uniformly, **then** picks `y` uniformly from values allowed by `x`. This biases the distribution toward values of `x` with fewer valid partners. Example: `x ∈ {0, 1}`, constraint says `y < x`. Without `solve`: only (1, 0) is legal → P(x=1) = 100%. With `solve x before y`: x picked first uniformly → P(x=0) = 50% but then y has no valid value → backtrack → P(x=1) = 100%. The effect becomes interesting with non-degenerate constraints.
+
+3. **`constraint_mode()`**: Enables/disables a named constraint block at runtime. `obj.constraint_mode(0)` disables all constraints; `obj.my_cons.constraint_mode(0)` disables one. Use to relax or tighten the random space for different test phases without rewriting classes. E.g., during stress testing, disable a normal-range constraint to test boundary behavior.
+
+4. **Contradictory constraints**: `randomize()` returns `0` (failure); variable values are undefined. Debug by: disabling constraints one at a time with `constraint_mode(0)` to isolate the conflict; using `rand_mode(0)` on variables to see which one is unsolvable; checking solver output (most simulators have constraint debug flags). Production testbenches always wrap with `if (!obj.randomize()) $fatal("constraint failure");`.
+
+5. **`post_randomize()` utility**: Called automatically after each successful `randomize()`. Use it to: compute derived fields (e.g., CRC from packet payload), apply transformations constraints can't express, log randomized values for debugging, or enforce relationships between fields that would be awkward as constraints. Keeps all stimulus-related logic inside the class.
+
+6. **`dist` with `:=` vs `:/`**: `:=` assigns the weight to **each** value in the range; `:/` **divides** the weight equally among the values in the range.
+
+   - `x dist {[0:9] := 10, 10 := 1}` → each of `0..9` gets weight 10 (total 100), value 10 gets weight 1. P(x=0) = 10/101.
+   - `x dist {[0:9] :/ 10, 10 := 1}` → weight 10 divided among `0..9` (each gets 1), value 10 gets 1. P(x=0) = 1/11.
+
+   Use `:=` when you want probability per-value; `:/` when you want fixed total probability for a range regardless of width.
+
 ---
 
 ## Checklist

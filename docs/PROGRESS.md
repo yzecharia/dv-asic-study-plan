@@ -33,7 +33,7 @@ Update this file as you go. Show it to Claude anytime to pick up where you left 
 - [x] HW1: Covergroup for FIFO states (full/empty/overflow/underflow)
 - [x] HW2: Cross coverage exercise
 - [x] HW3: 5 SVA assertions for handshake protocol
-- [ ] HW4: Assertion + coverage combined testbench for simple counter
+- [x] HW4: Assertion + coverage combined testbench for simple counter
 - [x] Design: Read Dally ch.8 (combinational building blocks) and ch.14 (sequential logic)
 - [x] Design HW3: Fixed-priority arbiter
 - [x] Design HW4: Parameterized shift register
