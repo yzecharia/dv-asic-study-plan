@@ -1,11 +1,37 @@
+# ── OS / Editor junk ─────────────────────────────────────────────
 .DS_Store
+._*
+*.swp
+*.swo
+*~
+*.bak
+*.orig
+
+# ── Python (ad-hoc scripts) ──────────────────────────────────────
+__pycache__/
+*.pyc
+
+# ── Vivado / xsim artifacts ──────────────────────────────────────
+xsim.dir/
+.Xil/
 *.jou
 *.log
-*.vcd
+*.pb
 *.wdb
-xsim.dir/
-build/
-.Xil/
 xsim.covdb/
 *.covinfo
+
+# ── Simulation outputs ───────────────────────────────────────────
+*.vcd
+*.fst
+*.ghw
+*.out
+*.vvp
+
+# ── Synthesis / build temp ───────────────────────────────────────
+.yosys_tmp/
+build/
+waves/
+
+# ── Project-specific ─────────────────────────────────────────────
 week_03_coverage_assertions/learning/misc/mailbox_example.sv
