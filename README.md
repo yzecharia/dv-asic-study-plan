@@ -103,8 +103,8 @@ Plus free online resources: **Verification Academy**, **ChipVerify**, **EDA Play
 
 ## Toolchain
 
-- **Xilinx Vivado / xsim** (via Docker on Apple Silicon) for local simulation
-- **EDA Playground** (with commercial simulators) for UVM runs
+- **Xilinx Vivado / xsim** (via Docker on Apple Silicon) for local simulation — UVM-capable with `-L uvm`
+- **EDA Playground** (with commercial simulators) — fallback for UVM edge cases
 - **VSCode** with SystemVerilog extensions for editing
 
 ---

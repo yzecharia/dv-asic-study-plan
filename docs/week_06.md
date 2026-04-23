@@ -29,8 +29,9 @@ This is where everything comes together. You'll build a complete, working UVM te
 - https://www.chipverify.com/uvm/uvm-objection
 
 ### Tool
-- Use **EDA Playground** for all exercises this week
-- Create a project with proper file organization (pkg, interface, top)
+- **Primary**: Vivado xsim via the `🧪 FLOW: XSIM UVM` VSCode task (supports UVM)
+- **Fallback**: EDA Playground if xsim chokes on a specific construct
+- Either way, organize your files properly: pkg, interface, top
 
 ---
 

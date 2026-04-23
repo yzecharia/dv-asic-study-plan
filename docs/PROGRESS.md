@@ -43,6 +43,7 @@ Update this file as you go. Show it to Claude anytime to pick up where you left 
 ## Phase 2: UVM (Weeks 4-6)
 
 ### Week 4 - UVM Architecture
+- [x] Read Salemi *UVM Primer* ch.1-8 (intro, conventional TB, SV interfaces, OOP review)
 - [ ] Read Salemi *UVM Primer* ch.9-14 (Factory, OO TB, UVM tests/components/environments)
 - [ ] Verification Academy: "UVM Basics" module
 - [ ] ChipVerify: uvm_component, uvm_object, factory pages

@@ -44,29 +44,8 @@ module counter_combined_tb;
         @(posedge clk) disable iff (~rst_n) (count_out >= 0);
     endproperty
 
-    // Capture prior-cycle values explicitly (portable across simulators)
-    logic [3:0] count_out_d;
-    logic [3:0] data_in_at_load;
-    logic       load_d, up_active_d, down_active_d;
-
-    always_ff @(posedge clk, negedge rst_n) begin
-        if (~rst_n) begin
-            count_out_d     <= '0;
-            data_in_at_load <= '0;
-            load_d          <= 1'b0;
-            up_active_d     <= 1'b0;
-            down_active_d   <= 1'b0;
-        end else begin
-            count_out_d     <= count_out;
-            load_d          <= load;
-            up_active_d     <= up   && !load && !down;
-            down_active_d   <= down && !load && !up;
-            if (load) data_in_at_load <= data_in;
-        end
-    end
-
     property load_check;
-        @(posedge clk) disable iff (~rst_n) load_d |-> (count_out == data_in_at_load);
+        @(posedge clk) disable iff (~rst_n) load |=> (count_out == $past(data_in));
     endproperty
 
     property up_down;
@@ -74,11 +53,13 @@ module counter_combined_tb;
     endproperty
 
     property increment;
-        @(posedge clk) disable iff (~rst_n) up_active_d |-> (count_out == (count_out_d + 1) % 16);
+        @(posedge clk) disable iff (~rst_n)
+            (up && !load && !down) |=> (count_out == ($past(count_out) + 1) % 16);
     endproperty
 
     property decrement;
-        @(posedge clk) disable iff (~rst_n) down_active_d |-> (count_out == (count_out_d + 15) % 16);
+        @(posedge clk) disable iff (~rst_n)
+            (down && !load && !up) |=> (count_out == ($past(count_out) + 15) % 16);
     endproperty
 
     assert property (count_max_limit) else $error("Counting outside spec range, count > 15");

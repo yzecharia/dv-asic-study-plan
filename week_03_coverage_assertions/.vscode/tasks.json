@@ -283,6 +283,30 @@
         "Y3. Open Optimized Schematic"
       ],
       "group": "build"
+    },
+    {
+      "label": "XU1. xsim UVM: Compile + Run UVM TB (-L uvm + UVM_TESTNAME)",
+      "type": "shell",
+      "command": "UVM_TESTNAME=${input:uvmTestName} SV_SEED=${input:svSeed} ${workspaceFolder}/../run_xsim_auto.sh ${file}",
+      "group": "build",
+      "presentation": { "clear": true, "group": "xsim" },
+      "problemMatcher": {
+        "owner": "xsim",
+        "fileLocation": ["relative", "${workspaceFolder}"],
+        "pattern": {
+          "regexp": "^ERROR:\\s+\\[\\w+ \\d+-\\d+\\]\\s+(.*?)\\s+\\[(.+?):(\\d+)\\]",
+          "message": 1,
+          "file": 2,
+          "line": 3
+        }
+      }
+    },
+    {
+      "label": "🧪 FLOW: XSIM UVM (UVM TB with test selection)",
+      "dependsOn": [
+        "XU1. xsim UVM: Compile + Run UVM TB (-L uvm + UVM_TESTNAME)"
+      ],
+      "group": "build"
     }
   ],
   "inputs": [
@@ -298,6 +322,12 @@
       "description": "FSM state encoding",
       "options": ["auto", "one-hot", "binary", "none"],
       "default": "auto"
+    },
+    {
+      "id": "uvmTestName",
+      "type": "promptString",
+      "description": "UVM test name (e.g. alu_base_test; leave empty if run_test(\"x\") is hardcoded in the TB)",
+      "default": ""
     }
   ]
 }

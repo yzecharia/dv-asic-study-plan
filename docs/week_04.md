@@ -35,11 +35,17 @@ UVM (Universal Verification Methodology) is the industry standard. Every DV job 
 - https://www.chipverify.com/uvm/uvm-factory
 
 ### Tool Setup
-**IMPORTANT:** iverilog does NOT fully support UVM. For this week and all UVM work, use:
-- **EDA Playground** (edaplayground.com) — free, browser-based, has Questa/VCS/Riviera
-  - Select "UVM 1.2" or "UVM 2.0" from the libraries dropdown
-  - Select a simulator (Aldec Riviera-PRO works well on free tier)
-- Alternatively, try Verilator (you have it installed) but UVM support is limited
+**IMPORTANT:** iverilog does NOT fully support UVM, and Verilator's UVM support is not production-ready either. Three options, in order of preference:
+
+1. **Vivado xsim (primary)** — your existing Docker setup supports UVM. Use the
+   `🧪 FLOW: XSIM UVM` VSCode task. It passes `-L uvm` to xvlog/xelab and
+   optionally prompts for a UVM_TESTNAME plusarg. Works for every Salemi chapter
+   and every UVM testbench you'll write in weeks 4-6, 11-12.
+2. **EDA Playground** (edaplayground.com) — free, browser-based. Good fallback when
+   xsim trips on something:
+   - Select "UVM 1.2" or "UVM 2.0" from the libraries dropdown
+   - Select a simulator (Aldec Riviera-PRO works well on free tier)
+3. **Verilator / iverilog** — not usable for UVM. Skip.
 
 ---
 
@@ -305,10 +311,11 @@ Run and verify the override works — you should see "FAST driver running" even 
 ## Checklist
 
 ### Verification Track
-- [ ] Read Salemi *UVM Primer* ch.9-14 (factory, OO TB, UVM tests/components/environments; skim ch.1-8 OOP review)
+- [x] Read Salemi *UVM Primer* ch.1-8 (intro, conventional TB, SV interfaces/BFM, OOP review)
+- [ ] Read Salemi *UVM Primer* ch.9-14 (factory, OO TB, UVM tests/components/environments)
 - [ ] Watched Verification Academy UVM Basics + Components
 - [ ] Read ChipVerify UVM introduction, architecture, component, factory pages
-- [ ] Set up EDA Playground account and ran a "Hello UVM" example
+- [ ] Ran a "Hello UVM" example (via xsim's `🧪 FLOW: XSIM UVM` task or EDA Playground)
 - [ ] Completed HW1 (Draw architecture from memory)
 - [ ] Completed HW2 (Skeleton UVM environment)
 - [ ] Completed HW3 (Full sequence_item implementation)

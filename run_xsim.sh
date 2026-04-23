@@ -95,9 +95,11 @@ if [[ -z "$TOP_MODULE" ]]; then
 fi
 
 # ── Build xvlog + xelab + xsim command ────────────────────────────────────
+# -L uvm links the pre-compiled UVM library on every run. Harmless for non-UVM
+# TBs (unused if the code doesn't import uvm_pkg), required for UVM TBs.
 XVLOG_CMDS=""
 for f in "${REL_FILES[@]}"; do
-    XVLOG_CMDS+="xvlog --sv /work/$f && "
+    XVLOG_CMDS+="xvlog --sv -L uvm /work/$f && "
 done
 
 SEED_FLAG=""
@@ -105,7 +107,15 @@ if [[ -n "${SV_SEED:-}" ]]; then
     SEED_FLAG=" -sv_seed ${SV_SEED}"
 fi
 
-SIM_CMD="${XVLOG_CMDS}xelab ${TOP_MODULE} -s sim --debug off && xsim sim --runall${SEED_FLAG}; EXIT=\$?; rm -rf /work/xsim.dir /work/xvlog.pb /work/xvlog.log /work/xelab.pb /work/xelab.log /work/xsim.log /work/xsim.jou /work/.Xil 2>/dev/null; exit \$EXIT"
+# UVM_TESTNAME env var → translated to +UVM_TESTNAME plusarg for xsim.
+# Set this when your TB calls run_test() with no argument and relies on the
+# plusarg to choose which test class to instantiate.
+UVM_TEST_FLAG=""
+if [[ -n "${UVM_TESTNAME:-}" ]]; then
+    UVM_TEST_FLAG=" -testplusarg UVM_TESTNAME=${UVM_TESTNAME}"
+fi
+
+SIM_CMD="${XVLOG_CMDS}xelab -L uvm ${TOP_MODULE} -s sim --debug off && xsim sim --runall${SEED_FLAG}${UVM_TEST_FLAG}; EXIT=\$?; rm -rf /work/xsim.dir /work/xvlog.pb /work/xvlog.log /work/xelab.pb /work/xelab.log /work/xsim.log /work/xsim.jou /work/.Xil 2>/dev/null; exit \$EXIT"
 
 # ── Print info ─────────────────────────────────────────────────────────────
 echo -e "${CYAN}╔══════════════════════════════════════════════════════╗${NC}"
