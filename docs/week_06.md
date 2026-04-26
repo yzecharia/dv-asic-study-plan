@@ -248,6 +248,27 @@ No RTL for this one — work through these on paper or a whiteboard. Understandi
 
 4. **Metastability MTBF**: Given a synchronizer with Tsetup=0.5ns, Tw=0.3ns (metastability window), clock=200MHz, input change rate=50MHz: Calculate MTBF with 1-FF vs 2-FF synchronizer. Why is 2-FF sufficient?
 
+### Design HW5: ECC — Parity + Hamming(7,4) on the Register File
+
+Memory subsystems in real chips need error detection / correction. This brings
+your week-06 deliverables in line with what most academic DV/RTL courses
+include in a "memory and reliability" module.
+
+1. **Parity bit** — extend Design HW1 (Register File) to add a single parity bit
+   per register. Write logic to detect single-bit errors on read. No correction —
+   just a fault flag.
+2. **Hamming(7,4) SECDED** — implement a small standalone module that:
+   - encodes a 4-bit data word into a 7-bit codeword (4 data + 3 parity), and
+   - decodes a 7-bit codeword back to 4 bits, **correcting** any single-bit error
+     and **detecting** double-bit errors.
+3. **Testbench** — directed tests that flip each bit position and confirm the
+   decoder corrects it; flip two bits and confirm the decoder reports an
+   uncorrectable error.
+
+Resources:
+- ChipVerify / Wikipedia "Hamming code" pages
+- Optional: Synopsys / Cadence app notes on SECDED in SRAM IP
+
 ---
 
 ## Checklist
@@ -271,4 +292,5 @@ No RTL for this one — work through these on paper or a whiteboard. Understandi
 - [ ] Completed Design HW2 (2-FF synchronizer + pulse synchronizer)
 - [ ] Completed Design HW3 (Asynchronous FIFO with gray code pointers)
 - [ ] Completed Design HW4 (Timing analysis pen-and-paper exercise)
+- [ ] Completed Design HW5 (Parity + Hamming SECDED on register file)
 - [ ] **MILESTONE: You understand CDC — the #1 source of silicon bugs!**

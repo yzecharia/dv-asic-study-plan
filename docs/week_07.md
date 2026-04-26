@@ -179,6 +179,39 @@ Tip: Use https://riscvasm.lucasteske.dev/ (online RISC-V assembler) to convert a
 
 ---
 
+## Bonus: Signed Arithmetic & Fixed-Point Numbers
+
+Most academic DV courses cover signed/fixed-point arithmetic explicitly because
+DSP and AI accelerator pipelines use it everywhere. Your RISC-V ALU already
+exercises signed comparisons (`SLT`/`SLTU`) and arithmetic shifts (`SRA`); this
+section pushes a level deeper.
+
+### Reading
+- Dally & Harting **ch.10 §10.1-10.4**: signed two's complement, sign extension,
+  overflow detection on signed adds.
+- Wikipedia **"Q (number format)"**: a 5-min read on Q1.15 / Q15.16 / general
+  Qm.n notation used in DSP.
+- ChipVerify **"SystemVerilog signed and unsigned"** (search the site).
+
+### Bonus HW5: Signed & Fixed-Point ALU Extensions
+1. **Signed multiplication**: extend HW2's ALU to compute the full 64-bit
+   signed product `A * B` for two 32-bit signed operands. Verify against
+   Verilog's `signed'(...)` cast.
+2. **Q15.16 fixed-point multiply**: build a tiny `qmul.sv` that takes two
+   `signed [31:0]` inputs interpreted as Q15.16, multiplies, and returns the
+   correctly scaled Q15.16 result (i.e., the 64-bit product right-shifted by 16,
+   with rounding).
+3. **Saturating add**: `sat_add.sv` — signed 16-bit add that clamps at
+   `+0x7FFF` / `-0x8000` instead of wrapping. Used in DSP/audio pipelines.
+4. **Testbench**: random + directed corner cases (max+1, min-1, sign-flip).
+
+Why care: AI accelerators (Gaudi, NVIDIA Tensor Cores) and DSP IPs verify
+exactly these number formats. Even if a junior DV role doesn't ask for it,
+knowing Q-format and saturation gives you something real to discuss in
+interviews about AI / signal-processing teams.
+
+---
+
 ## Checklist
 - [ ] Read Harris & Harris ch.6 and ch.7.1-7.3
 - [ ] Read RISC-V spec RV32I chapter
@@ -188,4 +221,5 @@ Tip: Use https://riscvasm.lucasteske.dev/ (online RISC-V assembler) to convert a
 - [ ] Completed HW2 (ALU with all operations)
 - [ ] Completed HW3 (Single-cycle datapath)
 - [ ] Completed HW4 (Assembly test programs — all 4 pass)
+- [ ] *(Bonus)* Completed HW5 (Signed mul + Q15.16 fixed-point + saturating add)
 - [ ] Can answer all self-check questions

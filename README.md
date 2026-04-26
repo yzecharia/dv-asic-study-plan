@@ -1,4 +1,4 @@
-# DV / ASIC Study Plan — 12 Weeks
+# DV / ASIC Study Plan — 12 Weeks (+2 Bonus)
 
 ![Progress](https://img.shields.io/badge/progress-3%2F12_weeks-brightgreen)
 ![Current Week](https://img.shields.io/badge/current_week-4-blue)
@@ -33,6 +33,13 @@ I am doing this on my own as an autodidact alongside my job search, building in 
 | 10 | — | SPI Master, AXI-Lite Slave | Not started |
 | 11 | UVM Testbench for UART | UART RTL cleanup | Not started |
 | 12 | UVM Testbench for FIFO | RISC-V CPU cleanup | Not started |
+| **13 (bonus)** | **Advanced UVM — RAL + Multi-UVC + Register Verification** | — | Not started |
+| **14 (bonus)** | — | **Design Closure — Synthesis, PPA, FPGA Implementation** | Not started |
+
+> The bonus weeks close gaps that academic DV/ASIC courses cover explicitly
+> (UVM RAL, multi-UVC environments, synthesis/PPA, FPGA implementation flow)
+> so the final portfolio is interview-grade across both verification and
+> design closure.
 
 ---
 
@@ -82,6 +89,7 @@ Earlier weeks (1–2) use a flatter `rtl/` + `tb/` layout. All build output
 | **3 — CPU Architecture** | 7-8 | — | Single-cycle & pipelined RISC-V RV32I CPU |
 | **4 — Protocols** | 9-10 | — | UART, SPI, AXI-Lite |
 | **5 — Portfolio Projects** | 11-12 | Full UVM testbenches for UART & FIFO | RTL cleanup & documentation |
+| **6 — Course-Coverage Bonus** | 13-14 | RAL + Multi-UVC + Register verification | Synthesis, PPA, FPGA implementation flow |
 
 ---
 
