@@ -1,17 +1,30 @@
-# Verif HW1 — UVM Architecture Diagram
+# Verif HW1 — UVM Architecture Diagram ✅
 
-Draw the UVM testbench architecture from memory. Spec: docs/week_04.md, HW1.
+Drew the Salemi ch.13 UVM testbench architecture from memory (no reference).
 
-## What to include
+![architecture](architecture.png)
 
-- Test → Env → Agent → (Driver, Sequencer, Monitor)
-- uvm_config_db flow
-- Analysis port connection from Monitor → Scoreboard/Coverage
-- Factory-created objects
+## What's in the diagram
 
-## Deliverable
+| Layer | Boxes |
+|---|---|
+| **Module hierarchy** | `top` instantiates `Design` (DUT) + `BFM` (interface), then calls `run_test()` to launch UVM |
+| **TB classes package** | `tb_classes` box (= `tinyalu_pkg`) — all UVM classes live inside it; `top` imports them |
+| **uvm_test layer** | `Test` extends `uvm_test`; calls `set_type_override` then `creates` the env |
+| **uvm_env layer** | `Environment` extends `uvm_env`; builds 3 children: tester, coverage, scoreboard |
+| **uvm_component layer** | `Base Tester` (abstract), `Coverage`, `Scoreboard` — all extend `uvm_component` |
+| **Inheritance** | `Tester extends base_tester`; the env asks the factory for a `base_tester` and the override swaps it for the concrete `Tester` |
+| **DUT interaction** | `Base Tester` drives the BFM via `send_op()`; `Coverage` + `Scoreboard` observe it; `Design` ↔ `BFM` are wired via ports (dashed line) |
 
-Save your diagram (hand-drawn photo, draw.io export, etc.) as
-`architecture.png` or `architecture.svg` in this folder.
+## Key concept demonstrated
 
-Or describe it in words in this file — your call.
+The pink/curved arrow labeled `creates base_tester (factory swaps it)` shows the
+**factory override pattern**: the `env` always asks for a `base_tester`, and the
+test's `set_type_override` redirects that to the concrete `Tester` (random or
+add). Same env, different stimulus, picked at test build time.
+
+## Iterations
+
+Drafted three times before settling — each pass tightened a detail
+(Design↔BFM port wiring as dashed line, package renamed `tb classes`,
+explicit `imports` arrow from `top`).

@@ -314,14 +314,14 @@ Run and verify the override works — you should see "FAST driver running" even 
 - [x] Read Salemi *UVM Primer* ch.1-8 (intro, conventional TB, SV interfaces/BFM, OOP review)
 - [x] Read Salemi *UVM Primer* ch.9 (factory pattern)
 - [x] Read Salemi *UVM Primer* ch.10 (object-oriented testbench — bridge to UVM)
-- [x] Read Salemi *UVM Primer* ch.11 (uvm_test) — ran ch.11 testbench end-to-end with xsim
+- [x] Read Salemi *UVM Primer* ch.11 (uvm_test) — ran random_test + add_test
 - [x] Read Salemi *UVM Primer* ch.12 (uvm_components)
-- [ ] Read Salemi *UVM Primer* ch.13 (uvm_environments) — **in progress**
-- [ ] Read Salemi *UVM Primer* ch.14 (a new paradigm)
+- [x] Read Salemi *UVM Primer* ch.13 (uvm_environments) — built UML diagram of folder
+- [x] Read Salemi *UVM Primer* ch.14 (a new paradigm) — **PRIMER COMPLETE 🎉**
 - [ ] Watched Verification Academy UVM Basics + Components
 - [ ] Read ChipVerify UVM introduction, architecture, component, factory pages
-- [ ] Ran a "Hello UVM" example (via xsim's `🧪 FLOW: XSIM UVM` task or EDA Playground)
-- [ ] Completed HW1 (Draw architecture from memory)
+- [x] Ran a "Hello UVM" example (ran ch.10 OO TB + ch.11 UVM TB + built full multi-DUT framework)
+- [x] Completed HW1 (Draw architecture from memory) — see `homework/verif_hw1_architecture_diagram/`
 - [ ] Completed HW2 (Skeleton UVM environment)
 - [ ] Completed HW3 (Full sequence_item implementation)
 - [ ] Completed HW4 (Factory override exercise)
