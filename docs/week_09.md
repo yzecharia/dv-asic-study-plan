@@ -17,6 +17,8 @@ UART is the simplest serial protocol and the perfect first "real" IP block to de
 ### Reading (Design Best Practices)
 - **Pong Chu ch.7**: UART section — you already have this book, review the design approach
 - **Cliff Cummings** *"Clock Domain Crossing"* — not needed for UART itself, but essential knowledge for protocols that cross clock domains
+- **Sutherland *SystemVerilog for Design* (2nd ed) ch.4-5**: SV interfaces and modports — wrap the UART signals (TX/RX/baud-tick/parity-error) in a proper interface instead of loose ports.
+- **Sutherland *SystemVerilog for Design* (2nd ed) ch.13**: RTL synthesis guidelines — clean coding for the TX/RX FSMs and the baud-rate generator.
 
 ### Industry Design Guidelines for UART
 - **Use a proper FSM** for TX and RX state machines (2-block style)

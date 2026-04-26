@@ -20,6 +20,11 @@ SPI is the second most common serial protocol (after UART) — used for flash, s
   - Read chapters 1-3 only
   - Focus on AXI4-Lite (simplified version, no bursts)
 - **ChipVerify AXI tutorial**: https://www.chipverify.com/axi/axi-protocol
+
+### Reading (Design Best Practices)
+- **Sutherland *SystemVerilog for Design* (2nd ed) ch.4-5**: SV interfaces and modports — bundle the SPI signals (SCLK/MOSI/MISO/CS) and the AXI-Lite 5 channels into proper interfaces with master/slave/monitor modports. This is exactly how real bus IPs are written.
+- **Sutherland *SystemVerilog for Design* (2nd ed) ch.11**: parameterized modules — AXI-Lite is naturally parameterized on `ADDR_WIDTH` and `DATA_WIDTH`. Use `generate` to scale the register bank in HW3.
+- **Sutherland *SystemVerilog for Design* (2nd ed) ch.13**: RTL synthesis guidelines — the SPI/AXI FSMs and handshake logic should follow these patterns to synthesize cleanly.
 - Key concepts:
   - 5 channels: Write Address (AW), Write Data (W), Write Response (B), Read Address (AR), Read Data (R)
   - Valid/Ready handshake on every channel

@@ -124,6 +124,8 @@ This week has two design focuses: (1) connecting your ALU DUT into UVM, and (2) 
 - **Dally & Harting ch.24**: "Interconnect" — buses, arbitration schemes (fixed-priority, round-robin, weighted), crossbars. Directly relevant to your round-robin arbiter HW.
 - **Cliff Cummings** *"Simulation and Synthesis Techniques for Asynchronous FIFO Design"* (SNUG 2002) — the canonical paper on async FIFO design with Gray code pointers. Read the theory now, build it in Week 6.
 - **ChipVerify**: https://www.chipverify.com/verilog/verilog-single-port-ram — RAM design patterns
+- **Sutherland *SystemVerilog for Design* (2nd ed) ch.7**: data types — packed/unpacked structs and arrays. Useful when shaping the dual-port RAM and cache-line types.
+- **Sutherland *SystemVerilog for Design* (2nd ed) ch.11**: hierarchical structure — `generate`, parameterized modules. Apply directly to the parametric RAM and arbiter HW.
 
 ### Design HW1: Top-Level Testbench Module
 Write the `tb_top.sv` that instantiates the DUT, interface, and runs UVM:

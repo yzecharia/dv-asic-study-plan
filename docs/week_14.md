@@ -28,6 +28,14 @@ Goals after this week:
 - **Xilinx UG901**: *Vivado Design Suite User Guide — Synthesis* (skim ch.1-3
   for the synthesis flow vocabulary)
 - **Yosys manual**: short and free at [yosyshq.net/yosys/](https://yosyshq.net/yosys/)
+- **Sutherland *SystemVerilog for Design* (2nd ed) ch.13**: RTL synthesis
+  guidelines — **the single most relevant chapter for this week**. Covers what
+  every synthesizer expects, what causes latches, how to write priority and
+  parallel logic, and which SV constructs are/aren't synthesizable. Read this
+  before running yosys on the RISC-V CPU.
+- **Sutherland *SystemVerilog for Design* (2nd ed) ch.9**: SV procedural
+  blocks — the `always_comb` / `always_ff` rules that yosys (and every
+  commercial synthesis tool) interpret unambiguously.
 
 ### Videos
 - **VLSI System Design YouTube channel** — short clips on synthesis flow

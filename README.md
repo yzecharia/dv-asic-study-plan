@@ -104,8 +104,10 @@ Earlier weeks (1–2) use a flatter `rtl/` + `tb/` layout. All build output
 | *Digital Design: A Systems Approach* — Dally & Harting | **Primary design textbook** — combinational blocks, arithmetic, sequential logic, timing, CDC, memory, pipelines, interconnect (weeks 3-8) |
 | *Digital Design and Computer Architecture: RISC-V* — Harris & Harris | CPU design (weeks 7-8) |
 | *FPGA Prototyping by SystemVerilog Examples* — Pong P. Chu | RTL design reference, UART (weeks 2, 9) |
+| *SystemVerilog for Design* (2nd ed) — Sutherland, Davidmann, Flake, Moorby | SV-for-design canonical reference — interfaces, modports, packed/unpacked types, `always_comb`/`always_ff`, parameterized modules, RTL synthesis guidelines (used from week 4 onwards across the design track and the bonus weeks) |
+| *RTL Modeling with SystemVerilog* — Sutherland | Practical synthesizable RTL coding patterns (companion to the above; design track weeks 6-10) |
 
-Key papers (free): **Cliff Cummings** — FSM coding styles, nonblocking assignments, clock domain crossing (CDC), async FIFO design, synthesis coding styles. These papers are industry gold — read all of them.
+Key papers (free): **Cliff Cummings** — FSM coding styles, nonblocking assignments, clock domain crossing (CDC), async FIFO design, synthesis coding styles, **SVA Design Tricks and Bind Files (SNUG-2009)**. These papers are industry gold — read all of them.
 
 Plus free online resources: **Verification Academy**, **ChipVerify**, **EDA Playground**, **Nandland**, and the **RISC-V spec**.
 

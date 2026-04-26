@@ -24,6 +24,10 @@ multi-agent UVM environments" — which most junior candidates can't.
 - **ChipVerify**: search "UVM RAL" — quick syntax reference
 - **Mentor whitepaper**: *"UVM Register Layer Quick Start"* (Google it; Mentor
   hosts it free)
+- **Sutherland *SystemVerilog for Design* (2nd ed) ch.5**: SV interfaces and
+  modports — when you build the RAL adapter (`uvm_reg_adapter`) you'll need to
+  understand how an interface is declared from the design side so you can
+  convert `uvm_reg_bus_op` to your bus's transaction shape.
 
 ### Videos (Verification Academy)
 - "Register Modeling" course (3 short lessons)

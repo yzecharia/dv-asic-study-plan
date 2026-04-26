@@ -147,6 +147,8 @@ Week 6 has three design focuses: (1) the register file that feeds into your UVM 
 - **Cliff Cummings** *"Clock Domain Crossing (CDC) Design & Verification Techniques Using SystemVerilog"* (SNUG 2008) — **essential reading**. This paper is cited in every CDC interview question. Covers metastability, 2-FF synchronizer, pulse synchronizer, gray code.
 - **Cliff Cummings** *"Simulation and Synthesis Techniques for Asynchronous FIFO Design"* (SNUG 2002) — you read the theory in Week 5, now build it.
 - **ChipVerify**: https://www.chipverify.com/verilog/verilog-clock-domain-crossing
+- **Sutherland *SystemVerilog for Design* (2nd ed) ch.9**: SV procedural blocks — `always_comb`, `always_ff`, `always_latch` and when each one is the right tool. Use this for the register-file and synchronizer code.
+- **Sutherland *SystemVerilog for Design* (2nd ed) ch.13**: RTL synthesis guidelines — what synthesizes cleanly and what doesn't. The single best chapter for writing register-file / FIFO RTL that won't surprise you in synthesis.
 
 ### Design Notes for the Register File
 - **x0 hardwired to zero** — this is a RISC-V convention; any write to x0 is ignored, reads always return 0

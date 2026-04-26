@@ -59,6 +59,7 @@ Starting from Week 4, your design work feeds directly into your UVM testbench. T
 - **Dally & Harting ch.13**: "Arithmetic Examples" — worked design examples combining arithmetic blocks.
 - **ChipVerify**: https://www.chipverify.com/systemverilog/systemverilog-interface
 - **Cliff Cummings** *"Synthesis Coding Styles for Efficient Designs"* — how your RTL maps to actual hardware gates
+- **Sutherland *SystemVerilog for Design* (2nd ed) ch.4-5**: SV interfaces and modports — the canonical reference. Read this before Design HW2 (the SV interface for the ALU).
 
 ### Design HW1: ALU DUT
 Design the ALU that your UVM testbench will verify:

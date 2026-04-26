@@ -24,6 +24,8 @@ You already have `DDCA_RISCV` on your machine — this week you either extend it
 - **Dally & Harting ch.9**: "Combinational Examples" — worked examples of combinational design including decoders and control logic.
 - **Cliff Cummings** *"Full Case Parallel Case"* — understanding synthesis pragmas for case statements (critical for decoders)
 - **Cliff Cummings** *"Coding And Scripting Techniques for FSM Designs with Synthesis-Optimized, Glitch-Free Outputs"*
+- **Sutherland *SystemVerilog for Design* (2nd ed) ch.10**: tasks and functions — clean way to factor decoder/ALU helper logic out of the top module.
+- **Sutherland *SystemVerilog for Design* (2nd ed) ch.13**: RTL synthesis guidelines — apply directly to the ALU, decoder, and datapath modules so they synthesize as intended.
 
 ### Reference
 - RISC-V Green Card (instruction reference sheet) — Google "RISC-V reference card PDF"

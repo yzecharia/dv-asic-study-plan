@@ -15,6 +15,8 @@ Every real CPU is pipelined. Understanding pipeline hazards (data, control, stru
   - Control hazards: branch prediction, pipeline flush
 - **Dally & Harting ch.23**: "Pipelines" — pipeline theory, throughput vs latency, pipeline hazards and interlocks. Gives a more general treatment of pipelining beyond just CPUs — applicable to any datapath.
 - **Patterson & Hennessy** (optional, deeper): Chapter 4 "The Processor"
+- **Sutherland *SystemVerilog for Design* (2nd ed) ch.9**: SV procedural blocks — cleanly modeling pipeline registers with `always_ff` and avoiding latch inference between stages.
+- **Sutherland *SystemVerilog for Design* (2nd ed) ch.13**: RTL synthesis guidelines — pipeline-friendly coding patterns; this is the chapter that keeps your forwarding muxes and hazard logic synthesizable.
 
 ### Videos
 - **MIT 6.004**: Pipelining lectures (2-3 lectures)
