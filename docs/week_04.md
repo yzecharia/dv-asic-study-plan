@@ -312,7 +312,12 @@ Run and verify the override works — you should see "FAST driver running" even 
 
 ### Verification Track
 - [x] Read Salemi *UVM Primer* ch.1-8 (intro, conventional TB, SV interfaces/BFM, OOP review)
-- [ ] Read Salemi *UVM Primer* ch.9-14 (factory, OO TB, UVM tests/components/environments)
+- [x] Read Salemi *UVM Primer* ch.9 (factory pattern)
+- [x] Read Salemi *UVM Primer* ch.10 (object-oriented testbench — bridge to UVM)
+- [x] Read Salemi *UVM Primer* ch.11 (uvm_test) — ran ch.11 testbench end-to-end with xsim
+- [x] Read Salemi *UVM Primer* ch.12 (uvm_components)
+- [ ] Read Salemi *UVM Primer* ch.13 (uvm_environments) — **in progress**
+- [ ] Read Salemi *UVM Primer* ch.14 (a new paradigm)
 - [ ] Watched Verification Academy UVM Basics + Components
 - [ ] Read ChipVerify UVM introduction, architecture, component, factory pages
 - [ ] Ran a "Hello UVM" example (via xsim's `🧪 FLOW: XSIM UVM` task or EDA Playground)
