@@ -16,13 +16,6 @@ Drew the Salemi ch.13 UVM testbench architecture from memory (no reference).
 | **Inheritance** | `Tester extends base_tester`; the env asks the factory for a `base_tester` and the override swaps it for the concrete `Tester` |
 | **DUT interaction** | `Base Tester` drives the BFM via `send_op()`; `Coverage` + `Scoreboard` observe it; `Design` ↔ `BFM` are wired via ports (dashed line) |
 
-## Key concept demonstrated
-
-The pink/curved arrow labeled `creates base_tester (factory swaps it)` shows the
-**factory override pattern**: the `env` always asks for a `base_tester`, and the
-test's `set_type_override` redirects that to the concrete `Tester` (random or
-add). Same env, different stimulus, picked at test build time.
-
 ## Iterations
 
 Drafted three times before settling — each pass tightened a detail
