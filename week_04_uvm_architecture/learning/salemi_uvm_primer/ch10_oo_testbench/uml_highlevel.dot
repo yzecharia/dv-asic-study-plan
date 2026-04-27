@@ -1,0 +1,71 @@
+// High-level architecture of ch10 OO testbench
+digraph ch10_highlevel {
+    rankdir=TB;
+    bgcolor="white";
+    node [fontname="Helvetica", fontsize=11];
+    edge [fontname="Helvetica", fontsize=9];
+
+    labelloc="t";
+    label=<<B>Salemi ch.10 — OO Testbench (High-Level Architecture)</B><BR/><FONT POINT-SIZE="10">tinyalu DUT verified by an object-oriented testbench</FONT>>;
+    fontsize=14;
+
+    // ===== Top module =====
+    top [shape=box, style="filled,rounded", fillcolor="#1f77b4", fontcolor="white",
+         label=<<B>module top</B><BR/><FONT POINT-SIZE="9">imports + instantiates everything</FONT>>];
+
+    // ===== DUT side =====
+    subgraph cluster_dut {
+        label=<<B>DUT (VHDL)</B>>;
+        style="filled,rounded";
+        fillcolor="#fff5e6";
+        color="#cc8800";
+
+        tinyalu [shape=box, style="filled,rounded", fillcolor="#ff9933", fontcolor="white",
+                 label=<<B>tinyalu</B>>];
+    }
+
+    // ===== Interface =====
+    bfm [shape=box, style="filled,rounded", fillcolor="#9467bd", fontcolor="white",
+         label=<<B>«interface»<BR/>tinyalu_bfm</B><BR/><FONT POINT-SIZE="9">signals + tasks (BFM)</FONT>>];
+
+    // ===== TB side =====
+    subgraph cluster_tb {
+        label=<<B>OO Testbench (SV classes)</B>>;
+        style="filled,rounded";
+        fillcolor="#e8f4ff";
+        color="#1f77b4";
+
+        testbench [shape=box, style="filled,rounded", fillcolor="#2ca02c", fontcolor="white",
+                   label=<<B>testbench</B><BR/><FONT POINT-SIZE="9">env / orchestrator</FONT>>];
+        tester    [shape=box, style="filled,rounded", fillcolor="#17becf", fontcolor="white",
+                   label=<<B>tester</B><BR/><FONT POINT-SIZE="9">stimulus driver</FONT>>];
+        scoreboard [shape=box, style="filled,rounded", fillcolor="#d62728", fontcolor="white",
+                    label=<<B>scoreboard</B><BR/><FONT POINT-SIZE="9">checker</FONT>>];
+        coverage  [shape=box, style="filled,rounded", fillcolor="#bcbd22", fontcolor="white",
+                   label=<<B>coverage</B><BR/><FONT POINT-SIZE="9">functional coverage</FONT>>];
+    }
+
+    // ===== Package =====
+    pkg [shape=note, style="filled", fillcolor="#f0f0f0",
+         label=<<B>«package»<BR/>tinyalu_pkg</B><BR/><FONT POINT-SIZE="9">operation_t enum<BR/>+ `include all classes</FONT>>];
+
+    // ===== Edges =====
+    top -> tinyalu [label="instantiates"];
+    top -> bfm [label="instantiates"];
+    top -> testbench [label="creates &amp;<BR/>execute()"];
+
+    tinyalu -> bfm [dir="both", label="ports", style="dashed"];
+
+    testbench -> tester [label="composes"];
+    testbench -> scoreboard [label="composes"];
+    testbench -> coverage [label="composes"];
+
+    tester -> bfm [label="drives", color="#17becf"];
+    scoreboard -> bfm [label="checks", color="#d62728", style="dashed"];
+    coverage -> bfm [label="samples", color="#bcbd22", style="dashed"];
+
+    pkg -> testbench [label="defines", style="dotted", arrowhead="empty"];
+    pkg -> tester [style="dotted", arrowhead="empty"];
+    pkg -> scoreboard [style="dotted", arrowhead="empty"];
+    pkg -> coverage [style="dotted", arrowhead="empty"];
+}

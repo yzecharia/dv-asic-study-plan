@@ -119,11 +119,6 @@ fully.
   **before** creating the env. This is the pattern ch.13 actually
   teaches.
 
-- **Drill ch.14 — Reflection** (no code)
-  *File:* `homework/verif/per_chapter/hw_ch14_new_paradigm/NOTES.md`
-  Half a page: *what does UVM give you that plain SV classes don't?*
-  Mention factory, phases, hierarchical naming, reusability. No code.
-
 ### Main HWs
 
 #### HW1: Architecture diagram from memory ✅ done
@@ -280,15 +275,14 @@ After all reading + HW, you should answer these without looking:
 - [x] Read Salemi *UVM Primer* ch.10 (OO testbench)
 - [x] Read Salemi *UVM Primer* ch.11 (uvm_test)
 - [x] Read Salemi *UVM Primer* ch.12 (uvm_components)
-- [ ] Read Salemi *UVM Primer* ch.13 (uvm_environments) — in progress
-- [ ] Read Salemi *UVM Primer* ch.14 (a new paradigm)
+- [x] Read Salemi *UVM Primer* ch.13 (uvm_environments)
+- [x] Read Salemi *UVM Primer* ch.14 (a new paradigm)
 - [ ] Watched Verification Academy UVM Basics
-- [x] Drill ch.9 (plain-SV factory)
+- [x] Drill ch.9 (factory pattern — UVM-style)
 - [x] Drill ch.10 (OO testbench, no UVM)
-- [ ] Drill ch.11 (hello UVM)
-- [ ] Drill ch.12 (component phases — build + run only)
-- [ ] Drill ch.13 (abstract base_tester + factory override)
-- [ ] Drill ch.14 (reflection)
+- [x] Drill ch.11 (hello UVM)
+- [x] Drill ch.12 (component phases — build + run only)
+- [x] Drill ch.13 (abstract base_tester + factory override)
 - [x] HW1: architecture diagram from memory
 - [ ] HW2: ALU UVM TB, Salemi-ch.13 style (no sequences)
 - [ ] HW3: standalone factory override demo

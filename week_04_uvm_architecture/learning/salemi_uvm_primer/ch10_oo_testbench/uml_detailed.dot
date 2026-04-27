@@ -1,0 +1,109 @@
+// Detailed UML class diagram of ch10 OO testbench
+digraph ch10_detailed {
+    rankdir=TB;
+    bgcolor="white";
+    node [fontname="Helvetica", fontsize=10, shape=plain];
+    edge [fontname="Helvetica", fontsize=9];
+
+    labelloc="t";
+    label=<<B>Salemi ch.10 — OO Testbench (Detailed Class Diagram)</B>>;
+    fontsize=14;
+
+    // ===== module top =====
+    top [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+        <TR><TD BGCOLOR="#1f77b4"><FONT COLOR="white"><B>«module» top</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT">+ DUT : tinyalu<BR ALIGN="LEFT"/>+ bfm : tinyalu_bfm<BR ALIGN="LEFT"/>+ testbench_h : testbench<BR ALIGN="LEFT"/></TD></TR>
+        <TR><TD ALIGN="LEFT"><I>initial</I> begin<BR ALIGN="LEFT"/>&#160;&#160;testbench_h = new(bfm)<BR ALIGN="LEFT"/>&#160;&#160;testbench_h.execute()<BR ALIGN="LEFT"/>end<BR ALIGN="LEFT"/></TD></TR>
+        </TABLE>
+    >];
+
+    // ===== package =====
+    pkg [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+        <TR><TD BGCOLOR="#7f7f7f"><FONT COLOR="white"><B>«package» tinyalu_pkg</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT"><B>typedef enum</B> operation_t {<BR ALIGN="LEFT"/>&#160;&#160;no_op, add_op, and_op,<BR ALIGN="LEFT"/>&#160;&#160;xor_op, mul_op, rst_op<BR ALIGN="LEFT"/>}<BR ALIGN="LEFT"/></TD></TR>
+        <TR><TD ALIGN="LEFT">`include "coverage.svh"<BR ALIGN="LEFT"/>`include "tester.svh"<BR ALIGN="LEFT"/>`include "scoreboard.svh"<BR ALIGN="LEFT"/>`include "testbench.svh"<BR ALIGN="LEFT"/></TD></TR>
+        </TABLE>
+    >];
+
+    // ===== tinyalu DUT =====
+    tinyalu [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+        <TR><TD BGCOLOR="#ff9933"><FONT COLOR="white"><B>«VHDL module» tinyalu (DUT)</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT"><B>ports:</B><BR ALIGN="LEFT"/>+ A, B : byte<BR ALIGN="LEFT"/>+ op : [2:0]<BR ALIGN="LEFT"/>+ clk, reset_n, start : in<BR ALIGN="LEFT"/>+ done : out<BR ALIGN="LEFT"/>+ result : [15:0] out<BR ALIGN="LEFT"/></TD></TR>
+        <TR><TD ALIGN="LEFT"><B>sub-modules:</B><BR ALIGN="LEFT"/>• single_cycle_add_and_xor<BR ALIGN="LEFT"/>• three_cycle_mult<BR ALIGN="LEFT"/></TD></TR>
+        </TABLE>
+    >];
+
+    // ===== bfm interface =====
+    bfm [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+        <TR><TD BGCOLOR="#9467bd"><FONT COLOR="white"><B>«interface» tinyalu_bfm</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT">+ A, B : byte unsigned<BR ALIGN="LEFT"/>+ clk, reset_n, start : bit<BR ALIGN="LEFT"/>+ op : wire [2:0]<BR ALIGN="LEFT"/>+ done : wire<BR ALIGN="LEFT"/>+ result : wire [15:0]<BR ALIGN="LEFT"/>+ op_set : operation_t<BR ALIGN="LEFT"/></TD></TR>
+        <TR><TD ALIGN="LEFT">+ initial begin /* clk gen */ end<BR ALIGN="LEFT"/>+ task reset_alu()<BR ALIGN="LEFT"/>+ task send_op(iA, iB, iop, alu_result)<BR ALIGN="LEFT"/></TD></TR>
+        </TABLE>
+    >];
+
+    // ===== testbench class =====
+    testbench [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+        <TR><TD BGCOLOR="#2ca02c"><FONT COLOR="white"><B>testbench</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT">+ bfm : virtual tinyalu_bfm<BR ALIGN="LEFT"/>+ tester_h : tester<BR ALIGN="LEFT"/>+ coverage_h : coverage<BR ALIGN="LEFT"/>+ scoreboard_h : scoreboard<BR ALIGN="LEFT"/></TD></TR>
+        <TR><TD ALIGN="LEFT">+ new(virtual tinyalu_bfm b)<BR ALIGN="LEFT"/>+ task execute()<BR ALIGN="LEFT"/>&#160;&#160;news all 3, fork-join_none<BR ALIGN="LEFT"/></TD></TR>
+        </TABLE>
+    >];
+
+    // ===== tester class =====
+    tester [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+        <TR><TD BGCOLOR="#17becf"><FONT COLOR="white"><B>tester</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT">+ bfm : virtual tinyalu_bfm<BR ALIGN="LEFT"/></TD></TR>
+        <TR><TD ALIGN="LEFT">+ new(virtual tinyalu_bfm b)<BR ALIGN="LEFT"/># get_op() : operation_t<BR ALIGN="LEFT"/># get_data() : byte<BR ALIGN="LEFT"/>+ task execute()<BR ALIGN="LEFT"/>&#160;&#160;reset → mul x2 → rst<BR ALIGN="LEFT"/>&#160;&#160;→ repeat(10) random<BR ALIGN="LEFT"/></TD></TR>
+        </TABLE>
+    >];
+
+    // ===== scoreboard class =====
+    scoreboard [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+        <TR><TD BGCOLOR="#d62728"><FONT COLOR="white"><B>scoreboard</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT">+ bfm : virtual tinyalu_bfm<BR ALIGN="LEFT"/></TD></TR>
+        <TR><TD ALIGN="LEFT">+ new(virtual tinyalu_bfm b)<BR ALIGN="LEFT"/>+ task execute()<BR ALIGN="LEFT"/>&#160;&#160;forever @(posedge bfm.done)<BR ALIGN="LEFT"/>&#160;&#160;predict from A, B, op_set<BR ALIGN="LEFT"/>&#160;&#160;$error if mismatch<BR ALIGN="LEFT"/></TD></TR>
+        </TABLE>
+    >];
+
+    // ===== coverage class =====
+    coverage [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+        <TR><TD BGCOLOR="#bcbd22"><FONT COLOR="white"><B>coverage</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT">+ bfm : virtual tinyalu_bfm<BR ALIGN="LEFT"/>+ A, B : byte (sampled)<BR ALIGN="LEFT"/>+ op_set : operation_t (sampled)<BR ALIGN="LEFT"/></TD></TR>
+        <TR><TD ALIGN="LEFT"><B>covergroup op_cov:</B><BR ALIGN="LEFT"/>&#160;&#160;coverpoint op_set<BR ALIGN="LEFT"/>&#160;&#160;single_cycle, multi_cycle,<BR ALIGN="LEFT"/>&#160;&#160;opn_rst, rst_opn,<BR ALIGN="LEFT"/>&#160;&#160;sngl_mul, mul_sngl,<BR ALIGN="LEFT"/>&#160;&#160;twoops, manymult<BR ALIGN="LEFT"/><BR ALIGN="LEFT"/><B>covergroup zeros_or_ones_on_ops:</B><BR ALIGN="LEFT"/>&#160;&#160;coverpoint A, B (zeros/others/ones)<BR ALIGN="LEFT"/>&#160;&#160;cross all_ops × A × B<BR ALIGN="LEFT"/></TD></TR>
+        <TR><TD ALIGN="LEFT">+ new(bfm) // news both covergroups<BR ALIGN="LEFT"/>+ task execute()<BR ALIGN="LEFT"/>&#160;&#160;forever @(negedge clk) sample<BR ALIGN="LEFT"/></TD></TR>
+        </TABLE>
+    >];
+
+    // ===== Edges =====
+    top -> tinyalu [label="instantiates", arrowhead="diamond"];
+    top -> bfm [label="instantiates", arrowhead="diamond"];
+    top -> testbench [label="creates", arrowhead="diamond"];
+
+    tinyalu -> bfm [dir="both", label="ports", style="dashed", arrowhead="none", arrowtail="none"];
+
+    testbench -> tester [label="1 — composes", arrowhead="diamond", color="#2ca02c"];
+    testbench -> scoreboard [label="1 — composes", arrowhead="diamond", color="#2ca02c"];
+    testbench -> coverage [label="1 — composes", arrowhead="diamond", color="#2ca02c"];
+
+    tester -> bfm [label="drives\n(send_op, reset_alu)", color="#17becf", style="bold"];
+    scoreboard -> bfm [label="checks\n@(posedge done)", color="#d62728", style="dashed"];
+    coverage -> bfm [label="samples\n@(negedge clk)", color="#bcbd22", style="dashed"];
+
+    pkg -> testbench [style="dotted", arrowhead="empty", label="defines"];
+    pkg -> tester [style="dotted", arrowhead="empty"];
+    pkg -> scoreboard [style="dotted", arrowhead="empty"];
+    pkg -> coverage [style="dotted", arrowhead="empty"];
+
+    // Layout hints
+    {rank=source; top; pkg;}
+    {rank=same; tinyalu; bfm; testbench;}
+    {rank=sink; tester; scoreboard; coverage;}
+}

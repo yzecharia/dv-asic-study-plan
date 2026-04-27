@@ -1,0 +1,111 @@
+// High-level architecture of ch13 UVM env testbench (ALL files)
+digraph ch13_highlevel {
+    rankdir=TB;
+    bgcolor="white";
+    node [fontname="Helvetica", fontsize=11];
+    edge [fontname="Helvetica", fontsize=9];
+
+    labelloc="t";
+    label=<<B>Salemi ch.13 — UVM Environment (High-Level Architecture, ALL files)</B><BR/><FONT POINT-SIZE="10">env wraps tester+coverage+scoreboard; factory override picks tester impl per test</FONT>>;
+    fontsize=14;
+
+    top [shape=box, style="filled,rounded", fillcolor="#1f77b4", fontcolor="white",
+         label=<<B>top.sv</B><BR/><FONT POINT-SIZE="9">module top — run_test()</FONT>>];
+
+    macros [shape=note, style="filled", fillcolor="#fafafa", fontcolor="#666666",
+            label=<<B>tinyalu_macros.svh</B><BR/><FONT POINT-SIZE="9">(stub — license only)</FONT>>];
+
+    pkg [shape=note, style="filled", fillcolor="#f0f0f0",
+         label=<<B>tinyalu_pkg.sv</B><BR/><FONT POINT-SIZE="9">«package» tinyalu_pkg<BR/>operation_t enum<BR/>+ `include classes</FONT>>];
+
+    bfm_file [shape=note, style="filled", fillcolor="#ede7f6",
+              label=<<B>tinyalu_bfm.sv</B>>];
+
+    subgraph cluster_dut {
+        label=<<B>DUT (VHDL — tinyalu_dut/)</B>>;
+        style="filled,rounded";
+        fillcolor="#fff5e6";
+        color="#cc8800";
+        tinyalu  [shape=box, style="filled,rounded", fillcolor="#ff9933", fontcolor="white",
+                  label=<<B>tinyalu.vhd</B>>];
+        sc_aax   [shape=box, style="filled,rounded", fillcolor="#ffb366", fontcolor="white",
+                  label=<<B>single_cycle_<BR/>add_and_xor.vhd</B>>];
+        tc_mult  [shape=box, style="filled,rounded", fillcolor="#ffb366", fontcolor="white",
+                  label=<<B>three_cycle_<BR/>mult.vhd</B>>];
+        tinyalu -> sc_aax  [arrowhead="diamond", label="instantiates"];
+        tinyalu -> tc_mult [arrowhead="diamond", label="instantiates"];
+    }
+
+    bfm [shape=box, style="filled,rounded", fillcolor="#9467bd", fontcolor="white",
+         label=<<B>«interface»<BR/>tinyalu_bfm</B>>];
+
+    subgraph cluster_tests {
+        label=<<B>Tests (uvm_test) — tb_classes/</B>>;
+        style="filled,rounded";
+        fillcolor="#fde7f0";
+        color="#c0306f";
+        random_test [shape=box, style="filled,rounded", fillcolor="#e377c2", fontcolor="white",
+                     label=<<B>random_test.svh</B><BR/><FONT POINT-SIZE="8">override base→random</FONT>>];
+        add_test [shape=box, style="filled,rounded", fillcolor="#e377c2", fontcolor="white",
+                  label=<<B>add_test.svh</B><BR/><FONT POINT-SIZE="8">override base→add</FONT>>];
+    }
+
+    env [shape=box, style="filled,rounded", fillcolor="#2ca02c", fontcolor="white",
+         label=<<B>env.svh</B><BR/><FONT POINT-SIZE="9">«uvm_env»</FONT>>];
+
+    subgraph cluster_components {
+        label=<<B>uvm_components (built by env)</B>>;
+        style="filled,rounded";
+        fillcolor="#e8f4ff";
+        color="#1f77b4";
+
+        base_tester [shape=box, style="filled,rounded", fillcolor="#0e7490", fontcolor="white",
+                     label=<<B>base_tester.svh</B><BR/><FONT POINT-SIZE="8">«abstract» (Questa)<BR/>get_op/get_data pure virtual</FONT>>];
+        vcs_base [shape=box, style="filled,rounded", fillcolor="#94a3b8", fontcolor="white",
+                  label=<<B>vcs_base_tester.svh</B><BR/><FONT POINT-SIZE="8">VCS alternate<BR/>(non-abstract — default impls)</FONT>>];
+        random_tester [shape=box, style="filled,rounded", fillcolor="#17becf", fontcolor="white",
+                       label=<<B>random_tester.svh</B>>];
+        add_tester [shape=box, style="filled,rounded", fillcolor="#0891b2", fontcolor="white",
+                    label=<<B>add_tester.svh</B>>];
+        scoreboard [shape=box, style="filled,rounded", fillcolor="#d62728", fontcolor="white",
+                    label=<<B>scoreboard.svh</B>>];
+        coverage [shape=box, style="filled,rounded", fillcolor="#bcbd22", fontcolor="white",
+                  label=<<B>coverage.svh</B>>];
+    }
+
+    // Inheritance
+    random_tester -> base_tester [arrowhead="empty", label="extends"];
+    add_tester    -> random_tester [arrowhead="empty", label="extends"];
+
+    // VCS swap relationship — alternate file used INSTEAD of base_tester.svh on VCS
+    vcs_base -> base_tester [arrowtail="odot", arrowhead="none", style="dashed", color="#94a3b8",
+                             label="alt build (VCS)"];
+
+    // Top wiring
+    top -> tinyalu [label="instantiates"];
+    top -> bfm [label="instantiates"];
+    top -> macros  [label="`include", style="dotted"];
+    top -> random_test [label="run_test()", style="dashed"];
+    top -> add_test [label="(or)", style="dashed"];
+
+    bfm_file -> bfm [arrowhead="empty", style="dotted", label="declares"];
+    tinyalu -> bfm [dir="both", label="ports", style="dashed"];
+
+    random_test -> env [label="builds"];
+    add_test -> env [label="builds"];
+
+    env -> base_tester [label="creates as base*\n(* factory swaps)"];
+    env -> scoreboard  [label="creates"];
+    env -> coverage    [label="creates"];
+
+    base_tester -> bfm [label="drives", color="#0e7490"];
+    scoreboard  -> bfm [label="checks", color="#d62728", style="dashed"];
+    coverage    -> bfm [label="samples", color="#bcbd22", style="dashed"];
+
+    pkg -> env         [style="dotted", arrowhead="empty", label="`include all classes"];
+    pkg -> base_tester [style="dotted", arrowhead="empty"];
+    pkg -> scoreboard  [style="dotted", arrowhead="empty"];
+    pkg -> coverage    [style="dotted", arrowhead="empty"];
+    pkg -> random_test [style="dotted", arrowhead="empty"];
+    pkg -> add_test    [style="dotted", arrowhead="empty"];
+}

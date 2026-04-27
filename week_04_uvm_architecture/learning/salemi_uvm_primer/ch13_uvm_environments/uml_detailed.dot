@@ -1,0 +1,197 @@
+// Detailed UML class diagram of ch13 UVM env testbench (ALL files in folder)
+digraph ch13_detailed {
+    rankdir=TB;
+    bgcolor="white";
+    node [fontname="Helvetica", fontsize=10, shape=plain];
+    edge [fontname="Helvetica", fontsize=9];
+
+    labelloc="t";
+    label=<<B>Salemi ch.13 — UVM Environment (Detailed Class Diagram, ALL files)</B>>;
+    fontsize=14;
+
+    // ===== module top =====
+    top [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+        <TR><TD BGCOLOR="#1f77b4"><FONT COLOR="white"><B>top.sv  «module» top</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT">+ bfm : tinyalu_bfm<BR ALIGN="LEFT"/>+ DUT : tinyalu<BR ALIGN="LEFT"/></TD></TR>
+        <TR><TD ALIGN="LEFT">initial begin<BR ALIGN="LEFT"/>&#160;&#160;uvm_config_db#(virtual tinyalu_bfm)::set(<BR ALIGN="LEFT"/>&#160;&#160;&#160;&#160;null, "*", "bfm", bfm);<BR ALIGN="LEFT"/>&#160;&#160;run_test();<BR ALIGN="LEFT"/>end<BR ALIGN="LEFT"/></TD></TR>
+        </TABLE>
+    >];
+
+    // ===== package =====
+    pkg [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+        <TR><TD BGCOLOR="#7f7f7f"><FONT COLOR="white"><B>tinyalu_pkg.sv  «package» tinyalu_pkg</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT"><B>typedef enum</B> operation_t {<BR ALIGN="LEFT"/>&#160;&#160;no_op, add_op, and_op,<BR ALIGN="LEFT"/>&#160;&#160;xor_op, mul_op, rst_op<BR ALIGN="LEFT"/>}<BR ALIGN="LEFT"/></TD></TR>
+        <TR><TD ALIGN="LEFT">`include "coverage.svh"<BR ALIGN="LEFT"/>`include "base_tester.svh"<BR ALIGN="LEFT"/>`include "random_tester.svh"<BR ALIGN="LEFT"/>`include "add_tester.svh"<BR ALIGN="LEFT"/>`include "scoreboard.svh"<BR ALIGN="LEFT"/>`include "env.svh"<BR ALIGN="LEFT"/>`include "random_test.svh"<BR ALIGN="LEFT"/>`include "add_test.svh"<BR ALIGN="LEFT"/></TD></TR>
+        </TABLE>
+    >];
+
+    // ===== macros (stub) =====
+    macros [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+        <TR><TD BGCOLOR="#9ca3af"><FONT COLOR="white"><B>tinyalu_macros.svh</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT"><FONT COLOR="#666666"><I>// stub — license header only,<BR ALIGN="LEFT"/>// no macros yet (placeholder for<BR ALIGN="LEFT"/>// project-specific macros)</I></FONT><BR ALIGN="LEFT"/></TD></TR>
+        </TABLE>
+    >];
+
+    // ===== bfm interface =====
+    bfm [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+        <TR><TD BGCOLOR="#9467bd"><FONT COLOR="white"><B>tinyalu_bfm.sv  «interface» tinyalu_bfm</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT">+ A, B : byte unsigned<BR ALIGN="LEFT"/>+ clk, reset_n, start : bit<BR ALIGN="LEFT"/>+ op : wire [2:0]<BR ALIGN="LEFT"/>+ done : wire<BR ALIGN="LEFT"/>+ result : wire [15:0]<BR ALIGN="LEFT"/>+ op_set : operation_t<BR ALIGN="LEFT"/></TD></TR>
+        <TR><TD ALIGN="LEFT">+ task reset_alu()<BR ALIGN="LEFT"/>+ task send_op(iA, iB, iop, alu_result)<BR ALIGN="LEFT"/></TD></TR>
+        </TABLE>
+    >];
+
+    // ===== DUT (VHDL) =====
+    tinyalu [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+        <TR><TD BGCOLOR="#ff9933"><FONT COLOR="white"><B>tinyalu_dut/tinyalu.vhd  «VHDL» tinyalu</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT">ports: A, B, op, clk, reset_n,<BR ALIGN="LEFT"/>&#160;&#160;&#160;&#160;&#160;&#160;&#160;start, done, result<BR ALIGN="LEFT"/>top wrapper: demux start, mux result<BR ALIGN="LEFT"/>based on op[2]<BR ALIGN="LEFT"/></TD></TR>
+        </TABLE>
+    >];
+
+    sc_aax [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+        <TR><TD BGCOLOR="#ffb366"><FONT COLOR="white"><B>tinyalu_dut/single_cycle_add_and_xor.vhd</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT">«VHDL» single_cycle<BR ALIGN="LEFT"/>handles ADD / AND / XOR<BR ALIGN="LEFT"/>1-cycle latency<BR ALIGN="LEFT"/></TD></TR>
+        </TABLE>
+    >];
+
+    tc_mult [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+        <TR><TD BGCOLOR="#ffb366"><FONT COLOR="white"><B>tinyalu_dut/three_cycle_mult.vhd</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT">«VHDL» three_cycle<BR ALIGN="LEFT"/>3-stage pipelined multiplier<BR ALIGN="LEFT"/>async reset<BR ALIGN="LEFT"/></TD></TR>
+        </TABLE>
+    >];
+
+    // ===== base_tester (Questa-flavored, abstract) =====
+    base_tester [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+        <TR><TD BGCOLOR="#0e7490"><FONT COLOR="white"><B>base_tester.svh  «abstract» base_tester<BR/>extends uvm_component</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT"><FONT COLOR="#666666"><I>// `ifdef QUESTA → virtual class</I></FONT><BR ALIGN="LEFT"/>+ bfm : virtual tinyalu_bfm<BR ALIGN="LEFT"/></TD></TR>
+        <TR><TD ALIGN="LEFT">+ new(name, parent)<BR ALIGN="LEFT"/>+ build_phase: get bfm from config_db<BR ALIGN="LEFT"/><B>+ pure virtual get_op() : operation_t</B><BR ALIGN="LEFT"/><B>+ pure virtual get_data() : byte</B><BR ALIGN="LEFT"/>+ run_phase()<BR ALIGN="LEFT"/>&#160;&#160;raise_objection<BR ALIGN="LEFT"/>&#160;&#160;reset_alu, repeat(1000) send_op<BR ALIGN="LEFT"/>&#160;&#160;drop_objection<BR ALIGN="LEFT"/></TD></TR>
+        </TABLE>
+    >];
+
+    // ===== vcs_base_tester (alternate file for VCS) =====
+    vcs_base [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+        <TR><TD BGCOLOR="#94a3b8"><FONT COLOR="white"><B>vcs_base_tester.svh  base_tester (VCS variant)<BR/>extends uvm_component</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT"><FONT COLOR="#666666"><I>// VCS doesn't allow factory-registering<BR ALIGN="LEFT"/>// abstract classes — this version is<BR ALIGN="LEFT"/>// concrete with default impls.<BR ALIGN="LEFT"/>// Use INSTEAD of base_tester.svh on VCS.</I></FONT><BR ALIGN="LEFT"/>+ bfm : virtual tinyalu_bfm<BR ALIGN="LEFT"/></TD></TR>
+        <TR><TD ALIGN="LEFT">+ new(name, parent)<BR ALIGN="LEFT"/>+ build_phase: get bfm from config_db<BR ALIGN="LEFT"/>+ <B>virtual</B> get_op() : returns no_op  // override in subclass<BR ALIGN="LEFT"/>+ <B>virtual</B> get_data() : returns 0<BR ALIGN="LEFT"/>+ run_phase()  // same as base_tester<BR ALIGN="LEFT"/></TD></TR>
+        </TABLE>
+    >];
+
+    // ===== random_tester =====
+    random_tester [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+        <TR><TD BGCOLOR="#17becf"><FONT COLOR="white"><B>random_tester.svh<BR/>extends base_tester</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT">+ new(name, parent)<BR ALIGN="LEFT"/>+ get_op() : operation_t<BR ALIGN="LEFT"/>&#160;&#160;random pick from {ops, rst}<BR ALIGN="LEFT"/>+ get_data() : byte<BR ALIGN="LEFT"/>&#160;&#160;biased: 25% 0x00, 25% 0xFF, else random<BR ALIGN="LEFT"/></TD></TR>
+        </TABLE>
+    >];
+
+    // ===== add_tester =====
+    add_tester [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+        <TR><TD BGCOLOR="#0891b2"><FONT COLOR="white"><B>add_tester.svh<BR/>extends random_tester</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT">+ new(name, parent)<BR ALIGN="LEFT"/>+ get_op() : operation_t<BR ALIGN="LEFT"/>&#160;&#160;<B>always returns add_op</B><BR ALIGN="LEFT"/>// inherits get_data from random_tester<BR ALIGN="LEFT"/></TD></TR>
+        </TABLE>
+    >];
+
+    // ===== scoreboard =====
+    scoreboard [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+        <TR><TD BGCOLOR="#d62728"><FONT COLOR="white"><B>scoreboard.svh<BR/>extends uvm_component</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT">+ bfm : virtual tinyalu_bfm<BR ALIGN="LEFT"/></TD></TR>
+        <TR><TD ALIGN="LEFT">+ new(name, parent)<BR ALIGN="LEFT"/>+ build_phase: get bfm from config_db<BR ALIGN="LEFT"/>+ run_phase:<BR ALIGN="LEFT"/>&#160;&#160;forever @(posedge bfm.done)<BR ALIGN="LEFT"/>&#160;&#160;predict from A, B, op_set<BR ALIGN="LEFT"/>&#160;&#160;$error if mismatch<BR ALIGN="LEFT"/></TD></TR>
+        </TABLE>
+    >];
+
+    // ===== coverage =====
+    coverage [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+        <TR><TD BGCOLOR="#bcbd22"><FONT COLOR="white"><B>coverage.svh<BR/>extends uvm_component</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT">+ bfm : virtual tinyalu_bfm<BR ALIGN="LEFT"/>covergroups (from ch.10):<BR ALIGN="LEFT"/>&#160;• op_cov<BR ALIGN="LEFT"/>&#160;• zeros_or_ones_on_ops<BR ALIGN="LEFT"/></TD></TR>
+        <TR><TD ALIGN="LEFT">+ new, build_phase<BR ALIGN="LEFT"/>+ run_phase: forever @(negedge clk) sample<BR ALIGN="LEFT"/></TD></TR>
+        </TABLE>
+    >];
+
+    // ===== env =====
+    env [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+        <TR><TD BGCOLOR="#2ca02c"><FONT COLOR="white"><B>env.svh<BR/>extends uvm_env</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT">+ tester_h : base_tester<BR ALIGN="LEFT"/>+ coverage_h : coverage<BR ALIGN="LEFT"/>+ scoreboard_h : scoreboard<BR ALIGN="LEFT"/></TD></TR>
+        <TR><TD ALIGN="LEFT">+ new(name, parent)<BR ALIGN="LEFT"/>+ build_phase:<BR ALIGN="LEFT"/>&#160;&#160;tester_h     = base_tester::type_id::create()<BR ALIGN="LEFT"/>&#160;&#160;coverage_h   = coverage::type_id::create()<BR ALIGN="LEFT"/>&#160;&#160;scoreboard_h = scoreboard::type_id::create()<BR ALIGN="LEFT"/></TD></TR>
+        </TABLE>
+    >];
+
+    // ===== random_test =====
+    random_test [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+        <TR><TD BGCOLOR="#e377c2"><FONT COLOR="white"><B>random_test.svh<BR/>extends uvm_test</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT">+ env_h : env<BR ALIGN="LEFT"/></TD></TR>
+        <TR><TD ALIGN="LEFT">+ new(name, parent)<BR ALIGN="LEFT"/>+ build_phase:<BR ALIGN="LEFT"/>&#160;&#160;<B>base_tester::type_id::set_type_override(<BR ALIGN="LEFT"/>&#160;&#160;&#160;&#160;random_tester::get_type())</B><BR ALIGN="LEFT"/>&#160;&#160;env_h = env::type_id::create()<BR ALIGN="LEFT"/></TD></TR>
+        </TABLE>
+    >];
+
+    // ===== add_test =====
+    add_test [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+        <TR><TD BGCOLOR="#e377c2"><FONT COLOR="white"><B>add_test.svh<BR/>extends uvm_test</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT">+ env_h : env<BR ALIGN="LEFT"/></TD></TR>
+        <TR><TD ALIGN="LEFT">+ new(name, parent)<BR ALIGN="LEFT"/>+ build_phase:<BR ALIGN="LEFT"/>&#160;&#160;<B>base_tester::type_id::set_type_override(<BR ALIGN="LEFT"/>&#160;&#160;&#160;&#160;add_tester::get_type())</B><BR ALIGN="LEFT"/>&#160;&#160;env_h = env::type_id::create()<BR ALIGN="LEFT"/></TD></TR>
+        </TABLE>
+    >];
+
+    // ===== Edges =====
+    // Inheritance
+    random_tester -> base_tester [arrowhead="empty", label="extends"];
+    add_tester    -> random_tester [arrowhead="empty", label="extends"];
+
+    // VCS-vs-Questa swap
+    vcs_base -> base_tester [arrowtail="odot", arrowhead="none", style="dashed", color="#94a3b8",
+                             penwidth="2", label="alternate file: use INSTEAD of\nbase_tester.svh when compiling on VCS"];
+
+    // Top hierarchy
+    top -> tinyalu [label="instantiates", arrowhead="diamond"];
+    top -> bfm [label="instantiates", arrowhead="diamond"];
+    top -> macros [label="`include", style="dotted"];
+    top -> random_test [label="run_test()", style="dashed"];
+    top -> add_test    [label="(or)",       style="dashed"];
+
+    // DUT internals
+    tinyalu -> sc_aax [arrowhead="diamond", label="instantiates"];
+    tinyalu -> tc_mult [arrowhead="diamond", label="instantiates"];
+
+    tinyalu -> bfm [dir="both", style="dashed", arrowhead="none", arrowtail="none", label="ports"];
+
+    // Tests build env
+    random_test -> env [arrowhead="diamond", color="#e377c2", label="creates"];
+    add_test    -> env [arrowhead="diamond", color="#e377c2", label="creates"];
+
+    // Env composes 3 components
+    env -> base_tester [arrowhead="diamond", color="#2ca02c", label="creates as base_tester*\n(* factory swaps it)"];
+    env -> scoreboard  [arrowhead="diamond", color="#2ca02c", label="creates"];
+    env -> coverage    [arrowhead="diamond", color="#2ca02c", label="creates"];
+
+    // FACTORY OVERRIDE — the key concept of ch.13
+    random_test -> random_tester [color="#cc0066", style="bold", penwidth="2",
+                                  label="set_type_override\nbase_tester → random_tester"];
+    add_test -> add_tester [color="#cc0066", style="bold", penwidth="2",
+                            label="set_type_override\nbase_tester → add_tester"];
+
+    // Components access BFM
+    base_tester -> bfm [color="#0e7490", label="drives (via send_op)", style="bold"];
+    scoreboard  -> bfm [color="#d62728", style="dashed", label="@(posedge done)"];
+    coverage    -> bfm [color="#bcbd22", style="dashed", label="@(negedge clk)"];
+
+    // Package
+    pkg -> env         [style="dotted", arrowhead="empty", label="defines (`include all)"];
+    pkg -> random_test [style="dotted", arrowhead="empty"];
+    pkg -> add_test    [style="dotted", arrowhead="empty"];
+    pkg -> base_tester [style="dotted", arrowhead="empty"];
+    pkg -> scoreboard  [style="dotted", arrowhead="empty"];
+    pkg -> coverage    [style="dotted", arrowhead="empty"];
+}
