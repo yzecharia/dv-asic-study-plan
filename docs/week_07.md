@@ -1,78 +1,109 @@
-# Week 6: Full UVM Testbench Integration
+# Week 7: Full UVM Testbench Integration (capstone project)
 
 ## Why This Matters
-This is where everything comes together. You'll build a complete, working UVM testbench end-to-end for a real DUT. After this week, you can say "I know UVM" in an interview and back it up.
+
+By the end of W6 you've built every UVM piece in isolation: factory,
+phases, env, analysis ports, transactions, agents, sequences. This
+week you put them together into a **complete production-style**
+testbench for a non-trivial DUT (a register file). On the design
+side, you tackle the three things that show up in *every* RTL
+interview: **timing analysis**, **clock domain crossing**, and the
+**asynchronous FIFO**.
+
+There is no new UVM concept this week. The point is integration —
+producing a clean, end-to-end testbench you fully understand.
 
 ## What to Study
 
-### Reading
-- **Salemi *The UVM Primer*** (finishing up):
-  - **ch.19 UVM Reporting** — `uvm_info`, `uvm_warning`, `uvm_error`, `uvm_fatal`, verbosity
-  - **ch.20 Class Hierarchies and Deep Operations**
-  - **ch.24 Onward with the UVM** — closing perspective
-- **Rosenberg & Meade ch.8-10** (primary for scoreboard & coverage): "Scoreboard", "Coverage", "Reporting"
-  - Reference models inside scoreboard
-  - Functional coverage integration in UVM
-  - End-of-test mechanism: `phase.raise_objection()` / `phase.drop_objection()`
-  - Salemi doesn't have a dedicated scoreboard chapter — Rosenberg's production-patterns treatment is what you want here
-- **Verification Academy UVM Cookbook** (free, online): scoreboard and coverage recipes — the best single reference
+### Reading — Verification
 
-### Videos (Verification Academy)
-- "UVM Scoreboard" course
-- "UVM Coverage" course
-- "UVM Debug and Reporting" course
+- **Salemi *The UVM Primer***:
+  - **ch.24 Onward with the UVM** — the wrap-up; what UVM doesn't
+    teach you (RAL, multi-UVC, advanced sequencing) and where to go
+    next.
+- **Rosenberg & Meade *A Practical Guide to Adopting the UVM* (2nd
+  ed.)** — the production-patterns reference. You don't need every
+  chapter; pick the ones relevant to your project:
+  - **ch.4-5** *Sequences and Stimulus* — production sequence
+    patterns: sequence libraries, layered sequences, response
+    handling
+  - **ch.6** *Driver-Sequencer interface* — pull-mode driver, RSP
+    handling, late randomization
+  - **ch.8** *Building scoreboards* — reference models, in-order
+    vs out-of-order checking
+  - Read these as needed during HW3, not back-to-back
+- **Verification Academy UVM Cookbook** (free, online):
+  - "Scoreboard" recipes
+  - "Coverage" recipes
+  - "Driver / Sequencer" patterns
+- **ChipVerify**: [uvm-scoreboard](https://www.chipverify.com/uvm/uvm-scoreboard),
+  [uvm-phases](https://www.chipverify.com/uvm/uvm-phases),
+  [uvm-objection](https://www.chipverify.com/uvm/uvm-objection)
 
-### Quick Reference (ChipVerify.com)
-- https://www.chipverify.com/uvm/uvm-scoreboard
-- https://www.chipverify.com/uvm/uvm-reporting
-- https://www.chipverify.com/uvm/uvm-phases
-- https://www.chipverify.com/uvm/uvm-objection
+### Reading — Design
 
-### Tool
-- **Primary**: Vivado xsim via the `🧪 FLOW: XSIM UVM` VSCode task (supports UVM)
-- **Fallback**: EDA Playground if xsim chokes on a specific construct
-- Either way, organize your files properly: pkg, interface, top
+- **Dally & Harting ch.15 — Timing Constraints** ⭐ — setup/hold,
+  clock skew, slack equation. Read before Design HW3.
+- **Dally & Harting ch.28 — Metastability and Synchronization
+  Failure** — the physics; MTBF; why 1 FF isn't enough
+- **Dally & Harting ch.29 — Synchronizer Design** — 2-FF
+  synchronizers, pulse synchronizers, gray-code crossings
+- **Cliff Cummings** *"Clock Domain Crossing (CDC) Design &
+  Verification Techniques Using SystemVerilog"* (SNUG 2008) ⭐ —
+  cited in nearly every CDC interview question
+- **Cliff Cummings** *"Simulation and Synthesis Techniques for
+  Asynchronous FIFO Design"* (SNUG 2002) ⭐ — you read the theory
+  in W6; build it now
+- **Sutherland *SV for Design* (2nd ed) ch.6 — Procedural Blocks**:
+  `always_comb` vs `always_ff` vs `always_latch`, when each is the
+  right tool. (Note: previous drafts of this doc cited "ch.9" or
+  "ch.13"; the correct chapter is ch.6. The book also has no ch.13
+  — *SV for Design* ends at ch.12.)
+- **Sutherland *RTL Modeling with SystemVerilog* ch.7-8** — separate
+  book, deeper synthesis-aware coding patterns for
+  combinational and sequential logic. Use as a tie-breaker reference
+  when style questions come up. (This is the "ch.13" people
+  sometimes cite — it lives in *RTL Modeling*, not *SV for Design*.)
+
+### Tool Setup
+
+- **Primary**: Vivado xsim via `🧪 FLOW: XSIM UVM`. UVM-capable.
+- **Fallback**: EDA Playground.
+- Organize files: per-block `_pkg.sv`, top-level interface, `top.sv`.
 
 ---
 
-## Homework
+## Verification Homework
 
-### HW1: Scoreboard with Reference Model for ALU
-Build a scoreboard that checks every ALU transaction against a reference model:
+### Drills (per-chapter / per-pattern warmups)
 
-Scaffolding for `alu_scoreboard extends uvm_scoreboard`:
-- Register with the factory via ``` `uvm_component_utils ```
-- Expose a `uvm_analysis_imp #(alu_transaction, alu_scoreboard)` so the monitor can push to it
-- Track `pass_count` and `fail_count`
+- **Drill — uvm_scoreboard**
+  *File:* `homework/verif/per_chapter/hw_w7_scoreboard/scoreboard_demo.sv`
+  Tiny `dummy_scoreboard extends uvm_scoreboard` with one
+  `uvm_analysis_imp #(my_txn, dummy_scoreboard)`, a `write()` that
+  bumps `pass_count`/`fail_count`, and a `report_phase` that prints
+  the tally. Connect a stub monitor that fires 10 transactions, half
+  passing, half failing.
 
-You need to implement:
-- **`write(alu_transaction txn)`** — the TLM hook. Inside, build a small
-  reference model (a `case` on `txn.operation`) that computes the expected
-  result from `operand_a`/`operand_b`. Compare against `txn.result`, bump the
-  counters, and `` `uvm_info `` / `` `uvm_error `` as appropriate.
-- **`report_phase`** — print the final pass/fail tally and raise a
-  `` `uvm_error `` if any transaction mismatched.
+- **Drill — uvm_subscriber covergroup**
+  *File:* `homework/verif/per_chapter/hw_w7_coverage/coverage_demo.sv`
+  `dummy_coverage extends uvm_subscriber #(my_txn)` with a
+  covergroup whose `sample()` is called from `write()`. Print
+  `cg.get_coverage()` in `report_phase`.
 
-### HW2: Functional Coverage in UVM
-Add a coverage collector component to your environment:
+- **Drill — Reset sequence**
+  *File:* `homework/verif/per_chapter/hw_w7_reset_sequence/reset_seq.sv`
+  `reset_sequence extends uvm_sequence #(my_txn)` whose `body()`
+  drives N reset cycles before sampling begins. This is the
+  pattern Rosenberg ch.4 calls a *prologue sequence* — every real
+  TB needs one.
 
-Build `alu_coverage extends uvm_subscriber #(alu_transaction)` with:
-- An internal `alu_transaction txn` handle that the covergroup can sample from
-- A `covergroup alu_cg` containing:
-  - a coverpoint on `txn.operation`
-  - coverpoints on `operand_a` and `operand_b`, each partitioned into
-    meaningful regions (think: zero / low / mid / high / max)
-  - cross coverpoints between operation and each operand
-- Constructor creates the covergroup
-- Override `write()` to update `txn` and call `alu_cg.sample()`
-- Override `report_phase` to print final coverage with `get_coverage()`
+### Main HWs
 
-Connect it in the env alongside the scoreboard. Run until coverage >95%.
+#### HW1: Register file DUT + interface
+*Folder:* `homework/design/connector/hw1_register_file/`
+(Listed under design too; the Verif HW2/HW3 reuses this.)
 
-### HW3: Complete End-to-End UVM Testbench for Register File
-Build a COMPLETE testbench for a register file DUT (32 registers x 32 bits, 2 read ports, 1 write port).
-
-**RTL (write this yourself):**
 ```systemverilog
 module register_file (
     input  logic        clk, rst_n,
@@ -81,218 +112,221 @@ module register_file (
     input  logic [31:0] wr_data,
     output logic [31:0] rd_data1, rd_data2
 );
-    // Register x0 is always 0 (RISC-V convention)
+    // x0 hardwired to 0 (RISC-V convention).
+    // 2 read ports + 1 write port.
+    // Write-first behavior: read-and-write same addr in same cycle
+    // returns the NEW value (forwarding inside the RF).
 endmodule
 ```
 
-**UVM Components (build all of these):**
-- `regfile_transaction` — sequence item with wr_en, addresses, data
-- `regfile_interface` — SV interface with clocking block
-- `regfile_driver` — drives interface signals
-- `regfile_monitor` — observes interface, broadcasts transactions
-- `regfile_agent` — contains driver + monitor + sequencer
-- `regfile_scoreboard` — maintains a reference model (array of 32 regs), checks reads
-- `regfile_coverage` — covers all registers written, read, write-then-read same register
-- `regfile_env` — assembles agent + scoreboard + coverage
-- `regfile_base_test` — base test class
-- `regfile_directed_test` — writes known values, reads back, checks
-- `regfile_random_test` — random read/write sequences
-- `regfile_stress_test` — back-to-back writes and reads, concurrent read during write
+Use `always_ff` for the register array, `always_comb` (with the
+write-forward MUX) for the read ports.
 
-**Top module:**
-- Instantiate DUT + interface
-- Connect via config_db
-- Run with `run_test()`
+**Self-test**: a directed TB that writes/reads each register,
+including same-cycle write-then-read-same-addr. This is the DUT
+for Verif HW2.
 
-This is a FULL project. Take your time. When done, you have a complete UVM testbench you understand inside out.
+#### HW2: Full UVM testbench for the register file ⭐
+*Folder:* `homework/verif/connector/hw2_regfile_uvm_tb/`
 
-### HW4: Regression & Coverage Closure
-Using the register file testbench from HW3:
+Build a complete UVM TB using **only** concepts from W4-W6:
 
-1. Run each test individually, record coverage:
-   - `+UVM_TESTNAME=regfile_directed_test`
-   - `+UVM_TESTNAME=regfile_random_test`
-   - `+UVM_TESTNAME=regfile_stress_test`
+- `regfile_item extends uvm_sequence_item` — fields: `wr_en`,
+  `wr_addr`, `rd_addr1`, `rd_addr2`, `wr_data`, plus non-rand
+  `rd_data1`/`rd_data2` populated by the monitor; full `do_copy`
+  / `do_compare` / `convert2string`.
+- `regfile_if` — modports for `dut`, `tb`, `monitor`; clocking block.
+- `regfile_driver extends uvm_driver #(regfile_item)` — pulls items
+  via `seq_item_port`, drives the interface.
+- `regfile_monitor extends uvm_monitor` — observes the bus,
+  publishes a populated `regfile_item` via `uvm_analysis_port`.
+- `regfile_agent extends uvm_agent` — driver + monitor + sequencer,
+  active/passive via config object.
+- `regfile_scoreboard extends uvm_scoreboard` — keeps a 32-entry
+  reference array; on every observed read, predicts and compares.
+  In-order checking is fine for this DUT.
+- `regfile_coverage extends uvm_subscriber #(regfile_item)` — covers
+  every register written, every register read, write-then-read-same
+  cross.
+- `regfile_env extends uvm_env` — agent + scoreboard + coverage.
+- Three tests: `regfile_directed_test`, `regfile_random_test`,
+  `regfile_stress_test` (back-to-back with concurrent read-during-
+  write).
+- Top: instantiate DUT + interface, store the vif via
+  `uvm_config_db`, call `run_test()`.
 
-2. Identify holes in coverage — which bins are not hit?
+#### HW3: Coverage closure
+*Folder:* `homework/verif/connector/hw3_coverage_closure/`
 
-3. Write a **new sequence** specifically targeting the uncovered bins
+Using the regfile TB:
 
-4. Re-run until you achieve 100% functional coverage
+1. Run each test individually, record functional coverage.
+2. Identify the uncovered bins.
+3. Write **one new sequence** specifically targeting the holes.
+4. Re-run; iterate until 100% functional coverage.
+5. Document: what was uncovered, what closed it.
 
-5. Document the process: what was uncovered, what sequence fixed it
+Coverage closure is what real DV engineers spend most of their day
+doing.
 
-This simulates real DV work — coverage closure is what you'll spend most of your time doing on the job.
+### Stretch (optional)
+
+- **Stretch — Layered sequences (Rosenberg ch.4-5)**
+  *Folder:* `homework/verif/big_picture/layered_sequences/`
+  Write a high-level "scenario" sequence that internally calls
+  smaller building-block sequences (e.g., `reset → fill → drain`).
+  Production-pattern preview before W12.
 
 ---
 
-## Self-Check Questions
-1. What does `raise_objection` / `drop_objection` do? What happens if you forget it?
-2. What's the difference between `uvm_subscriber` and manually connecting with `uvm_analysis_imp`?
-3. How do you run different tests from the command line without recompiling?
-4. What's the purpose of `report_phase`? What other end-of-test phases exist?
-5. How would you merge coverage from multiple test runs?
-6. Explain the complete flow of a transaction: sequence -> sequencer -> driver -> DUT -> monitor -> scoreboard
+## Design Homework
 
----
+### Drills (per-chapter warmups)
 
-## Design Track: Register File, Clock Domain Crossing & Async FIFO
+- **Drill Dally ch.15 — Setup/hold timing**
+  *Folder:* `homework/design/per_chapter/hw_dally_ch15_timing/`
+  Pen-and-paper. Given Tclk=10ns, Tsetup=0.5ns, Thold=0.3ns,
+  Tcq=0.8ns, Tcomb=7ns: compute slack. Repeat with Tclk=8ns and
+  Tcomb=8ns — does it close?
 
-Week 6 has three design focuses: (1) the register file that feeds into your UVM testbench, (2) clock domain crossing — the single most common source of silicon bugs, and (3) the async FIFO — which combines CDC with the FIFO you already know.
+- **Drill Dally ch.28 — MTBF intuition**
+  *Folder:* `homework/design/per_chapter/hw_dally_ch28_mtbf/`
+  Pen-and-paper. Given Tw=0.3ns, Tres=1ns, fclk=200MHz, fdata=50MHz:
+  estimate MTBF for a 1-FF synchronizer; for a 2-FF one. Why is
+  the 2-FF MTBF much better than 2× longer?
 
-### Reading (Design)
-- **Dally & Harting ch.15**: "Timing Constraints" — setup time, hold time, clock skew, timing analysis. Read this before the timing exercise (Design HW4).
-- **Dally & Harting ch.28**: "Metastability and Synchronization Failure" — the physics of metastability, MTBF calculation, why synchronizers work. Essential background for CDC.
-- **Dally & Harting ch.29**: "Synchronizer Design" — 2-FF synchronizers, synchronizer architectures, design guidelines. Directly maps to Design HW2.
-- **Cliff Cummings** *"Clock Domain Crossing (CDC) Design & Verification Techniques Using SystemVerilog"* (SNUG 2008) — **essential reading**. This paper is cited in every CDC interview question. Covers metastability, 2-FF synchronizer, pulse synchronizer, gray code.
-- **Cliff Cummings** *"Simulation and Synthesis Techniques for Asynchronous FIFO Design"* (SNUG 2002) — you read the theory in Week 5, now build it.
-- **ChipVerify**: https://www.chipverify.com/verilog/verilog-clock-domain-crossing
-- **Sutherland *SystemVerilog for Design* (2nd ed) ch.9**: SV procedural blocks — `always_comb`, `always_ff`, `always_latch` and when each one is the right tool. Use this for the register-file and synchronizer code.
-- **Sutherland *SystemVerilog for Design* (2nd ed) ch.13**: RTL synthesis guidelines — what synthesizes cleanly and what doesn't. The single best chapter for writing register-file / FIFO RTL that won't surprise you in synthesis.
+- **Drill Dally ch.29 — 2-FF synchronizer**
+  *Folder:* `homework/design/per_chapter/hw_dally_ch29_synchronizer/`
+  ```systemverilog
+  module sync_2ff #(parameter WIDTH = 1) (
+      input  logic clk_dst, rst_n,
+      input  logic [WIDTH-1:0] data_in,
+      output logic [WIDTH-1:0] data_out);
+  ```
+  Two back-to-back FFs. Use only for slow-changing level signals.
 
-### Design Notes for the Register File
-- **x0 hardwired to zero** — this is a RISC-V convention; any write to x0 is ignored, reads always return 0
-- **2 read ports, 1 write port** — standard for single-issue CPUs
-- **Write-first behavior**: if you read and write the same register on the same cycle, the read should return the NEW value (forwarding within the register file)
-- **Use `always_ff`** for the write port, **`always_comb`** for read ports
-- This register file will be reused in your RISC-V CPU (Weeks 7-8)
+### Main HWs
 
-### Design HW1: Register File
-Build the register file as part of verification HW3, but design it as a standalone, well-tested module first. See HW3 verification spec above for the interface.
+#### HW1: Register file DUT (shared with Verif HW2)
+*Folder:* `homework/design/connector/hw1_register_file/`
+See Verification HW2 for the spec.
 
-### Design HW2: 2-FF Synchronizer & Pulse Synchronizer
-These are the fundamental CDC building blocks. Every ASIC has hundreds of them.
+#### HW2: Pulse synchronizer
+*Folder:* `homework/design/connector/hw2_pulse_synchronizer/`
 
 ```systemverilog
-// Part A: Basic 2-FF synchronizer (for slow-changing signals)
-module sync_2ff #(
-    parameter WIDTH = 1
-)(
-    input  logic             clk_dst,    // destination clock
-    input  logic             rst_n,
-    input  logic [WIDTH-1:0] data_in,    // from source clock domain
-    output logic [WIDTH-1:0] data_out    // synchronized to clk_dst
-);
-    // Two back-to-back flip-flops
-    // The first FF may go metastable — the second FF resolves it
-    // ONLY use for signals that change slowly (level signals, not pulses)
-endmodule
-
-// Part B: Pulse synchronizer (for single-cycle pulses across domains)
 module pulse_sync (
     input  logic clk_src, clk_dst, rst_n,
-    input  logic pulse_in,    // single-cycle pulse in clk_src domain
-    output logic pulse_out    // single-cycle pulse in clk_dst domain
+    input  logic pulse_in,    // 1-cycle pulse @ clk_src
+    output logic pulse_out    // 1-cycle pulse @ clk_dst
 );
-    // Method: toggle a flag in source domain, synchronize the toggle to
-    // destination domain, detect edges on the synchronized toggle
-    //
-    // This handles the case where clk_src pulse is too short for clk_dst
-    // to sample directly
-endmodule
 ```
+Toggle-based: flip a flag in the source domain, sync the toggle
+into the destination domain via `sync_2ff`, edge-detect the
+synced toggle to recreate the pulse. TB drives pulses at varying
+gaps and confirms each one arrives exactly once.
 
-Write a testbench with two clock domains (e.g., 100 MHz and 37 MHz — intentionally non-integer ratio):
-1. Drive level signal changes through 2-FF sync, verify they arrive (with 2-cycle latency)
-2. Drive single-cycle pulses through pulse sync, verify each pulse arrives exactly once
-3. Drive pulses very close together — verify none are lost
-
-### Design HW3: Asynchronous FIFO
-The crowning achievement of CDC design. Asked about in nearly every ASIC interview:
+#### HW3: Asynchronous FIFO ⭐
+*Folder:* `homework/design/connector/hw3_async_fifo/`
 
 ```systemverilog
 module async_fifo #(
     parameter DATA_WIDTH = 8,
-    parameter ADDR_WIDTH = 4    // DEPTH = 2^ADDR_WIDTH (must be power of 2!)
+    parameter ADDR_WIDTH = 4    // DEPTH = 2**ADDR_WIDTH (power of 2)
 )(
-    // Write domain
-    input  logic                  wr_clk, wr_rst_n,
-    input  logic                  wr_en,
+    // write domain
+    input  logic                  wr_clk, wr_rst_n, wr_en,
     input  logic [DATA_WIDTH-1:0] wr_data,
     output logic                  full,
-    // Read domain
-    input  logic                  rd_clk, rd_rst_n,
-    input  logic                  rd_en,
+    // read domain
+    input  logic                  rd_clk, rd_rst_n, rd_en,
     output logic [DATA_WIDTH-1:0] rd_data,
     output logic                  empty
 );
-    // Key design elements:
-    // 1. Dual-port RAM for storage (from Week 5 Design HW2)
-    // 2. Write pointer (binary) in write clock domain
-    // 3. Read pointer (binary) in read clock domain
-    // 4. Gray code conversion: binary -> gray for crossing domains
-    //    gray = binary ^ (binary >> 1)
-    // 5. Synchronize gray-coded write pointer to read domain (2-FF)
-    // 6. Synchronize gray-coded read pointer to write domain (2-FF)
-    // 7. Full detection: compare synced read pointer with write pointer
-    //    Full when gray_wr_ptr == {~gray_rd_sync[MSB:MSB-1], gray_rd_sync[MSB-2:0]}
-    // 8. Empty detection: compare synced write pointer with read pointer
-    //    Empty when gray_rd_ptr == gray_wr_sync
-    //
-    // IMPORTANT: depth MUST be power of 2 for gray code to work correctly
-endmodule
 ```
+Implements the Cummings-paper design exactly:
+1. Dual-port RAM for storage (your W5 design HW1 generalizes).
+2. Binary write-pointer in `wr_clk` domain, binary read-pointer in
+   `rd_clk` domain.
+3. Both pointers gray-code-encoded for crossing
+   (`gray = bin ^ (bin >> 1)`).
+4. 2-FF synchronize each gray pointer into the *other* domain.
+5. `full` (in wr domain): synced rd_ptr_gray equals wr_ptr_gray
+   with the top two bits inverted.
+6. `empty` (in rd domain): synced wr_ptr_gray equals rd_ptr_gray.
 
-Write a testbench with asymmetric clocks (e.g., write at 100 MHz, read at 33 MHz):
-1. Fill the FIFO completely — verify full flag
-2. Drain completely — verify empty flag and data integrity (FIFO order)
-3. Continuous write + read at different rates — verify no data corruption
-4. Stress test: write bursts faster than read can drain
+TB with asymmetric clocks (e.g., 100 MHz write, 33 MHz read):
+fill / drain / continuous / burst-faster-than-drain. Verify FIFO
+order and no data corruption.
 
-### Design HW4: Timing Analysis Exercise (Pen & Paper)
-No RTL for this one — work through these on paper or a whiteboard. Understanding timing is critical for interviews:
+#### HW4: Critical-path / clock-frequency analysis (paper)
+*Folder:* `homework/design/connector/hw4_critical_path/`
 
-1. **Setup & hold calculation**: Given Tclk=10ns, Tsetup=0.5ns, Thold=0.3ns, Tcq=0.8ns, and combinational delay=7ns: What is the slack? Can the design meet timing?
+For your W4 ALU:
+1. Draw the datapath (input regs → operand MUX → adder/AND/OR/XOR
+   → output reg). Annotate each block's typical delay.
+2. Identify the critical path.
+3. Compute the maximum clock frequency.
+4. Suggest one pipelining cut that would push fmax up; compute
+   new fmax.
 
-2. **Critical path identification**: Draw the datapath of your Week 4 ALU (inputs -> mux -> adder -> output register). Label each component's delay. What's the critical path? What's the maximum clock frequency?
+Pen-and-paper. This is exactly the analysis a static timing report
+makes you do every day in industry.
 
-3. **Pipelining for timing**: Take the multiplier from Week 4 HW3. If it were combinational (single cycle), the critical path would be WIDTH stages of add+shift. Show how breaking it into a multi-cycle design trades latency for throughput.
+### Stretch (optional)
 
-4. **Metastability MTBF**: Given a synchronizer with Tsetup=0.5ns, Tw=0.3ns (metastability window), clock=200MHz, input change rate=50MHz: Calculate MTBF with 1-FF vs 2-FF synchronizer. Why is 2-FF sufficient?
+- **Stretch — ECC: parity + Hamming(7,4) SECDED**
+  *Folder:* `homework/design/big_picture/ecc/`
+  Out-of-curriculum (no assigned chapter teaches Hamming codes;
+  use Wikipedia + ChipVerify). Add a parity bit per register on the
+  W7 register file. Then a standalone Hamming(7,4) encoder/decoder
+  that corrects single-bit errors and detects double-bit errors.
+  Useful interview talking point but not required.
 
-### Design HW5: ECC — Parity + Hamming(7,4) on the Register File
+---
 
-Memory subsystems in real chips need error detection / correction. This brings
-your week-06 deliverables in line with what most academic DV/RTL courses
-include in a "memory and reliability" module.
+## Self-Check Questions
 
-1. **Parity bit** — extend Design HW1 (Register File) to add a single parity bit
-   per register. Write logic to detect single-bit errors on read. No correction —
-   just a fault flag.
-2. **Hamming(7,4) SECDED** — implement a small standalone module that:
-   - encodes a 4-bit data word into a 7-bit codeword (4 data + 3 parity), and
-   - decodes a 7-bit codeword back to 4 bits, **correcting** any single-bit error
-     and **detecting** double-bit errors.
-3. **Testbench** — directed tests that flip each bit position and confirm the
-   decoder corrects it; flip two bits and confirm the decoder reports an
-   uncorrectable error.
-
-Resources:
-- ChipVerify / Wikipedia "Hamming code" pages
-- Optional: Synopsys / Cadence app notes on SECDED in SRAM IP
+1. What does `phase.raise_objection` / `drop_objection` actually do
+   to the simulation?
+2. Why is the scoreboard the right place for the reference model,
+   and not the monitor?
+3. How do you ensure your testbench supports `run_test("any_test")`
+   without recompiling?
+4. What is the difference between a 2-FF synchronizer (level) and a
+   pulse synchronizer? When do you reach for which?
+5. Why must async-FIFO depth be a power of 2 with gray-code
+   pointers?
+6. Walk through a transaction's full life: where it's created, who
+   randomizes it, who drives it, who observes it, who checks it.
 
 ---
 
 ## Checklist
 
 ### Verification Track
-- [ ] Read Rosenberg ch.8-10
-- [ ] Watched Verification Academy Scoreboard + Coverage + Reporting
-- [ ] Read ChipVerify scoreboard, reporting, phases pages
-- [ ] Completed HW1 (Scoreboard with reference model)
-- [ ] Completed HW2 (UVM coverage collector)
-- [ ] Completed HW3 (Full register file UVM testbench — includes RTL design)
-- [ ] Completed HW4 (Regression & coverage closure)
+- [ ] Read Salemi ch.24 (Onward with the UVM)
+- [ ] Read Rosenberg ch.4-6, ch.8 as needed during HW
+- [ ] VA Cookbook: scoreboard + coverage recipes
+- [ ] Drill: uvm_scoreboard
+- [ ] Drill: uvm_subscriber covergroup
+- [ ] Drill: reset sequence
+- [ ] HW1: register file DUT (shared with design)
+- [ ] HW2: full UVM TB for register file
+- [ ] HW3: coverage closure
 - [ ] Can answer all self-check questions
-- [ ] **MILESTONE: You can build a UVM testbench from scratch!**
 
 ### Design Track
-- [ ] Read Dally ch.15 (timing constraints), ch.28 (metastability), ch.29 (synchronizer design)
+- [ ] Read Dally ch.15 (timing)
+- [ ] Read Dally ch.28 (metastability)
+- [ ] Read Dally ch.29 (synchronizer design)
 - [ ] Read Cummings CDC paper (SNUG 2008)
 - [ ] Read Cummings async FIFO paper (SNUG 2002)
-- [ ] Completed Design HW1 (Register file with x0=0 and write-first)
-- [ ] Completed Design HW2 (2-FF synchronizer + pulse synchronizer)
-- [ ] Completed Design HW3 (Asynchronous FIFO with gray code pointers)
-- [ ] Completed Design HW4 (Timing analysis pen-and-paper exercise)
-- [ ] Completed Design HW5 (Parity + Hamming SECDED on register file)
-- [ ] **MILESTONE: You understand CDC — the #1 source of silicon bugs!**
+- [ ] Read Sutherland *SV for Design* ch.6 (procedural blocks)
+- [ ] Drill Dally ch.15 (timing math)
+- [ ] Drill Dally ch.28 (MTBF math)
+- [ ] Drill Dally ch.29 (2-FF synchronizer)
+- [ ] HW1: register file DUT
+- [ ] HW2: pulse synchronizer
+- [ ] HW3: async FIFO
+- [ ] HW4: critical-path analysis

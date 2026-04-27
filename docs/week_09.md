@@ -1,221 +1,284 @@
-# Week 8: Pipelined CPU & Hazard Handling
+# Week 9: Pipelined CPU & Hazard Handling
 
 ## Why This Matters
-Every real CPU is pipelined. Understanding pipeline hazards (data, control, structural) and their solutions (forwarding, stalling, flushing) is essential interview knowledge. Building this proves you understand hardware at the microarchitecture level.
+
+Every real CPU is pipelined. Understanding pipeline hazards (data,
+control, structural) and their solutions (forwarding, stalling,
+flushing) is essential interview knowledge — and the diagrams come
+up *every* time. Building a working 5-stage pipeline on top of your
+W8 single-cycle CPU proves you understand microarchitecture, not
+just RTL syntax.
+
+This week, drills are per-hazard-type. Main HWs are the
+incremental pipeline-correctness milestones.
 
 ## What to Study
 
-### Reading
-- **Harris & Harris ch.7.5-7.8**: Pipelining
-  - 5-stage pipeline: IF, ID, EX, MEM, WB
-  - Pipeline registers
-  - Data hazards: RAW (read-after-write)
-  - Forwarding (bypassing)
-  - Stalls (load-use hazard)
-  - Control hazards: branch prediction, pipeline flush
-- **Dally & Harting ch.23**: "Pipelines" — pipeline theory, throughput vs latency, pipeline hazards and interlocks. Gives a more general treatment of pipelining beyond just CPUs — applicable to any datapath.
-- **Patterson & Hennessy** (optional, deeper): Chapter 4 "The Processor"
-- **Sutherland *SystemVerilog for Design* (2nd ed) ch.9**: SV procedural blocks — cleanly modeling pipeline registers with `always_ff` and avoiding latch inference between stages.
-- **Sutherland *SystemVerilog for Design* (2nd ed) ch.13**: RTL synthesis guidelines — pipeline-friendly coding patterns; this is the chapter that keeps your forwarding muxes and hazard logic synthesizable.
+### Reading — Verification
 
-### Videos
-- **MIT 6.004**: Pipelining lectures (2-3 lectures)
-- **Harris & Harris** lecture on pipelining if available
+- **Spear & Tumbush ch.4 §4.9** — same minimal SVA chapter as W8;
+  use it to write hazard-violation assertions.
+- **ChipVerify** — quick reference for `$past`, `$rose`, `$fell`
+  used in hazard assertions. (Note: full SVA semantics are
+  *outside* Spear's scope — see Sutherland's *SVA Handbook* if you
+  want the deep dive.)
 
-### Reference
-- Your single-cycle CPU from Week 7 is the starting point
+### Reading — Design
+
+- **Harris & Harris ch.7.5** ⭐ — pipelined microarchitecture
+  (the 5-stage IF/ID/EX/MEM/WB datapath).
+- **Harris & Harris ch.7.7** ⭐ — hazards: data hazards, forwarding,
+  load-use stall, control hazards, branch prediction.
+- **Harris & Harris ch.7.8** — performance analysis (CPI, throughput).
+- **Dally & Harting ch.16 — Datapath Sequential Logic**: pipeline
+  registers, forwarding muxes — the design building blocks behind
+  Harris ch.7.5.
+- **Sutherland *SV for Design* ch.6 — Procedural Blocks**:
+  `always_ff` for pipeline registers; how to avoid latch inference
+  between stages.
+- **Sutherland *SV for Design* ch.5 — Arrays, Structures, Unions**:
+  packed `struct` for the IF/ID, ID/EX, EX/MEM, MEM/WB pipeline
+  bundles.
+
+### Tool Setup
+
+- xsim or iverilog. No new tools — same flow as W8.
 
 ---
 
-## Homework
+## Verification Homework
 
-### HW1: Add Pipeline Registers
-Take your single-cycle CPU and insert pipeline registers between each stage:
+### Drills (per-hazard-type warmups)
 
-```
-IF/ID Register:
-    - instruction
-    - pc
-    - pc_plus4
+> Each drill targets one specific hazard. Small assembly snippets
+> + a self-checking TB. ~50 lines each.
 
-ID/EX Register:
-    - control signals (reg_write, mem_write, mem_read, branch, alu_src, alu_control, mem_to_reg)
-    - read_data1, read_data2
-    - immediate
-    - rd, rs1, rs2
-    - pc, pc_plus4
+- **Drill — RAW (read-after-write) hazard demo (Harris ch.7.7)**
+  *File:* `homework/verif/per_chapter/hw_hazard_raw/raw_hazard.s`
+  ```
+  addi x1, x0, 5
+  add  x2, x1, x1   # depends on x1 just written — RAW
+  ```
+  TB runs this on the W8 single-cycle CPU and on the pipelined
+  CPU; confirms single-cycle gets 10, pipelined (without
+  forwarding) gets 0 or stale value. This is the motivating
+  example for HW2.
 
-EX/MEM Register:
-    - control signals (reg_write, mem_write, mem_read, branch, mem_to_reg)
-    - alu_result
-    - write_data (for store)
-    - rd
-    - zero flag
-    - branch_target
+- **Drill — Load-use hazard demo (Harris ch.7.7)**
+  *File:* `homework/verif/per_chapter/hw_hazard_load_use/load_use.s`
+  ```
+  lw   x1, 0(x0)
+  add  x2, x1, x3   # x1 not ready until end of MEM — needs stall
+  ```
+  Even with forwarding, this MUST stall 1 cycle. Drill confirms
+  stall logic later in HW3.
 
-MEM/WB Register:
-    - control signals (reg_write, mem_to_reg)
-    - alu_result
-    - read_data (from memory)
-    - rd
-```
+- **Drill — Control hazard demo (Harris ch.7.7)**
+  *File:* `homework/verif/per_chapter/hw_hazard_control/control_hazard.s`
+  ```
+  beq  x0, x0, target
+  addi x1, x0, 99   # FLUSHED
+  addi x2, x0, 99   # FLUSHED
+  target: addi x3, x0, 1
+  ```
+  Predict-not-taken + flush on misprediction. Drill confirms the
+  next-2-instructions are not committed.
 
-Implement as a struct or individual registers. Run your Week 7 test programs — they will FAIL due to hazards. That's expected!
+- **Drill — Hazard SVA (Spear §4.9)**
+  *File:* `homework/verif/per_chapter/hw_hazard_sva/hazard_sva.sv`
+  Light concurrent assertions on the pipeline:
+  - `assert property (@(posedge clk) (rd_wb == 0) |-> !reg_write_wb)`
+    — never write x0.
+  - `assert property (@(posedge clk) stall |=> $stable(pc))`
+    — when stall is asserted, PC must hold next cycle.
+  Two or three asserts is plenty — Spear barely covers SVA.
 
-Document which tests fail and why (identify the specific hazard in each case).
+### Main HWs
 
-### HW2: Forwarding Unit
-Implement the forwarding (bypass) unit to solve most data hazards:
+#### HW1: Hazard regression suite
+*Folder:* `homework/verif/connector/hw1_hazard_regression/`
 
-```systemverilog
-module forwarding_unit (
-    input  logic [4:0] rs1_ex,       // source register 1 in EX stage
-    input  logic [4:0] rs2_ex,       // source register 2 in EX stage
-    input  logic [4:0] rd_mem,       // destination register in MEM stage
-    input  logic [4:0] rd_wb,        // destination register in WB stage
-    input  logic       reg_write_mem, // writing in MEM stage?
-    input  logic       reg_write_wb,  // writing in WB stage?
-    output logic [1:0] forward_a,    // 00=reg, 01=WB, 10=MEM
-    output logic [1:0] forward_b     // 00=reg, 01=WB, 10=MEM
-);
-    // TODO: decide when to forward and from where.
-    // Questions to answer as you design:
-    //   - Which stage's result is "newer" — MEM or WB?
-    //   - What happens when both stages write the same register?
-    //   - Why does x0 need special handling?
-endmodule
-```
+A self-checking TB that runs a battery of hazard-trigger programs
+through the pipelined CPU (built in DHW1-DHW4) and verifies each
+finishes with the right architectural state.
 
-Add MUXes before the ALU inputs to select between:
-- Register file output (no hazard)
-- MEM stage result (EX-EX forwarding)
-- WB stage result (MEM-EX forwarding)
+Programs (one .hex / .s each):
+- Test A: EX-EX forwarding (back-to-back ALU ops).
+- Test B: MEM-EX forwarding (one nop between).
+- Test C: load-use stall + forward.
+- Test D: branch taken — flush 2 instructions.
+- Test E: back-to-back loads with double-forward.
+- Test F: store after load (forward to store-data).
+- Test G: full integration — `sum 1..10` (final x1 = 55).
 
-Re-run tests — ALU-to-ALU sequences should now work:
-```
-addi x1, x0, 5
-addi x2, x1, 3    # needs forwarding: x1 from previous instruction
-```
+TB loads each program, releases reset, runs to completion, reads
+expected register values, asserts. Print a final pass/fail summary.
 
-### HW3: Hazard Detection Unit (Stall for Load-Use)
-Forwarding can't solve everything. A load followed by a use needs a 1-cycle stall:
+#### HW2: Pipeline-state assertion bundle
+*Folder:* `homework/verif/connector/hw2_pipeline_assertions/`
 
-```
-lw   x1, 0(x0)    # x1 available after MEM stage
-add  x2, x1, x3   # needs x1 in EX stage — too early!
-```
+Concurrent SVA bundle on the pipelined CPU:
+- x0 is never written.
+- PC holds steady whenever `stall` is asserted.
+- On a flush, the next two `instruction` outputs at IF must be
+  treated as bubbles (i.e., `reg_write` must be 0 for those slots
+  by the time they reach WB).
+- `mem_read` and `mem_write` are never both asserted.
 
-```systemverilog
-module hazard_detection_unit (
-    input  logic [4:0] rs1_id,       // source registers in ID stage
-    input  logic [4:0] rs2_id,
-    input  logic [4:0] rd_ex,        // destination in EX stage
-    input  logic       mem_read_ex,  // is EX stage a load?
-    output logic       stall         // insert bubble
-);
-    // Derive the stall condition. Think about:
-    //   - When is the EX-stage instruction actually a load?
-    //   - When does its destination register collide with either ID source?
-    //   - Why must you special-case x0?
-endmodule
-```
+Run alongside HW1's regression and confirm zero assertion
+failures.
 
-When stalling:
-- Freeze PC (don't update)
-- Freeze IF/ID register (don't update)
-- Insert NOP (bubble) into ID/EX register (zero all control signals)
+### Stretch (optional)
 
-Test with:
-```
-lw   x1, 0(x0)
-add  x2, x1, x3   # should stall 1 cycle, then forward
-```
+- **Stretch — Branch prediction (Harris ch.7.7 mentions, light
+  coverage)**
+  Add a 1-bit predictor (history bit per branch PC, small table)
+  and re-measure cycles for `test_loop.hex`. Compare against
+  predict-not-taken. Harris ch.7.7 mentions branch prediction but
+  doesn't go deep — outside-curriculum extension is the
+  Patterson & Hennessy ch.4 treatment.
 
-### HW4: Branch Handling (Flush on Misprediction)
-Implement branch handling with "predict not taken" strategy:
+---
 
-- Always fetch the next sequential instruction (predict not taken)
-- If the branch IS taken (detected in MEM or EX stage):
-  - Flush the incorrectly fetched instructions (zero out IF/ID and ID/EX registers)
-  - Set PC to branch target
+## Design Homework
 
-```systemverilog
-module branch_unit (
-    input  logic        branch_mem,    // is MEM stage a branch?
-    input  logic        zero_mem,      // ALU zero flag
-    input  logic [31:0] branch_target, // computed target
-    output logic        flush,         // flush IF/ID and ID/EX
-    output logic        pc_sel         // 0=PC+4, 1=branch_target
-);
-endmodule
-```
+### Drills (per-hazard-type warmups)
 
-Test with:
-```
-addi x1, x0, 5
-addi x2, x0, 5
-beq  x1, x2, target   # taken — must flush next 2 instructions
-addi x3, x0, 99       # FLUSHED — should NOT execute
-addi x4, x0, 99       # FLUSHED — should NOT execute
-target:
-addi x5, x0, 1        # x5 = 1
-```
+- **Drill — Pipeline register module (Harris ch.7.5, Dally ch.16,
+  Sutherland ch.5+ch.6)**
+  *Folder:* `homework/design/per_chapter/hw_pipe_register/`
+  One generic `pipe_reg #(type T)` parameterized on the bundle
+  type. Internally one `always_ff` with synchronous flush input
+  that zeroes the bundle. Use a packed `struct` (Sutherland ch.5)
+  for the bundle types.
 
-### HW5: Comprehensive Hazard Tests
-Write test programs that trigger each specific hazard:
+- **Drill — Forwarding unit (Harris ch.7.7)**
+  *Folder:* `homework/design/per_chapter/hw_forwarding_unit/`
+  ```systemverilog
+  module forwarding_unit (
+      input  logic [4:0] rs1_ex, rs2_ex,
+      input  logic [4:0] rd_mem, rd_wb,
+      input  logic       reg_write_mem, reg_write_wb,
+      output logic [1:0] forward_a, forward_b // 00=reg 01=WB 10=MEM
+  );
+  ```
+  Pure combinational priority logic. MEM beats WB. x0 never
+  forwards.
 
-```
-# Test A: EX-EX forwarding (no stall needed)
-addi x1, x0, 1
-add  x2, x1, x1     # forward x1 from EX/MEM
+- **Drill — Hazard detection unit (load-use stall)
+  (Harris ch.7.7)**
+  *Folder:* `homework/design/per_chapter/hw_hazard_detection/`
+  ```systemverilog
+  module hazard_detection_unit (
+      input  logic [4:0] rs1_id, rs2_id,
+      input  logic [4:0] rd_ex,
+      input  logic       mem_read_ex,
+      output logic       stall
+  );
+  ```
+  When the EX-stage instruction is a load AND its destination
+  matches either ID source: stall.
 
-# Test B: MEM-EX forwarding
-addi x1, x0, 1
-nop
-add  x2, x1, x1     # forward x1 from MEM/WB
+- **Drill — Branch unit + flush (Harris ch.7.7)**
+  *Folder:* `homework/design/per_chapter/hw_branch_unit/`
+  Resolve branches in MEM (simplest), assert `flush` to zero
+  IF/ID and ID/EX bundles, mux PC ← branch_target.
 
-# Test C: Load-use stall + forward
-lw   x1, 0(x0)
-add  x2, x1, x0     # stall 1 cycle, then forward
+### Main HWs
 
-# Test D: Branch taken — flush
-beq  x0, x0, skip
-addi x1, x0, 99     # must be flushed
-skip: addi x1, x0, 1
+#### HW1: Insert pipeline registers (no hazard logic yet)
+*Folder:* `homework/design/connector/hw1_pipeline_registers/`
 
-# Test E: Back-to-back loads
-lw   x1, 0(x0)
-lw   x2, 4(x0)
-add  x3, x1, x2     # double forwarding
+Take your W8 single-cycle CPU. Add the four pipeline-register
+stages between IF/ID/EX/MEM/WB using your pipe-register drill.
+Carry across the right signals at each boundary:
 
-# Test F: Store after load (no hazard for store data)
-lw   x1, 0(x0)
-sw   x1, 4(x0)      # needs forwarding for store data
+- IF/ID: instruction, pc, pc+4
+- ID/EX: control bundle, read_data1, read_data2, imm, rd, rs1, rs2,
+  pc, pc+4
+- EX/MEM: control subset, alu_result, write_data, rd, zero,
+  branch_target
+- MEM/WB: control subset, alu_result, mem_read_data, rd
 
-# Test G: Full program — sum 1 to 10 (combines everything)
-```
+Run W8's `test_alu.hex`, `test_loop.hex`. **They will fail.**
+Document each failure and identify which hazard caused it. This
+is the motivating prework for HW2-HW4.
 
-All tests must produce correct results. Verify in waveform.
+#### HW2: Add forwarding (EX-EX and MEM-EX)
+*Folder:* `homework/design/connector/hw2_forwarding/`
+
+Wire your forwarding-unit drill in. Add forwarding muxes in front
+of the ALU operand-A and operand-B inputs, selecting between
+register-file output, EX/MEM result, MEM/WB result.
+
+After this, ALU-to-ALU sequences pass; load-use still fails.
+
+#### HW3: Add load-use stall
+*Folder:* `homework/design/connector/hw3_stall/`
+
+Wire your hazard-detection-unit drill in. When `stall == 1`:
+- Freeze PC (don't update).
+- Freeze IF/ID register (don't update).
+- Insert a bubble into ID/EX (zero the control bundle).
+
+After this, load-use sequences pass.
+
+#### HW4: Add branch flush
+*Folder:* `homework/design/connector/hw4_branch_flush/`
+
+Wire your branch-unit drill in. On a taken branch resolved in MEM,
+flush IF/ID and ID/EX (zero the bundles) and select PC ←
+branch_target.
+
+After this, all hazard regression tests in VHW1 pass.
+
+### Stretch (optional)
+
+- **Stretch — Resolve branches in ID stage**
+  Move branch resolution earlier. Reduces flush penalty from 2
+  cycles to 1, but needs new forwarding paths. Harris discusses
+  this briefly.
 
 ---
 
 ## Self-Check Questions
+
 1. What are the three types of hazards? Give an example of each.
 2. Why can't forwarding solve the load-use hazard?
-3. What's the performance penalty of a branch misprediction in a 5-stage pipeline?
-4. What's the difference between "predict not taken" and "predict taken"?
-5. Draw the pipeline diagram for: `lw x1, 0(x0)` followed by `add x2, x1, x3` — show the stall bubble.
-6. Could you move branch resolution to the ID stage? What would change?
+3. What's the performance penalty of a branch misprediction in a
+   5-stage pipeline?
+4. Difference between "predict not taken" and "predict taken"?
+5. Draw the pipeline diagram for `lw x1,0(x0); add x2,x1,x3;`
+   showing the stall bubble.
+6. Could branch resolution move to the ID stage? What changes?
 
 ---
 
 ## Checklist
-- [ ] Read Harris & Harris ch.7.5-7.8
-- [ ] Watched MIT 6.004 pipelining lectures
-- [ ] Completed HW1 (Pipeline registers — tests fail due to hazards)
-- [ ] Completed HW2 (Forwarding unit — ALU-ALU tests pass)
-- [ ] Completed HW3 (Hazard detection — load-use tests pass)
-- [ ] Completed HW4 (Branch handling — branch tests pass)
-- [ ] Completed HW5 (All 7 hazard test programs pass)
+
+### Verification Track
+- [ ] Read Spear ch.4 §4.9 (assertion intro)
+- [ ] Drill: RAW hazard demo
+- [ ] Drill: load-use hazard demo
+- [ ] Drill: control hazard demo
+- [ ] Drill: hazard SVA bundle
+- [ ] HW1: hazard regression (7 programs pass)
+- [ ] HW2: pipeline-state assertion bundle
 - [ ] Can answer all self-check questions
-- [ ] **MILESTONE: Working pipelined RISC-V CPU!**
+
+### Design Track
+- [ ] Read Harris ch.7.5 (pipelined uarch)
+- [ ] Read Harris ch.7.7 (hazards)
+- [ ] Read Harris ch.7.8 (perf analysis)
+- [ ] Read Dally ch.16 (datapath sequential)
+- [ ] Read Sutherland ch.5 (structs for pipeline bundles)
+- [ ] Read Sutherland ch.6 (always_ff for pipe registers)
+- [ ] Drill: pipe_reg module
+- [ ] Drill: forwarding unit
+- [ ] Drill: hazard detection unit
+- [ ] Drill: branch unit + flush
+- [ ] HW1: pipeline registers inserted (W8 tests fail as expected)
+- [ ] HW2: forwarding (ALU-ALU passes)
+- [ ] HW3: stall (load-use passes)
+- [ ] HW4: branch flush (branch tests pass)
+- [ ] **MILESTONE: Working pipelined RISC-V CPU.**
