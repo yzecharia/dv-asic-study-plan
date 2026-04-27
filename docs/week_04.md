@@ -1,337 +1,207 @@
 # Week 4: UVM Architecture & Components
 
 ## Why This Matters
-UVM (Universal Verification Methodology) is the industry standard. Every DV job listing in Israel mentions UVM. It's a SystemVerilog class library that provides a reusable testbench structure. This week you learn the architecture — how all the pieces fit together.
 
-## What to Study
+UVM (Universal Verification Methodology) is the industry standard. Every DV
+job listing in Israel mentions UVM. This week you internalize **the
+architecture** — the factory pattern, uvm_test, uvm_components, and uvm_env.
+You won't touch sequences, TLM, or transactions yet — those come in weeks 5
+and 6. The scope is deliberately narrow so each concept clicks fully.
 
-### Reading
-- **Salemi *The UVM Primer*** (primary — uses TinyALU as the running DUT):
-  - **ch.1 Introduction** (quick read)
-  - **ch.2-3 Conventional TB + SV Interfaces/BFM** (skim — you already know this)
-  - **ch.4-8 OOP review** (skim fast — you have this from weeks 1-2)
-  - **ch.9 The Factory Pattern** ⭐ (read carefully — core UVM abstraction)
-  - **ch.10 An Object-Oriented Testbench** (bridges OOP → UVM)
-  - **ch.11 UVM Tests** ⭐
-  - **ch.12 UVM Components** ⭐
-  - **ch.13 UVM Environments** ⭐
-  - **ch.14 A New Paradigm**
-- **Videos**: companion videos at [uvmprimer.com](http://uvmprimer.com), one per chapter
-- **Rosenberg & Meade ch.1-4** (reference, optional): deeper treatment if you want industry-depth framing
-- **Verification Academy UVM Cookbook** (free, online): topic-indexed recipes — bookmark and search when stuck
+## What to Study (Salemi ch.9-14 only)
 
-### Videos (Verification Academy)
-- "UVM Basics" course — start from lesson 1
-- "UVM Components" course
-- From the **SystemVerilog OOP for UVM Verification** course (deferred from Weeks 1–2), NOW watch:
-  - *What is the UVM Factory?*
-  - *Using the UVM Factory*
-  - *Using the UVM Configuration Database* (save for Week 5 when config_db is the main topic, but you can watch it now if you're curious)
+This week's reading is **the first half of UVM**: building the static
+hierarchy. Sequences, TLM, and transactions wait for weeks 5-6.
 
-### Quick Reference (ChipVerify.com)
-- https://www.chipverify.com/uvm/uvm-introduction
-- https://www.chipverify.com/uvm/uvm-testbench-architecture
-- https://www.chipverify.com/uvm/uvm-component
-- https://www.chipverify.com/uvm/uvm-factory
+### Reading — Verification
+
+- **Salemi *The UVM Primer***:
+  - **ch.9 The Factory Pattern** ⭐ — core abstraction; `\`uvm_object_utils`, `type_id::create`, `set_type_override`
+  - **ch.10 An Object-Oriented Testbench** — pre-UVM bridge: tester + scoreboard + coverage classes
+  - **ch.11 UVM Tests** ⭐ — `uvm_test`, `run_test()`, `+UVM_TESTNAME` plusarg
+  - **ch.12 UVM Components** ⭐ — class lineage, the 9 phases, reporting macros
+  - **ch.13 UVM Environments** ⭐ — `uvm_env`, abstract base class + factory override pattern
+  - **ch.14 A New Paradigm** — short philosophical wrap-up; what UVM gives you over plain OOP
+- **Verification Academy**: "UVM Basics" course — start from lesson 1
+- **ChipVerify**: [uvm-introduction](https://www.chipverify.com/uvm/uvm-introduction), [uvm-testbench-architecture](https://www.chipverify.com/uvm/uvm-testbench-architecture), [uvm-component](https://www.chipverify.com/uvm/uvm-component), [uvm-factory](https://www.chipverify.com/uvm/uvm-factory)
+- **Cheatsheet** (your repo): [cheatsheets/salemi_uvm_ch9-13.sv](../cheatsheets/salemi_uvm_ch9-13.sv)
+- **Consolidation PDF** (your repo): [docs/uvm_consolidation_salemi_ch9-15.pdf](uvm_consolidation_salemi_ch9-15.pdf)
+
+### Reading — Design
+
+- **Dally & Harting ch.10** — Arithmetic Circuits: ripple-carry adder, subtractor, comparator, multipliers (shift-add)
+- **Dally & Harting ch.12** — Fast Arithmetic: carry-lookahead adders, Wallace trees, barrel shifters
+- **Dally & Harting ch.13** — Arithmetic Examples (worked designs)
+- **Sutherland *SystemVerilog for Design* ch.4-5** — SV interfaces, modports, clocking blocks
+- **Cliff Cummings** *"Synthesis Coding Styles for Efficient Designs"*
+- **Cheatsheet**: [cheatsheets/spear_ch4_interfaces.sv](../cheatsheets/spear_ch4_interfaces.sv)
 
 ### Tool Setup
-**IMPORTANT:** iverilog does NOT fully support UVM, and Verilator's UVM support is not production-ready either. Three options, in order of preference:
 
-1. **Vivado xsim (primary)** — your existing Docker setup supports UVM. Use the
-   `🧪 FLOW: XSIM UVM` VSCode task. It passes `-L uvm` to xvlog/xelab and
-   optionally prompts for a UVM_TESTNAME plusarg. Works for every Salemi chapter
-   and every UVM testbench you'll write in weeks 4-6, 11-12.
-2. **EDA Playground** (edaplayground.com) — free, browser-based. Good fallback when
-   xsim trips on something:
-   - Select "UVM 1.2" or "UVM 2.0" from the libraries dropdown
-   - Select a simulator (Aldec Riviera-PRO works well on free tier)
-3. **Verilator / iverilog** — not usable for UVM. Skip.
+- **Vivado xsim (Docker)** — your existing setup. UVM-capable with `-L uvm`.
+- **EDA Playground** — fallback for any UVM weirdness.
+- **Run helpers**: `xvlog_lint.sh`, `run_xsim.sh`
 
 ---
 
-## Design Track: ALU & SV Interfaces
+## Verification Homework
 
-Starting from Week 4, your design work feeds directly into your UVM testbench. The ALU you build this week is the DUT you'll verify through Weeks 4-6.
+### Per-chapter (small focused exercises — one per Salemi chapter)
 
-### Reading (Design)
-- **Dally & Harting ch.10**: "Arithmetic Circuits" — adders (ripple carry, carry select), subtractors, comparators, multipliers (shift-add). Core chapter for this week's ALU and multiplier HW.
-- **Dally & Harting ch.12**: "Fast Arithmetic Circuits" — carry-lookahead adders, fast multipliers, barrel shifters. Explains the circuits behind your barrel shifter HW.
-- **Dally & Harting ch.13**: "Arithmetic Examples" — worked design examples combining arithmetic blocks.
-- **ChipVerify**: https://www.chipverify.com/systemverilog/systemverilog-interface
-- **Cliff Cummings** *"Synthesis Coding Styles for Efficient Designs"* — how your RTL maps to actual hardware gates
-- **Sutherland *SystemVerilog for Design* (2nd ed) ch.4-5**: SV interfaces and modports — the canonical reference. Read this before Design HW2 (the SV interface for the ALU).
+Each per-chapter HW is **10-30 lines** of code. Goal: feel each concept
+under your fingers, isolated from the others.
 
-### Design HW1: ALU DUT
-Design the ALU that your UVM testbench will verify:
+- **HW ch.9 — Factory pattern**
+  *File:* `homework/verif/per_chapter/hw_ch09_factory_pattern/factory_demo.sv`
+  Recreate the animal/lion/chicken example from Salemi ch.9. Register two
+  classes with `\`uvm_object_utils`, instantiate via `type_id::create`,
+  demonstrate one `set_type_override`. No UVM components yet — just the
+  factory mechanism.
 
-```systemverilog
-module alu #(
-    parameter WIDTH = 8
-)(
-    input  logic                clk,
-    input  logic                rst_n,
-    input  logic [WIDTH-1:0]    operand_a,
-    input  logic [WIDTH-1:0]    operand_b,
-    input  logic [2:0]          operation,   // ADD, SUB, AND, OR, XOR
-    input  logic                valid_in,
-    output logic [WIDTH:0]      result,      // extra bit for carry/overflow
-    output logic                valid_out
-);
-```
+- **HW ch.10 — Object-Oriented Testbench (no UVM)**
+  *File:* `homework/verif/per_chapter/hw_ch10_oo_testbench/oo_tb_demo.sv`
+  Build a non-UVM testbench: a `testbench` class composing a `tester` +
+  `scoreboard`, all communicating via direct method calls. Use
+  `fork/join_none`. Pure SV classes, no UVM imports. The point is to feel
+  the pattern UVM later standardizes.
 
-Industry practices:
-- Registered outputs (1-cycle latency) — more realistic than pure combinational
-- Valid signal for handshaking
-- Parameterized width
+- **HW ch.11 — UVM Tests**
+  *File:* `homework/verif/per_chapter/hw_ch11_uvm_tests/hello_uvm_test.sv`
+  Write a minimal `uvm_test` that prints `"Hello UVM"` in `run_phase`. Run
+  with `+UVM_TESTNAME=my_test`. No env, no components — just `top` calling
+  `run_test()`.
 
-### Design HW2: SystemVerilog Interface for the ALU
-Write the SV interface that connects DUT to testbench:
+- **HW ch.12 — UVM Components**
+  *File:* `homework/verif/per_chapter/hw_ch12_uvm_components/phases_demo.sv`
+  Write a `uvm_component` subclass that prints a labeled message in
+  `build_phase`, `connect_phase`, `run_phase`, and `report_phase`. Build
+  it inside a `uvm_test`. Observe the phase order in the log.
 
-```systemverilog
-interface alu_if (input logic clk, rst_n);
-    logic [7:0]  operand_a, operand_b;
-    logic [2:0]  operation;
-    logic        valid_in;
-    logic [8:0]  result;
-    logic        valid_out;
+- **HW ch.13 — UVM Environments**
+  *File:* `homework/verif/per_chapter/hw_ch13_uvm_environments/env_demo.sv`
+  Write a `uvm_env` that builds 2-3 `uvm_component` children. Print the
+  topology with `uvm_top.print_topology()` in `start_of_simulation_phase`.
 
-    modport dut (input  operand_a, operand_b, operation, valid_in,
-                 output result, valid_out);
+- **HW ch.14 — A New Paradigm (reflective)**
+  *File:* `homework/verif/per_chapter/hw_ch14_new_paradigm/NOTES.md`
+  Write a half-page reflection: *what does UVM give you that plain SV
+  classes don't?* Mention factory, phases, hierarchical naming, and
+  reusability. No code.
 
-    modport tb  (output operand_a, operand_b, operation, valid_in,
-                 input  result, valid_out);
+### Connector — tie all 6 chapters together
 
-    clocking cb @(posedge clk);
-        output operand_a, operand_b, operation, valid_in;
-        input  result, valid_out;
-    endclocking
-endinterface
-```
+- **Connector HW — Salemi-ch.13-style UVM testbench (no sequences)**
+  *Folder:* `homework/verif/connector/`
+  Build a complete UVM testbench for the ALU DUT (from your design HW)
+  using ONLY ch.9-14 concepts:
+    - `uvm_test` → `uvm_env` → abstract `base_tester` + `scoreboard` +
+      `coverage` (all `uvm_component` subclasses)
+    - Stimulus generated **inside the tester component** (no sequences,
+      no TLM, no analysis ports — those are weeks 5-6)
+    - Two concrete tester classes (e.g., `random_tester`, `directed_tester`)
+    - The test installs `set_type_override` to swap testers
+  Goal: prove you can build the static UVM hierarchy end-to-end.
 
-This interface is what your UVM driver and monitor will use via `virtual alu_if` handles passed through `uvm_config_db`.
+### Big picture — stretch within scope
 
-### Design HW3: Sequential Shift-Add Multiplier
-Design a multiplier that computes the product over multiple cycles — this is how real hardware multipliers work when area is constrained:
+- **Big-picture HW — Architecture diagram from memory** (already done ✅)
+  *Folder:* `homework/verif/big_picture/architecture_diagram/`
+  Drew the canonical UVM architecture from memory, exported as PNG.
 
-```systemverilog
-module shift_add_multiplier #(
-    parameter WIDTH = 8
-)(
-    input  logic                  clk, rst_n,
-    input  logic                  start,
-    input  logic [WIDTH-1:0]      multiplicand,
-    input  logic [WIDTH-1:0]      multiplier,
-    output logic [2*WIDTH-1:0]    product,
-    output logic                  done,
-    output logic                  busy
-);
-    // Algorithm:
-    // 1. Load multiplier into shift register
-    // 2. For each bit of multiplier:
-    //    - If bit is 1, add shifted multiplicand to accumulator
-    //    - Shift multiplicand left by 1
-    //    - Shift multiplier right by 1
-    // 3. After WIDTH cycles, product is ready
-    //
-    // Industry practice: use an FSM (IDLE -> COMPUTE -> DONE)
-    // Bonus: add support for signed multiplication (Booth's algorithm)
-endmodule
-```
-
-Write a testbench:
-- Test corner cases: 0×N, 1×N, N×N, MAX×MAX
-- Compare result against `*` operator for 100 random inputs
-- Verify timing: exactly WIDTH clock cycles to compute
-
-### Design HW4: Barrel Shifter
-Design a single-cycle barrel shifter — used inside ALUs and floating-point units:
-
-```systemverilog
-module barrel_shifter #(
-    parameter WIDTH = 32
-)(
-    input  logic [WIDTH-1:0]         data_in,
-    input  logic [$clog2(WIDTH)-1:0] shift_amount,
-    input  logic [1:0]               shift_type,  // 00=SLL, 01=SRL, 10=SRA
-    output logic [WIDTH-1:0]         data_out
-);
-    // Implement using cascaded MUX layers (log2(WIDTH) stages)
-    // Each stage shifts by 1, 2, 4, 8, 16 positions
-    // SRA: fill with sign bit instead of zero
-endmodule
-```
-
-This is the same structure used in your RISC-V ALU (Week 7). Write a testbench verifying all three shift types with various shift amounts.
+- **Big-picture HW — Factory override demo**
+  *Folder:* `homework/verif/big_picture/factory_override_demo/`
+  Standalone factory-override exercise (decoupled from the connector HW).
+  A `slow_driver` and `fast_driver`; the test picks one via override.
+  Salemi-style minimal example to drill the override mechanic.
 
 ---
 
-## Homework
+## Design Homework
 
-### HW1: Draw the UVM Architecture from Memory
-Without looking at any reference, draw on paper (or in a drawing tool) the standard UVM testbench architecture:
+Same per-chapter / connector / big-picture format applied to RTL design.
 
-```
-uvm_test
-  └── uvm_env
-        ├── uvm_agent (active)
-        │     ├── uvm_sequencer
-        │     ├── uvm_driver
-        │     └── uvm_monitor
-        ├── uvm_agent (passive — monitor only)
-        │     └── uvm_monitor
-        ├── uvm_scoreboard
-        └── uvm_coverage
-```
+### Per-chapter
 
-Label each component with:
-- What it does
-- Which UVM base class it extends
-- How it connects to others (TLM ports)
+- **HW Dally ch.10 — Ripple-carry adder**
+  *Folder:* `homework/design/per_chapter/hw_dally_ch10_arithmetic_basics/`
+  Build a parameterized ripple-carry adder + simple TB.
 
-Then check against the book. Can you draw it perfectly?
+- **HW Dally ch.12 — Carry-lookahead adder**
+  *Folder:* `homework/design/per_chapter/hw_dally_ch12_fast_arithmetic/`
+  Build a 4-bit CLA adder. Compare gate count and critical-path delay
+  vs ripple-carry (paper analysis).
 
-### HW2: Build a Skeleton UVM Environment
-Create a complete UVM testbench skeleton for an ALU. No actual DUT yet — just the structure.
+- **HW Sutherland ch.4 — SV interface for the ALU**
+  *Folder:* `homework/design/per_chapter/hw_sutherland_ch4_interfaces/`
+  Write the `alu_if` interface with modports (`dut`, `tb`, `monitor`) and
+  a clocking block. (You've practiced this in `spear_and_tumbush/ch4/ex1`
+  — apply it to the ALU specifically.)
 
-On EDA Playground, create these files:
+### Connector — combines arithmetic + interface
 
-**Transaction (uvm_sequence_item):**
-```systemverilog
-class alu_transaction extends uvm_sequence_item;
-    `uvm_object_utils(alu_transaction)
+- **Connector HW — ALU DUT**
+  *Folder:* `homework/design/connector/`
+  Build a parameterized ALU with registered outputs (1-cycle latency),
+  valid handshake, ops: ADD, SUB, AND, OR, XOR. Wire it through the
+  interface from the per-chapter HW. Sanity TB to drive a few transactions.
 
-    rand bit [7:0] operand_a;
-    rand bit [7:0] operand_b;
-    rand enum {ADD, SUB, AND, OR, XOR} operation;
-    bit [8:0] result;  // not rand — set by DUT/monitor
+### Big picture — stretch within scope
 
-    function new(string name = "alu_transaction");
-        super.new(name);
-    endfunction
+- **Big-picture HW — Sequential shift-add multiplier**
+  *Folder:* `homework/design/big_picture/shift_add_multiplier/`
+  Multi-cycle multiplier with FSM (IDLE → COMPUTE → DONE). Test corner
+  cases. Bonus: Booth's algorithm for signed.
 
-    // Implement: do_copy, do_compare, convert2string
-endclass
-```
-
-**Driver, Monitor, Agent, Scoreboard, Env, Test:**
-Create all these as empty shells with correct inheritance and phase methods:
-- `alu_driver extends uvm_driver #(alu_transaction)` — has `run_phase` that calls `seq_item_port.get_next_item()`
-- `alu_monitor extends uvm_monitor` — has analysis port
-- `alu_agent extends uvm_agent` — builds driver + monitor + sequencer in `build_phase`, connects in `connect_phase`
-- `alu_scoreboard extends uvm_scoreboard` — has `uvm_analysis_imp`, `write()` function
-- `alu_env extends uvm_env` — builds agent + scoreboard
-- `alu_test extends uvm_test` — builds env
-
-Make sure it compiles and runs (prints UVM topology) even without a DUT.
-
-### HW3: Implement uvm_sequence_item Properly
-Take the `alu_transaction` from HW2 and fully implement all required methods:
-
-```systemverilog
-class alu_transaction extends uvm_sequence_item;
-    `uvm_object_utils(alu_transaction)
-
-    // ... fields ...
-
-    // Implement these:
-    virtual function void do_copy(uvm_object rhs);
-        // Deep copy all fields
-    endfunction
-
-    virtual function bit do_compare(uvm_object rhs, uvm_comparer comparer);
-        // Compare all fields, return 1 if match
-    endfunction
-
-    virtual function string convert2string();
-        // Return formatted string: "A=XX B=XX OP=ADD RESULT=XXX"
-    endfunction
-
-    virtual function void do_print(uvm_printer printer);
-        // Pretty print using printer.print_field()
-    endfunction
-endclass
-```
-
-Write a small test that:
-1. Creates two transactions with `type_id::create()`
-2. Randomizes both
-3. Copies one to the other with `copy()`
-4. Compares them (should match)
-5. Modifies one field and compares again (should not match)
-6. Prints both using `print()`
-
-### HW4: Factory Override Exercise
-Demonstrate the UVM factory pattern:
-
-```systemverilog
-// Base driver — drives transactions slowly (1 per 10 clocks)
-class slow_driver extends uvm_driver #(alu_transaction);
-    `uvm_component_utils(slow_driver)
-    // ...
-    virtual task run_phase(uvm_phase phase);
-        `uvm_info(get_type_name(), "SLOW driver running", UVM_LOW)
-    endtask
-endclass
-
-// Fast driver — drives transactions every clock
-class fast_driver extends slow_driver;
-    `uvm_component_utils(fast_driver)
-    // ...
-    virtual task run_phase(uvm_phase phase);
-        `uvm_info(get_type_name(), "FAST driver running", UVM_LOW)
-    endtask
-endclass
-```
-
-In the test:
-```systemverilog
-class fast_test extends uvm_test;
-    virtual function void build_phase(uvm_phase phase);
-        super.build_phase(phase);
-        // Factory override: replace slow_driver with fast_driver everywhere
-        set_type_override_by_type(slow_driver::get_type(), fast_driver::get_type());
-        env = alu_env::type_id::create("env", this);
-    endfunction
-endclass
-```
-
-Run and verify the override works — you should see "FAST driver running" even though the agent creates a `slow_driver`.
+- **Big-picture HW — Barrel shifter**
+  *Folder:* `homework/design/big_picture/barrel_shifter/`
+  Single-cycle barrel shifter using cascaded MUX layers. Supports
+  SLL/SRL/SRA. Test with various shift amounts.
 
 ---
 
 ## Self-Check Questions
+
+After all reading + HW, you should be able to answer these without looking:
+
 1. What's the difference between `uvm_object` and `uvm_component`?
 2. Why use `type_id::create()` instead of `new()`?
-3. What are the main UVM phases and in what order do they execute?
-4. What is a TLM analysis port and why is it used instead of direct function calls?
-5. What's the difference between an active agent and a passive agent?
-6. What does `uvm_config_db` do? (preview for next week)
+3. What are the 9 UVM phases and in what order do they execute?
+4. What's the difference between an active agent and a passive agent?
+5. What does `uvm_config_db` do? (preview for week 5)
+6. Why is the abstract-base-class + factory-override pattern useful?
+   (Hint: same env, multiple stimulus styles, picked at runtime.)
 
 ---
 
 ## Checklist
 
 ### Verification Track
-- [x] Read Salemi *UVM Primer* ch.1-8 (intro, conventional TB, SV interfaces/BFM, OOP review)
-- [x] Read Salemi *UVM Primer* ch.9 (factory pattern)
-- [x] Read Salemi *UVM Primer* ch.10 (object-oriented testbench — bridge to UVM)
-- [x] Read Salemi *UVM Primer* ch.11 (uvm_test) — ran random_test + add_test
-- [x] Read Salemi *UVM Primer* ch.12 (uvm_components)
-- [x] Read Salemi *UVM Primer* ch.13 (uvm_environments) — built UML diagram of folder
-- [x] Read Salemi *UVM Primer* ch.14 (a new paradigm) — **PRIMER COMPLETE 🎉**
-- [ ] Watched Verification Academy UVM Basics + Components
-- [ ] Read ChipVerify UVM introduction, architecture, component, factory pages
-- [x] Ran a "Hello UVM" example (ran ch.10 OO TB + ch.11 UVM TB + built full multi-DUT framework)
-- [x] Completed HW1 (Draw architecture from memory) — see `homework/verif_hw1_architecture_diagram/`
-- [ ] Completed HW2 (Skeleton UVM environment)
-- [ ] Completed HW3 (Full sequence_item implementation)
-- [ ] Completed HW4 (Factory override exercise)
+- [ ] Read Salemi *UVM Primer* ch.9 (factory)
+- [ ] Read Salemi *UVM Primer* ch.10 (OO testbench)
+- [ ] Read Salemi *UVM Primer* ch.11 (uvm_test)
+- [ ] Read Salemi *UVM Primer* ch.12 (uvm_components)
+- [ ] Read Salemi *UVM Primer* ch.13 (uvm_environments)
+- [ ] Read Salemi *UVM Primer* ch.14 (a new paradigm)
+- [ ] Watched Verification Academy UVM Basics
+- [ ] Read ChipVerify UVM intro / architecture / component / factory pages
+- [ ] Per-chapter HW ch.9 (factory pattern)
+- [ ] Per-chapter HW ch.10 (OO testbench)
+- [ ] Per-chapter HW ch.11 (uvm_test)
+- [ ] Per-chapter HW ch.12 (uvm_components)
+- [ ] Per-chapter HW ch.13 (uvm_environments)
+- [ ] Per-chapter HW ch.14 (reflection)
+- [ ] Connector HW (Salemi-ch.13-style TB, no sequences)
+- [x] Big-picture HW: architecture diagram from memory
+- [ ] Big-picture HW: factory override demo
 - [ ] Can answer all self-check questions
 
 ### Design Track
-- [ ] Read Dally ch.10 (arithmetic circuits) and ch.12 (fast arithmetic / barrel shifter)
-- [ ] Read about SV interfaces and modports
-- [ ] Completed Design HW1 (ALU DUT with registered outputs)
-- [ ] Completed Design HW2 (SV interface with modports + clocking block)
-- [ ] Completed Design HW3 (Sequential shift-add multiplier)
-- [ ] Completed Design HW4 (Barrel shifter)
+- [ ] Read Dally ch.10 (arithmetic circuits)
+- [ ] Read Dally ch.12 (fast arithmetic)
+- [ ] Read Sutherland ch.4-5 (SV interfaces, modports, clocking)
+- [ ] Per-chapter HW: ripple-carry adder
+- [ ] Per-chapter HW: carry-lookahead adder + comparison
+- [ ] Per-chapter HW: ALU SV interface
+- [ ] Connector HW: ALU DUT (registered, valid handshake)
+- [ ] Big-picture HW: shift-add multiplier
+- [ ] Big-picture HW: barrel shifter
