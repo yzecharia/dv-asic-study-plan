@@ -51,7 +51,8 @@ I am doing this on my own as an autodidact alongside my job search, building in 
 │                          # + PROGRESS.md tracking overall completion
 ├── cheatsheets/           # Topic cheatsheets — runnable .sv reference files
 │                          # (oop_basics, advanced_oop, data_types, threads_and_ipc,
-│                          #  assertions_sva, functional_coverage, salemi_uvm_ch9-13)
+│                          #  assertions_sva, functional_coverage,
+│                          #  salemi_uvm_ch9-13, spear_ch4_interfaces)
 ├── tools/                 # Repo-wide scripts
 │   └── update_progress_badges.py    # auto-update README badges from week_NN.md
 │
