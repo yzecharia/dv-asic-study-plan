@@ -47,13 +47,24 @@ I am doing this on my own as an autodidact alongside my job search, building in 
 
 ```
 .
+├── docs/                  # Week-by-week study plans (week_01.md … week_14.md)
+│                          # + PROGRESS.md tracking overall completion
+├── cheatsheets/           # Topic cheatsheets — runnable .sv reference files
+│                          # (oop_basics, advanced_oop, data_types, threads_and_ipc,
+│                          #  assertions_sva, functional_coverage, salemi_uvm_ch9-13)
+├── tools/                 # Repo-wide scripts
+│   └── update_progress_badges.py    # auto-update README badges from week_NN.md
+│
 ├── week_01_sv_oop/
 ├── week_02_constrained_random/
 ├── ...
 ├── week_12_riscv_fifo_projects/
-├── run_xsim.sh            # Vivado xsim run helper
-├── run_xsim_auto.sh       # Auto-includes *_pkg.sv files
-└── xvlog_lint.sh           # Lint helper
+│
+├── run_xsim.sh            # Vivado xsim run helper (Docker-backed)
+├── run_xsim_auto.sh       # Same, auto-includes *_pkg.sv files
+├── xvlog_lint.sh          # Lint helper
+├── README.md
+└── LICENSE                # MIT
 ```
 
 Each `week_XX_*/` folder has its own `.vscode/tasks.json` wired for the
