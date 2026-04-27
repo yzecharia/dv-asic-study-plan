@@ -1,183 +1,179 @@
-# Week 11: Portfolio Project #1 — UART with Full UVM Testbench
+# Week 10: SPI Master & AXI-Lite Basics
 
 ## Why This Matters
-This is your first GitHub portfolio piece. It demonstrates: RTL design, UVM verification, coverage-driven methodology, and professional documentation. This is what hiring managers click on.
+SPI is the second most common serial protocol (after UART) — used for flash, sensors, ADCs, display controllers. AXI is THE bus standard in ARM-based SoCs and most modern ASICs. Knowing both makes you versatile for any Israeli semiconductor company working on SoCs.
 
-## Goal
-Take your UART RTL from Week 9 and wrap it in a complete UVM testbench. Push to GitHub with a professional README.
+## What to Study
+
+### SPI Protocol
+- **Nandland SPI tutorial**: https://nandland.com/spi-serial-peripheral-interface/
+- Google "SPI protocol tutorial" — key concepts:
+  - 4 signals: SCLK, MOSI, MISO, CS (chip select)
+  - 4 modes: CPOL (clock polarity) x CPHA (clock phase)
+  - Mode 0 (CPOL=0, CPHA=0) is most common
+  - Full duplex: data goes both ways simultaneously
+  - Multi-slave: one CS per slave device
+  - No acknowledgment — simpler than I2C
+
+### AXI-Lite Protocol
+- **ARM AMBA AXI Protocol Specification** (free PDF — Google "ARM IHI0022E")
+  - Read chapters 1-3 only
+  - Focus on AXI4-Lite (simplified version, no bursts)
+- **ChipVerify AXI tutorial**: https://www.chipverify.com/axi/axi-protocol
+
+### Reading (Design Best Practices)
+- **Sutherland *SystemVerilog for Design* (2nd ed) ch.4-5**: SV interfaces and modports — bundle the SPI signals (SCLK/MOSI/MISO/CS) and the AXI-Lite 5 channels into proper interfaces with master/slave/monitor modports. This is exactly how real bus IPs are written.
+- **Sutherland *SystemVerilog for Design* (2nd ed) ch.11**: parameterized modules — AXI-Lite is naturally parameterized on `ADDR_WIDTH` and `DATA_WIDTH`. Use `generate` to scale the register bank in HW3.
+- **Sutherland *SystemVerilog for Design* (2nd ed) ch.13**: RTL synthesis guidelines — the SPI/AXI FSMs and handshake logic should follow these patterns to synthesize cleanly.
+- Key concepts:
+  - 5 channels: Write Address (AW), Write Data (W), Write Response (B), Read Address (AR), Read Data (R)
+  - Valid/Ready handshake on every channel
+  - AXI-Lite: single transfers only (no bursts), fixed data width
 
 ---
 
-## Step-by-Step
+## Homework
 
-### Step 1: Project Structure
-Create a clean project structure:
+### HW1: SPI Master — All 4 Modes
+Design a configurable SPI master:
 
-```
-uart-uvm-verification/
-    rtl/
-        uart_tx.sv
-        uart_rx.sv
-        baud_rate_gen.sv
-        uart_top.sv
-    tb/
-        uart_pkg.sv           # package with all UVM classes
-        uart_if.sv            # SV interface
-        uart_seq_item.sv      # transaction
-        uart_driver.sv        # drives TX interface
-        uart_monitor.sv       # observes RX interface
-        uart_agent.sv         # agent (active or passive)
-        uart_scoreboard.sv    # reference model + checker
-        uart_coverage.sv      # functional coverage
-        uart_env.sv           # environment
-        uart_base_test.sv     # base test
-        uart_tests.sv         # all test classes
-        uart_sequences.sv     # all sequences
-        tb_top.sv             # top-level testbench module
-    sim/
-        Makefile              # compile & run commands
-        run_regression.sh     # run all tests
-    docs/
-        architecture.png      # testbench block diagram
-    README.md
+```systemverilog
+module spi_master #(
+    parameter CLK_DIV = 4,      // SCLK = clk / (2 * CLK_DIV)
+    parameter DATA_WIDTH = 8
+)(
+    input  logic                  clk, rst_n,
+    input  logic                  start,          // pulse to begin
+    input  logic [1:0]            mode,           // SPI mode (0-3)
+    input  logic [DATA_WIDTH-1:0] tx_data,        // data to send
+    output logic [DATA_WIDTH-1:0] rx_data,        // data received
+    output logic                  busy,
+    output logic                  done,
+    // SPI signals
+    output logic                  sclk,
+    output logic                  mosi,
+    input  logic                  miso,
+    output logic                  cs_n            // active low
+);
+    // Mode decoding:
+    // Mode 0: CPOL=0 CPHA=0 — sample on rising edge, shift on falling
+    // Mode 1: CPOL=0 CPHA=1 — shift on rising edge, sample on falling
+    // Mode 2: CPOL=1 CPHA=0 — sample on falling edge, shift on rising
+    // Mode 3: CPOL=1 CPHA=1 — shift on rising edge, sample on falling
+endmodule
 ```
 
-### Step 2: UVM Components
+### HW2: SPI Testbench with Slave Model
+Write a simple SPI slave model for testing:
 
-**uart_seq_item:**
-```
-- rand bit [7:0] data
-- rand int unsigned delay_between_bytes (0-100 clocks)
-- rand bit inject_framing_error
-- constraint: inject_framing_error dist {0 := 95, 1 := 5}
-```
-
-**uart_driver:**
-- Gets transactions from sequencer
-- Drives tx_start and tx_data on the interface
-- Waits for tx_done before getting next item
-
-**uart_monitor:**
-- Watches rx_valid pulse
-- Captures rx_data when valid
-- Sends transaction to analysis port
-
-**uart_scoreboard:**
-- Receives TX transactions (what was sent)
-- Receives RX transactions (what was received)
-- Compares: rx_data must match tx_data
-- Tracks pass/fail counts
-
-**uart_coverage:**
-- All 256 data byte values sent
-- All 256 data byte values received
-- Back-to-back transmissions
-- Framing error injected and detected
-- Different baud rates tested
-
-**uart_sequences:**
-```
-- uart_single_byte_seq: send one specific byte
-- uart_random_seq: send N random bytes
-- uart_all_bytes_seq: send all 256 values
-- uart_stress_seq: back-to-back with 0 delay
-- uart_error_seq: inject framing errors
+```systemverilog
+module spi_slave_model #(
+    parameter DATA_WIDTH = 8
+)(
+    input  logic sclk, cs_n, mosi,
+    output logic miso,
+    input  logic [1:0] mode,
+    input  logic [DATA_WIDTH-1:0] tx_data,  // data slave sends back
+    output logic [DATA_WIDTH-1:0] rx_data,  // data slave received
+    output logic                  rx_valid
+);
+    // Simple shift register that mirrors SPI protocol
+endmodule
 ```
 
-**uart_tests:**
-```
-- uart_directed_test: known patterns (0x00, 0xFF, 0x55, 0xAA)
-- uart_random_test: 1000 random bytes
-- uart_coverage_test: run until 100% coverage
-- uart_stress_test: back-to-back at max speed
-- uart_error_test: framing error injection and detection
-```
+Testbench:
+- **Loopback test**: SPI master sends data, slave receives it, slave sends response, master receives it
+- **All 4 modes**: Test each SPI mode with the same data
+- **Different data patterns**: 0x55, 0xAA, 0xFF, 0x00, random
+- **Multiple back-to-back transfers**: CS stays low between bytes
+- **Different clock dividers**: Test SPI at different speeds
 
-### Step 3: Run Regression
-Run all tests. For each test, record:
-- Pass/fail
-- Number of transactions
-- Coverage achieved
+### HW3: AXI-Lite Slave — Register Bank
+Implement an AXI-Lite slave with 4 read/write registers:
 
-Create a simple regression script that runs all tests and reports results.
+```systemverilog
+module axi_lite_slave #(
+    parameter ADDR_WIDTH = 4,     // 16 bytes = 4 registers
+    parameter DATA_WIDTH = 32
+)(
+    input  logic                    aclk, aresetn,
 
-### Step 4: Coverage Closure
-If coverage is below 100%:
-1. Identify uncovered bins
-2. Write targeted sequences
-3. Re-run until 100%
+    // Write Address Channel
+    input  logic [ADDR_WIDTH-1:0]   awaddr,
+    input  logic                    awvalid,
+    output logic                    awready,
 
-### Step 5: README
-Write a professional README with:
+    // Write Data Channel
+    input  logic [DATA_WIDTH-1:0]   wdata,
+    input  logic [DATA_WIDTH/8-1:0] wstrb,
+    input  logic                    wvalid,
+    output logic                    wready,
 
-```markdown
-# UART with UVM Verification Environment
+    // Write Response Channel
+    output logic [1:0]              bresp,
+    output logic                    bvalid,
+    input  logic                    bready,
 
-## Overview
-Fully verified UART (TX + RX) IP core with a complete UVM testbench.
+    // Read Address Channel
+    input  logic [ADDR_WIDTH-1:0]   araddr,
+    input  logic                    arvalid,
+    output logic                    arready,
 
-## Architecture
-![Testbench Architecture](docs/architecture.png)
+    // Read Data Channel
+    output logic [DATA_WIDTH-1:0]   rdata,
+    output logic [1:0]              rresp,
+    output logic                    rvalid,
+    input  logic                    rready
+);
+    // Internal: 4 registers, addressed at offsets 0x0, 0x4, 0x8, 0xC
+    logic [DATA_WIDTH-1:0] regs [0:3];
 
-## Features
-- Configurable baud rate (9600, 115200, etc.)
-- 16x oversampling receiver
-- Framing error detection
-- Full UVM testbench with:
-  - Constrained random verification
-  - Coverage-driven methodology
-  - Multiple test scenarios
-  - Reference model scoreboard
-
-## Results
-| Test | Transactions | Result |
-|------|-------------|--------|
-| Directed | 10 | PASS |
-| Random | 1000 | PASS |
-| Stress | 5000 | PASS |
-| Error | 500 | PASS |
-
-Functional coverage: **100%**
-
-## How to Run
-```
-make compile
-make run TEST=uart_random_test
-make regression  # run all tests
+    // Write logic: accept awaddr+wdata, write to register, respond on B channel
+    // Read logic: accept araddr, return register value on R channel
+    // Handshake: proper valid/ready protocol on every channel
+endmodule
 ```
 
-## Tools
-- Simulator: [Questa/VCS/iverilog]
-- SystemVerilog + UVM 2.0
-```
+### HW4: AXI-Lite Testbench with Assertions
+Write a testbench for the AXI-Lite slave:
 
-### Step 6: Push to GitHub
-```bash
-cd uart-uvm-verification
-git init
-git add .
-git commit -m "UART IP with full UVM verification environment"
-git remote add origin https://github.com/YOUR_USERNAME/uart-uvm-verification.git
-git push -u origin main
-```
+**Directed tests:**
+1. Write 0xDEADBEEF to register 0, read it back, verify match
+2. Write to all 4 registers, read all 4 back
+3. Write with byte strobes (wstrb): write only upper 2 bytes
+4. Read from unwritten register (should be 0 after reset)
+
+**Assertions (SVA):**
+- AXI handshake: once `valid` is asserted, it stays high until `ready`
+- Response: `bresp` and `rresp` are always OKAY (2'b00) for valid addresses
+- No overlapping transactions: don't start new write before previous response
+- `awvalid` and `wvalid` can be asserted in any order or simultaneously
+
+**Coverage:**
+- All 4 register addresses written and read
+- Back-to-back writes
+- Back-to-back reads
+- Write immediately followed by read to same address
+- All values of `wstrb`
+
+---
+
+## Self-Check Questions
+1. Draw the timing diagram for SPI Mode 0 sending byte 0xA5.
+2. What's the maximum SPI clock frequency relative to the system clock?
+3. In AXI, can `awvalid` and `wvalid` be asserted on the same cycle? Different cycles?
+4. What's the difference between AXI4-Full and AXI4-Lite?
+5. Why does AXI use separate read and write channels?
+6. What does `wstrb` do? When would you use it?
 
 ---
 
 ## Checklist
-- [ ] Project structure created
-- [ ] RTL ported from Week 9 (clean, well-commented)
-- [ ] uart_seq_item implemented
-- [ ] uart_driver implemented
-- [ ] uart_monitor implemented
-- [ ] uart_agent implemented (active + passive modes)
-- [ ] uart_scoreboard implemented with reference model
-- [ ] uart_coverage implemented
-- [ ] uart_env implemented
-- [ ] All 5 sequences implemented
-- [ ] All 5 tests implemented
-- [ ] tb_top connects DUT to interface and starts UVM
-- [ ] All tests pass
-- [ ] Coverage >95% (ideally 100%)
-- [ ] README written with architecture diagram
-- [ ] Pushed to GitHub
-- [ ] **MILESTONE: First portfolio project live on GitHub!**
+- [ ] Studied SPI protocol (Nandland + tutorial)
+- [ ] Read AXI-Lite spec (ARM AMBA chapters 1-3)
+- [ ] Read ChipVerify AXI tutorial
+- [ ] Completed HW1 (SPI master — all 4 modes)
+- [ ] Completed HW2 (SPI testbench with slave model)
+- [ ] Completed HW3 (AXI-Lite slave register bank)
+- [ ] Completed HW4 (AXI-Lite testbench with assertions + coverage)
+- [ ] Can answer all self-check questions

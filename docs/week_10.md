@@ -1,179 +1,176 @@
-# Week 10: SPI Master & AXI-Lite Basics
+# Week 9: UART Design & Verification
 
 ## Why This Matters
-SPI is the second most common serial protocol (after UART) — used for flash, sensors, ADCs, display controllers. AXI is THE bus standard in ARM-based SoCs and most modern ASICs. Knowing both makes you versatile for any Israeli semiconductor company working on SoCs.
+UART is the simplest serial protocol and the perfect first "real" IP block to design and verify. It's used everywhere — debug ports, sensor interfaces, FPGA-to-PC communication. More importantly, it's a clean project to demonstrate your full RTL + verification skillset.
 
 ## What to Study
 
-### SPI Protocol
-- **Nandland SPI tutorial**: https://nandland.com/spi-serial-peripheral-interface/
-- Google "SPI protocol tutorial" — key concepts:
-  - 4 signals: SCLK, MOSI, MISO, CS (chip select)
-  - 4 modes: CPOL (clock polarity) x CPHA (clock phase)
-  - Mode 0 (CPOL=0, CPHA=0) is most common
-  - Full duplex: data goes both ways simultaneously
-  - Multi-slave: one CS per slave device
-  - No acknowledgment — simpler than I2C
-
-### AXI-Lite Protocol
-- **ARM AMBA AXI Protocol Specification** (free PDF — Google "ARM IHI0022E")
-  - Read chapters 1-3 only
-  - Focus on AXI4-Lite (simplified version, no bursts)
-- **ChipVerify AXI tutorial**: https://www.chipverify.com/axi/axi-protocol
+### Reading
+- **UART Protocol**: Google "UART protocol tutorial" — any good one covers:
+  - Start bit (low), 8 data bits (LSB first), optional parity, stop bit (high)
+  - Baud rate: bit period = 1/baud_rate (e.g., 9600 baud = 104.17us per bit)
+  - Oversampling (typically 16x) for reliable RX sampling
+  - No clock line — sender and receiver must agree on baud rate
+- **Nandland UART tutorial**: https://nandland.com/uart-serial-port-module/
+- **Pong P. Chu ch.7** (you have this book): UART section
 
 ### Reading (Design Best Practices)
-- **Sutherland *SystemVerilog for Design* (2nd ed) ch.4-5**: SV interfaces and modports — bundle the SPI signals (SCLK/MOSI/MISO/CS) and the AXI-Lite 5 channels into proper interfaces with master/slave/monitor modports. This is exactly how real bus IPs are written.
-- **Sutherland *SystemVerilog for Design* (2nd ed) ch.11**: parameterized modules — AXI-Lite is naturally parameterized on `ADDR_WIDTH` and `DATA_WIDTH`. Use `generate` to scale the register bank in HW3.
-- **Sutherland *SystemVerilog for Design* (2nd ed) ch.13**: RTL synthesis guidelines — the SPI/AXI FSMs and handshake logic should follow these patterns to synthesize cleanly.
-- Key concepts:
-  - 5 channels: Write Address (AW), Write Data (W), Write Response (B), Read Address (AR), Read Data (R)
-  - Valid/Ready handshake on every channel
-  - AXI-Lite: single transfers only (no bursts), fixed data width
+- **Pong Chu ch.7**: UART section — you already have this book, review the design approach
+- **Cliff Cummings** *"Clock Domain Crossing"* — not needed for UART itself, but essential knowledge for protocols that cross clock domains
+- **Sutherland *SystemVerilog for Design* (2nd ed) ch.4-5**: SV interfaces and modports — wrap the UART signals (TX/RX/baud-tick/parity-error) in a proper interface instead of loose ports.
+- **Sutherland *SystemVerilog for Design* (2nd ed) ch.13**: RTL synthesis guidelines — clean coding for the TX/RX FSMs and the baud-rate generator.
+
+### Industry Design Guidelines for UART
+- **Use a proper FSM** for TX and RX state machines (2-block style)
+- **Parameterize baud rate and clock frequency** — don't hardcode divisor values
+- **Use `localparam`** for computed constants (e.g., `localparam DIVISOR = CLK_FREQ / (BAUD_RATE * OVERSAMPLE)`)
+- **Separate concerns**: baud_rate_gen, uart_tx, uart_rx as independent modules with clean interfaces
+- **Add a FIFO buffer** between the user interface and the TX module — this is how real UART IPs work
+
+### Reference Implementations (study, don't copy)
+- Nandland UART Verilog code
+- OpenCores UART implementations
 
 ---
 
 ## Homework
 
-### HW1: SPI Master — All 4 Modes
-Design a configurable SPI master:
+### HW1: Baud Rate Generator
+Design a configurable baud rate generator:
 
 ```systemverilog
-module spi_master #(
-    parameter CLK_DIV = 4,      // SCLK = clk / (2 * CLK_DIV)
-    parameter DATA_WIDTH = 8
+module baud_rate_gen #(
+    parameter CLK_FREQ  = 50_000_000,  // 50 MHz system clock
+    parameter BAUD_RATE = 9600,
+    parameter OVERSAMPLE = 16          // 16x oversampling
 )(
-    input  logic                  clk, rst_n,
-    input  logic                  start,          // pulse to begin
-    input  logic [1:0]            mode,           // SPI mode (0-3)
-    input  logic [DATA_WIDTH-1:0] tx_data,        // data to send
-    output logic [DATA_WIDTH-1:0] rx_data,        // data received
-    output logic                  busy,
-    output logic                  done,
-    // SPI signals
-    output logic                  sclk,
-    output logic                  mosi,
-    input  logic                  miso,
-    output logic                  cs_n            // active low
+    input  logic clk, rst_n,
+    output logic baud_tick,            // 1 tick per bit period (for TX)
+    output logic sample_tick           // 16 ticks per bit period (for RX)
 );
-    // Mode decoding:
-    // Mode 0: CPOL=0 CPHA=0 — sample on rising edge, shift on falling
-    // Mode 1: CPOL=0 CPHA=1 — shift on rising edge, sample on falling
-    // Mode 2: CPOL=1 CPHA=0 — sample on falling edge, shift on rising
-    // Mode 3: CPOL=1 CPHA=1 — shift on rising edge, sample on falling
-endmodule
-```
-
-### HW2: SPI Testbench with Slave Model
-Write a simple SPI slave model for testing:
-
-```systemverilog
-module spi_slave_model #(
-    parameter DATA_WIDTH = 8
-)(
-    input  logic sclk, cs_n, mosi,
-    output logic miso,
-    input  logic [1:0] mode,
-    input  logic [DATA_WIDTH-1:0] tx_data,  // data slave sends back
-    output logic [DATA_WIDTH-1:0] rx_data,  // data slave received
-    output logic                  rx_valid
-);
-    // Simple shift register that mirrors SPI protocol
+    // Compute divisor: CLK_FREQ / (BAUD_RATE * OVERSAMPLE)
+    // Use a counter that generates a tick when it reaches the divisor
 endmodule
 ```
 
 Testbench:
-- **Loopback test**: SPI master sends data, slave receives it, slave sends response, master receives it
-- **All 4 modes**: Test each SPI mode with the same data
-- **Different data patterns**: 0x55, 0xAA, 0xFF, 0x00, random
-- **Multiple back-to-back transfers**: CS stays low between bytes
-- **Different clock dividers**: Test SPI at different speeds
+- Verify `sample_tick` frequency = BAUD_RATE * 16
+- Verify `baud_tick` frequency = BAUD_RATE
+- Test with different BAUD_RATE parameters (9600, 115200, 921600)
 
-### HW3: AXI-Lite Slave — Register Bank
-Implement an AXI-Lite slave with 4 read/write registers:
+### HW2: UART Transmitter
+Design the TX module:
 
 ```systemverilog
-module axi_lite_slave #(
-    parameter ADDR_WIDTH = 4,     // 16 bytes = 4 registers
-    parameter DATA_WIDTH = 32
-)(
-    input  logic                    aclk, aresetn,
-
-    // Write Address Channel
-    input  logic [ADDR_WIDTH-1:0]   awaddr,
-    input  logic                    awvalid,
-    output logic                    awready,
-
-    // Write Data Channel
-    input  logic [DATA_WIDTH-1:0]   wdata,
-    input  logic [DATA_WIDTH/8-1:0] wstrb,
-    input  logic                    wvalid,
-    output logic                    wready,
-
-    // Write Response Channel
-    output logic [1:0]              bresp,
-    output logic                    bvalid,
-    input  logic                    bready,
-
-    // Read Address Channel
-    input  logic [ADDR_WIDTH-1:0]   araddr,
-    input  logic                    arvalid,
-    output logic                    arready,
-
-    // Read Data Channel
-    output logic [DATA_WIDTH-1:0]   rdata,
-    output logic [1:0]              rresp,
-    output logic                    rvalid,
-    input  logic                    rready
+module uart_tx (
+    input  logic       clk, rst_n,
+    input  logic       baud_tick,      // from baud rate generator
+    input  logic       tx_start,       // pulse to begin transmission
+    input  logic [7:0] tx_data,        // data to send
+    output logic       tx_serial,      // serial output line
+    output logic       tx_busy,        // high while transmitting
+    output logic       tx_done         // pulse when done
 );
-    // Internal: 4 registers, addressed at offsets 0x0, 0x4, 0x8, 0xC
-    logic [DATA_WIDTH-1:0] regs [0:3];
-
-    // Write logic: accept awaddr+wdata, write to register, respond on B channel
-    // Read logic: accept araddr, return register value on R channel
-    // Handshake: proper valid/ready protocol on every channel
+    // State machine:
+    // IDLE:  tx_serial = 1 (idle high), wait for tx_start
+    // START: tx_serial = 0 (start bit), wait 1 bit period
+    // DATA:  shift out 8 bits LSB first, 1 bit per baud_tick
+    // STOP:  tx_serial = 1 (stop bit), wait 1 bit period
+    // -> back to IDLE
 endmodule
 ```
 
-### HW4: AXI-Lite Testbench with Assertions
-Write a testbench for the AXI-Lite slave:
+Testbench:
+- Send byte 0x55 (alternating bits — easy to verify visually)
+- Send byte 0x00 and 0xFF (edge cases)
+- Send byte 0xA3 and verify serial output bit-by-bit
+- Verify timing matches baud rate
 
-**Directed tests:**
-1. Write 0xDEADBEEF to register 0, read it back, verify match
-2. Write to all 4 registers, read all 4 back
-3. Write with byte strobes (wstrb): write only upper 2 bytes
-4. Read from unwritten register (should be 0 after reset)
+### HW3: UART Receiver
+Design the RX module with 16x oversampling:
 
-**Assertions (SVA):**
-- AXI handshake: once `valid` is asserted, it stays high until `ready`
-- Response: `bresp` and `rresp` are always OKAY (2'b00) for valid addresses
-- No overlapping transactions: don't start new write before previous response
-- `awvalid` and `wvalid` can be asserted in any order or simultaneously
+```systemverilog
+module uart_rx (
+    input  logic       clk, rst_n,
+    input  logic       sample_tick,    // 16x oversampling tick
+    input  logic       rx_serial,      // serial input line
+    output logic [7:0] rx_data,        // received data
+    output logic       rx_valid,       // pulse when data is ready
+    output logic       rx_error        // framing error (bad stop bit)
+);
+    // State machine:
+    // IDLE:  wait for falling edge on rx_serial (start bit)
+    // START: sample at middle of start bit (count 8 sample_ticks)
+    //        if rx_serial != 0, false start — go back to IDLE
+    // DATA:  sample 8 bits at middle of each bit (every 16 sample_ticks)
+    // STOP:  check stop bit is high, else framing error
+    // -> back to IDLE
+endmodule
+```
+
+Testbench:
+- Drive a known serial stream manually and verify rx_data matches
+- Test framing error: drive stop bit as 0
+- Test false start: drive start bit briefly then go high
+
+### HW4: TX-to-RX Loopback Test
+Connect TX output directly to RX input:
+
+```systemverilog
+module uart_top (
+    input  logic       clk, rst_n,
+    input  logic       tx_start,
+    input  logic [7:0] tx_data,
+    output logic [7:0] rx_data,
+    output logic       rx_valid,
+    output logic       tx_busy
+);
+    logic serial_line;
+    // Instantiate baud_gen, uart_tx, uart_rx
+    // Connect tx_serial -> rx_serial
+endmodule
+```
+
+Testbench:
+- **Directed test**: Send 10 known bytes, verify each is received correctly
+- **Random test**: Send 1000 random bytes, compare TX data to RX data
+- **Back-to-back**: Send bytes with minimal gap, verify no data loss
+- **Error test**: Temporarily corrupt the serial line mid-transmission
+
+### HW5: Add Assertions & Coverage
+Add to your testbench:
+
+**Assertions:**
+- `tx_serial` is high during IDLE
+- Start bit is exactly 1 bit period wide
+- Data bits are stable for exactly 1 bit period each
+- Stop bit is high
+- `tx_busy` and `tx_done` never overlap
+- `rx_valid` only pulses for 1 clock cycle
 
 **Coverage:**
-- All 4 register addresses written and read
-- Back-to-back writes
-- Back-to-back reads
-- Write immediately followed by read to same address
-- All values of `wstrb`
+- All 256 possible data byte values transmitted and received
+- Back-to-back transmissions (tx_start while tx_busy was just cleared)
+- Framing error occurred and was detected
 
 ---
 
 ## Self-Check Questions
-1. Draw the timing diagram for SPI Mode 0 sending byte 0xA5.
-2. What's the maximum SPI clock frequency relative to the system clock?
-3. In AXI, can `awvalid` and `wvalid` be asserted on the same cycle? Different cycles?
-4. What's the difference between AXI4-Full and AXI4-Lite?
-5. Why does AXI use separate read and write channels?
-6. What does `wstrb` do? When would you use it?
+1. Why does UART use oversampling? Why 16x specifically?
+2. How does the receiver find the middle of each bit?
+3. What happens if TX and RX have slightly different baud rates (clock drift)?
+4. What's a framing error? What causes it?
+5. How would you add parity checking? (optional extension)
+6. What's the maximum reliable baud rate for a given clock frequency?
 
 ---
 
 ## Checklist
-- [ ] Studied SPI protocol (Nandland + tutorial)
-- [ ] Read AXI-Lite spec (ARM AMBA chapters 1-3)
-- [ ] Read ChipVerify AXI tutorial
-- [ ] Completed HW1 (SPI master — all 4 modes)
-- [ ] Completed HW2 (SPI testbench with slave model)
-- [ ] Completed HW3 (AXI-Lite slave register bank)
-- [ ] Completed HW4 (AXI-Lite testbench with assertions + coverage)
+- [ ] Studied UART protocol (read tutorial + Nandland)
+- [ ] Completed HW1 (Baud rate generator)
+- [ ] Completed HW2 (UART TX)
+- [ ] Completed HW3 (UART RX)
+- [ ] Completed HW4 (Loopback test — directed + random)
+- [ ] Completed HW5 (Assertions + coverage)
 - [ ] Can answer all self-check questions
+- [ ] **RTL is clean and ready for UVM testbench in Week 11**

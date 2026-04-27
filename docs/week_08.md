@@ -1,221 +1,227 @@
-# Week 8: Pipelined CPU & Hazard Handling
+# Week 7: RISC-V ISA & Single-Cycle CPU
 
 ## Why This Matters
-Every real CPU is pipelined. Understanding pipeline hazards (data, control, structural) and their solutions (forwarding, stalling, flushing) is essential interview knowledge. Building this proves you understand hardware at the microarchitecture level.
+Computer architecture knowledge separates "I can write Verilog" from "I understand what I'm building." A CPU project on your resume proves deep understanding of digital design — datapath, control, instruction decoding, memory hierarchy. Israeli semiconductor companies (Intel, Marvell, Qualcomm) love this.
+
+You already have `DDCA_RISCV` on your machine — this week you either extend it or rebuild it properly in SystemVerilog with verification in mind.
 
 ## What to Study
 
 ### Reading
-- **Harris & Harris ch.7.5-7.8**: Pipelining
-  - 5-stage pipeline: IF, ID, EX, MEM, WB
-  - Pipeline registers
-  - Data hazards: RAW (read-after-write)
-  - Forwarding (bypassing)
-  - Stalls (load-use hazard)
-  - Control hazards: branch prediction, pipeline flush
-- **Dally & Harting ch.23**: "Pipelines" — pipeline theory, throughput vs latency, pipeline hazards and interlocks. Gives a more general treatment of pipelining beyond just CPUs — applicable to any datapath.
-- **Patterson & Hennessy** (optional, deeper): Chapter 4 "The Processor"
-- **Sutherland *SystemVerilog for Design* (2nd ed) ch.9**: SV procedural blocks — cleanly modeling pipeline registers with `always_ff` and avoiding latch inference between stages.
-- **Sutherland *SystemVerilog for Design* (2nd ed) ch.13**: RTL synthesis guidelines — pipeline-friendly coding patterns; this is the chapter that keeps your forwarding muxes and hazard logic synthesizable.
+- **Harris & Harris ch.6**: "Architecture" — RISC-V ISA, instruction formats
+- **Harris & Harris ch.7 (7.1-7.3)**: "Microarchitecture" — single-cycle implementation
+- **RISC-V Spec Volume 1** (free PDF from riscv.org): Chapter 2 — RV32I Base Integer ISA
+  - Only 47 instructions. Manageable.
+  - Focus on: R-type, I-type, S-type, B-type, U-type, J-type formats
 
 ### Videos
-- **MIT 6.004**: Pipelining lectures (2-3 lectures)
-- **Harris & Harris** lecture on pipelining if available
+- **MIT 6.004** (YouTube/OCW): Lectures on single-cycle processor
+- **Harris & Harris lecture videos** if available from your university
+
+### Reading (Design Best Practices)
+- **Dally & Harting ch.17**: "Factoring Finite-State Machines" — decomposing complex FSMs into smaller, manageable pieces. Directly applicable to the CPU control unit.
+- **Dally & Harting ch.18**: "Microcode" — microprogrammed control vs hardwired control. Understanding the tradeoff between the two approaches for instruction decoding.
+- **Dally & Harting ch.9**: "Combinational Examples" — worked examples of combinational design including decoders and control logic.
+- **Cliff Cummings** *"Full Case Parallel Case"* — understanding synthesis pragmas for case statements (critical for decoders)
+- **Cliff Cummings** *"Coding And Scripting Techniques for FSM Designs with Synthesis-Optimized, Glitch-Free Outputs"*
+- **Sutherland *SystemVerilog for Design* (2nd ed) ch.10**: tasks and functions — clean way to factor decoder/ALU helper logic out of the top module.
+- **Sutherland *SystemVerilog for Design* (2nd ed) ch.13**: RTL synthesis guidelines — apply directly to the ALU, decoder, and datapath modules so they synthesize as intended.
 
 ### Reference
-- Your single-cycle CPU from Week 7 is the starting point
+- RISC-V Green Card (instruction reference sheet) — Google "RISC-V reference card PDF"
+- Your existing code in `/Users/yuval/verilog_projects/DDCA_RISCV/`
+
+### Industry Design Guidelines for the CPU
+- **Separate datapath from control** — decoder/control in one module, datapath in another
+- **Use enums for opcodes and ALU operations** — not raw bit patterns
+- **Use `always_comb` with `unique case`** for the decoder — catches missing cases at simulation time
+- **Parameterize the data width** even if you only use 32-bit — shows good design habits
+- **Name your signals clearly**: `alu_result`, not `res`; `mem_write_en`, not `mw`
 
 ---
 
 ## Homework
 
-### HW1: Add Pipeline Registers
-Take your single-cycle CPU and insert pipeline registers between each stage:
-
-```
-IF/ID Register:
-    - instruction
-    - pc
-    - pc_plus4
-
-ID/EX Register:
-    - control signals (reg_write, mem_write, mem_read, branch, alu_src, alu_control, mem_to_reg)
-    - read_data1, read_data2
-    - immediate
-    - rd, rs1, rs2
-    - pc, pc_plus4
-
-EX/MEM Register:
-    - control signals (reg_write, mem_write, mem_read, branch, mem_to_reg)
-    - alu_result
-    - write_data (for store)
-    - rd
-    - zero flag
-    - branch_target
-
-MEM/WB Register:
-    - control signals (reg_write, mem_to_reg)
-    - alu_result
-    - read_data (from memory)
-    - rd
-```
-
-Implement as a struct or individual registers. Run your Week 7 test programs — they will FAIL due to hazards. That's expected!
-
-Document which tests fail and why (identify the specific hazard in each case).
-
-### HW2: Forwarding Unit
-Implement the forwarding (bypass) unit to solve most data hazards:
+### HW1: RISC-V Instruction Decoder
+Write a standalone instruction decoder module:
 
 ```systemverilog
-module forwarding_unit (
-    input  logic [4:0] rs1_ex,       // source register 1 in EX stage
-    input  logic [4:0] rs2_ex,       // source register 2 in EX stage
-    input  logic [4:0] rd_mem,       // destination register in MEM stage
-    input  logic [4:0] rd_wb,        // destination register in WB stage
-    input  logic       reg_write_mem, // writing in MEM stage?
-    input  logic       reg_write_wb,  // writing in WB stage?
-    output logic [1:0] forward_a,    // 00=reg, 01=WB, 10=MEM
-    output logic [1:0] forward_b     // 00=reg, 01=WB, 10=MEM
+module rv32i_decoder (
+    input  logic [31:0] instruction,
+    output logic [6:0]  opcode,
+    output logic [4:0]  rd, rs1, rs2,
+    output logic [2:0]  funct3,
+    output logic [6:0]  funct7,
+    output logic [31:0] imm,           // sign-extended immediate
+    output logic [3:0]  alu_control,   // decoded ALU operation
+    output logic        reg_write,     // write to register file
+    output logic        mem_write,     // write to memory
+    output logic        mem_read,      // read from memory
+    output logic        branch,        // branch instruction
+    output logic        jump,          // JAL/JALR
+    output logic [1:0]  alu_src        // ALU operand B source
 );
-    // TODO: decide when to forward and from where.
-    // Questions to answer as you design:
-    //   - Which stage's result is "newer" — MEM or WB?
-    //   - What happens when both stages write the same register?
-    //   - Why does x0 need special handling?
+```
+
+Supported instruction types:
+- **R-type:** ADD, SUB, AND, OR, XOR, SLL, SRL, SRA, SLT, SLTU
+- **I-type:** ADDI, ANDI, ORI, XORI, SLTI, SLTIU, SLLI, SRLI, SRAI, LW, JALR
+- **S-type:** SW
+- **B-type:** BEQ, BNE, BLT, BGE, BLTU, BGEU
+- **U-type:** LUI, AUIPC
+- **J-type:** JAL
+
+Write a testbench that feeds known instruction encodings and verifies all outputs. Use a reference table from the RISC-V spec.
+
+### HW2: ALU with All RV32I Operations
+Write the ALU module:
+
+```systemverilog
+module rv32i_alu (
+    input  logic [31:0] a, b,
+    input  logic [3:0]  alu_control,
+    output logic [31:0] result,
+    output logic        zero,          // result == 0
+    output logic        negative,      // result[31]
+    output logic        overflow       // signed overflow
+);
+    // Operations based on alu_control:
+    // ADD, SUB, AND, OR, XOR, SLL, SRL, SRA, SLT, SLTU
 endmodule
 ```
 
-Add MUXes before the ALU inputs to select between:
-- Register file output (no hazard)
-- MEM stage result (EX-EX forwarding)
-- WB stage result (MEM-EX forwarding)
+Write a thorough testbench:
+- All operations with corner cases (0, -1, MAX_INT, MIN_INT)
+- Overflow detection for ADD/SUB
+- Shift by 0, 1, 31
+- SLT vs SLTU difference (signed vs unsigned comparison)
 
-Re-run tests — ALU-to-ALU sequences should now work:
-```
-addi x1, x0, 5
-addi x2, x1, 3    # needs forwarding: x1 from previous instruction
-```
-
-### HW3: Hazard Detection Unit (Stall for Load-Use)
-Forwarding can't solve everything. A load followed by a use needs a 1-cycle stall:
+### HW3: Single-Cycle Datapath
+Build the complete single-cycle CPU. Key modules:
 
 ```
-lw   x1, 0(x0)    # x1 available after MEM stage
-add  x2, x1, x3   # needs x1 in EX stage — too early!
+                    +----------+
+Instruction  ------>| Decoder  |-----> Control signals
+Memory              +----------+
+    |                                    |
+    v                                    v
++--------+    +--------+    +-----+    +--------+
+|   PC   |--->| I-Mem  |--->| Reg |--->| ALU    |---> Data Memory
++--------+    +--------+    | File|    +--------|     (Load/Store)
+    ^                       +--------+
+    |                           ^
+    +------ PC+4 / Branch -----+
 ```
 
-```systemverilog
-module hazard_detection_unit (
-    input  logic [4:0] rs1_id,       // source registers in ID stage
-    input  logic [4:0] rs2_id,
-    input  logic [4:0] rd_ex,        // destination in EX stage
-    input  logic       mem_read_ex,  // is EX stage a load?
-    output logic       stall         // insert bubble
-);
-    // Derive the stall condition. Think about:
-    //   - When is the EX-stage instruction actually a load?
-    //   - When does its destination register collide with either ID source?
-    //   - Why must you special-case x0?
-endmodule
+Modules to implement:
+1. `program_counter` — PC register with reset
+2. `instruction_memory` — ROM initialized from file
+3. `register_file` — 32 x 32-bit (x0 hardwired to 0)
+4. `rv32i_alu` — from HW2
+5. `rv32i_decoder` — from HW1
+6. `data_memory` — RAM for loads/stores
+7. `imm_generator` — extract and sign-extend immediates
+8. `rv32i_top` — top-level connecting everything
+
+### HW4: Assembly Test Programs
+Write small RISC-V assembly programs (or hand-encode the hex) to test your CPU:
+
+**Test 1: Basic ALU**
+```
+addi x1, x0, 5      # x1 = 5
+addi x2, x0, 3      # x2 = 3
+add  x3, x1, x2     # x3 = 8
+sub  x4, x1, x2     # x4 = 2
+and  x5, x1, x2     # x5 = 1
+or   x6, x1, x2     # x6 = 7
 ```
 
-When stalling:
-- Freeze PC (don't update)
-- Freeze IF/ID register (don't update)
-- Insert NOP (bubble) into ID/EX register (zero all control signals)
-
-Test with:
+**Test 2: Memory**
 ```
-lw   x1, 0(x0)
-add  x2, x1, x3   # should stall 1 cycle, then forward
+addi x1, x0, 42     # x1 = 42
+sw   x1, 0(x0)      # mem[0] = 42
+lw   x2, 0(x0)      # x2 = mem[0] = 42
 ```
 
-### HW4: Branch Handling (Flush on Misprediction)
-Implement branch handling with "predict not taken" strategy:
-
-- Always fetch the next sequential instruction (predict not taken)
-- If the branch IS taken (detected in MEM or EX stage):
-  - Flush the incorrectly fetched instructions (zero out IF/ID and ID/EX registers)
-  - Set PC to branch target
-
-```systemverilog
-module branch_unit (
-    input  logic        branch_mem,    // is MEM stage a branch?
-    input  logic        zero_mem,      // ALU zero flag
-    input  logic [31:0] branch_target, // computed target
-    output logic        flush,         // flush IF/ID and ID/EX
-    output logic        pc_sel         // 0=PC+4, 1=branch_target
-);
-endmodule
-```
-
-Test with:
+**Test 3: Branches**
 ```
 addi x1, x0, 5
 addi x2, x0, 5
-beq  x1, x2, target   # taken — must flush next 2 instructions
-addi x3, x0, 99       # FLUSHED — should NOT execute
-addi x4, x0, 99       # FLUSHED — should NOT execute
-target:
-addi x5, x0, 1        # x5 = 1
+beq  x1, x2, skip   # should branch
+addi x3, x0, 1      # should NOT execute
+skip:
+addi x3, x0, 2      # x3 should be 2
 ```
 
-### HW5: Comprehensive Hazard Tests
-Write test programs that trigger each specific hazard:
-
+**Test 4: Loop (sum 1 to 10)**
 ```
-# Test A: EX-EX forwarding (no stall needed)
-addi x1, x0, 1
-add  x2, x1, x1     # forward x1 from EX/MEM
-
-# Test B: MEM-EX forwarding
-addi x1, x0, 1
-nop
-add  x2, x1, x1     # forward x1 from MEM/WB
-
-# Test C: Load-use stall + forward
-lw   x1, 0(x0)
-add  x2, x1, x0     # stall 1 cycle, then forward
-
-# Test D: Branch taken — flush
-beq  x0, x0, skip
-addi x1, x0, 99     # must be flushed
-skip: addi x1, x0, 1
-
-# Test E: Back-to-back loads
-lw   x1, 0(x0)
-lw   x2, 4(x0)
-add  x3, x1, x2     # double forwarding
-
-# Test F: Store after load (no hazard for store data)
-lw   x1, 0(x0)
-sw   x1, 4(x0)      # needs forwarding for store data
-
-# Test G: Full program — sum 1 to 10 (combines everything)
+addi x1, x0, 0      # sum = 0
+addi x2, x0, 1      # i = 1
+addi x3, x0, 11     # limit = 11
+loop:
+add  x1, x1, x2     # sum += i
+addi x2, x2, 1      # i++
+bne  x2, x3, loop   # if i != 11, loop
+# x1 should be 55
 ```
 
-All tests must produce correct results. Verify in waveform.
+Load each program into instruction memory, simulate, verify results in waveform.
+
+Tip: Use https://riscvasm.lucasteske.dev/ (online RISC-V assembler) to convert assembly to hex.
 
 ---
 
 ## Self-Check Questions
-1. What are the three types of hazards? Give an example of each.
-2. Why can't forwarding solve the load-use hazard?
-3. What's the performance penalty of a branch misprediction in a 5-stage pipeline?
-4. What's the difference between "predict not taken" and "predict taken"?
-5. Draw the pipeline diagram for: `lw x1, 0(x0)` followed by `add x2, x1, x3` — show the stall bubble.
-6. Could you move branch resolution to the ID stage? What would change?
+1. What are the 6 RISC-V instruction formats? Draw each one with bit fields.
+2. Why is x0 hardwired to zero? What problem does it solve?
+3. How does the immediate encoding differ between I-type, S-type, and B-type?
+4. What control signals are needed to distinguish ADD from SUB? (Hint: funct7)
+5. What's the critical path of a single-cycle CPU?
+6. Why is single-cycle impractical for real CPUs? (preview for Week 8)
+
+---
+
+## Bonus: Signed Arithmetic & Fixed-Point Numbers
+
+Most academic DV courses cover signed/fixed-point arithmetic explicitly because
+DSP and AI accelerator pipelines use it everywhere. Your RISC-V ALU already
+exercises signed comparisons (`SLT`/`SLTU`) and arithmetic shifts (`SRA`); this
+section pushes a level deeper.
+
+### Reading
+- Dally & Harting **ch.10 §10.1-10.4**: signed two's complement, sign extension,
+  overflow detection on signed adds.
+- Wikipedia **"Q (number format)"**: a 5-min read on Q1.15 / Q15.16 / general
+  Qm.n notation used in DSP.
+- ChipVerify **"SystemVerilog signed and unsigned"** (search the site).
+
+### Bonus HW5: Signed & Fixed-Point ALU Extensions
+1. **Signed multiplication**: extend HW2's ALU to compute the full 64-bit
+   signed product `A * B` for two 32-bit signed operands. Verify against
+   Verilog's `signed'(...)` cast.
+2. **Q15.16 fixed-point multiply**: build a tiny `qmul.sv` that takes two
+   `signed [31:0]` inputs interpreted as Q15.16, multiplies, and returns the
+   correctly scaled Q15.16 result (i.e., the 64-bit product right-shifted by 16,
+   with rounding).
+3. **Saturating add**: `sat_add.sv` — signed 16-bit add that clamps at
+   `+0x7FFF` / `-0x8000` instead of wrapping. Used in DSP/audio pipelines.
+4. **Testbench**: random + directed corner cases (max+1, min-1, sign-flip).
+
+Why care: AI accelerators (Gaudi, NVIDIA Tensor Cores) and DSP IPs verify
+exactly these number formats. Even if a junior DV role doesn't ask for it,
+knowing Q-format and saturation gives you something real to discuss in
+interviews about AI / signal-processing teams.
 
 ---
 
 ## Checklist
-- [ ] Read Harris & Harris ch.7.5-7.8
-- [ ] Watched MIT 6.004 pipelining lectures
-- [ ] Completed HW1 (Pipeline registers — tests fail due to hazards)
-- [ ] Completed HW2 (Forwarding unit — ALU-ALU tests pass)
-- [ ] Completed HW3 (Hazard detection — load-use tests pass)
-- [ ] Completed HW4 (Branch handling — branch tests pass)
-- [ ] Completed HW5 (All 7 hazard test programs pass)
+- [ ] Read Harris & Harris ch.6 and ch.7.1-7.3
+- [ ] Read RISC-V spec RV32I chapter
+- [ ] Downloaded RISC-V reference card
+- [ ] Watched MIT 6.004 single-cycle processor lecture
+- [ ] Completed HW1 (Instruction decoder)
+- [ ] Completed HW2 (ALU with all operations)
+- [ ] Completed HW3 (Single-cycle datapath)
+- [ ] Completed HW4 (Assembly test programs — all 4 pass)
+- [ ] *(Bonus)* Completed HW5 (Signed mul + Q15.16 fixed-point + saturating add)
 - [ ] Can answer all self-check questions
-- [ ] **MILESTONE: Working pipelined RISC-V CPU!**

@@ -1,144 +1,266 @@
-# Week 13 (Bonus): Advanced UVM — RAL + Multi-UVC + Register Verification
+# Week 12: Portfolio Projects #2 & #3 — RISC-V CPU + FIFO UVM
 
 ## Why This Matters
-The 12-week core plan gets you a working junior DV foundation. This bonus week
-closes two specific gaps that **academic DV courses cover explicitly** and that
-**Israeli senior DV teams ask about in interviews**:
-
-1. **UVM RAL (Register Abstraction Layer)** — modeling DUT registers as a
-   first-class testbench object, with auto-generated read/write APIs that the
-   sequences can use without hand-coding bus transactions every time.
-2. **Multi-UVC integration** — wiring up a verification environment that
-   contains agents from **multiple** independent UVCs (e.g., AXI + UART +
-   register interface), all driven by a coordinated virtual sequence.
-
-After this week you can claim "I have hands-on experience with RAL and
-multi-agent UVM environments" — which most junior candidates can't.
-
-## What to Study
-
-### Reading
-- **Salemi UVM Primer ch.16-18** (final RAL chapters in the book)
-- **Verification Academy UVM Cookbook → "Register Layer"** ⭐ (free, the
-  industry-standard reference)
-- **ChipVerify**: search "UVM RAL" — quick syntax reference
-- **Mentor whitepaper**: *"UVM Register Layer Quick Start"* (Google it; Mentor
-  hosts it free)
-- **Sutherland *SystemVerilog for Design* (2nd ed) ch.5**: SV interfaces and
-  modports — when you build the RAL adapter (`uvm_reg_adapter`) you'll need to
-  understand how an interface is declared from the design side so you can
-  convert `uvm_reg_bus_op` to your bus's transaction shape.
-
-### Videos (Verification Academy)
-- "Register Modeling" course (3 short lessons)
-- "UVM Multi-Domain Environments" (mentions multi-UVC patterns)
-
-### Reference
-- The `tools/ralgen.py` you already wrote in your `uvm_framework` repo
-  generates a basic RAL model from `regs.json` — extend it (or hand-write a
-  full one) for the homework below.
+Three GitHub repos is the magic number. It shows consistency, not a one-off. The RISC-V CPU shows architecture depth, the FIFO UVM shows you can verify any IP block. Together with the UART, you have a portfolio that makes you stand out from other junior candidates.
 
 ---
 
-## Homework
+## Project #2: RISC-V Pipelined CPU
 
-### HW1: Hand-Written UVM RAL Block (no code generation)
-Pick a small register set (4 registers max) and write a UVM RAL model **by
-hand** — no `ralgen.py`. Goal: understand every line of the model.
-
-Required classes:
-- `my_ctrl_reg extends uvm_reg` with a few `uvm_reg_field`s (use `configure`)
-- `my_status_reg extends uvm_reg` (read-only)
-- `my_reg_block extends uvm_reg_block` containing both registers, with a
-  `default_map` (`UVM_LITTLE_ENDIAN`, 4-byte addressing)
-
-Required methods to exercise:
-- `reg_block.CTRL.write(status, 32'h0001)`
-- `reg_block.STATUS.read(status, val)`
-- `reg_block.CTRL.set(0xCAFE); reg_block.CTRL.update(status);`
-- `reg_block.CTRL.predict(...)` and `reg_block.CTRL.get_mirrored_value()`
-
-### HW2: RAL Adapter — Plug Into Your Existing Driver
-Write `my_reg_adapter extends uvm_reg_adapter`:
-- `reg2bus()`: convert a `uvm_reg_bus_op` into your bus's transaction type
-  (e.g., your `alu_transaction` or a new `apb_transaction`)
-- `bus2reg()`: the reverse direction
-
-Connect adapter to the existing sequencer:
-```systemverilog
-reg_block.default_map.set_sequencer(env.agt.sqr, env.adapter);
-reg_block.default_map.set_auto_predict(1);
-```
-
-Verify: write a sequence that does `reg_block.CTRL.write(...)` and watch the
-real bus transactions hit the DUT exactly as if you'd hand-coded them.
-
-### HW3: Multi-UVC Environment
-Take your existing `uvm_framework` repo. It already has **two independent
-DUTs** (ALU + FIFO) with full UVCs each. Build a NEW env that contains BOTH
-agents simultaneously:
+### Step 1: Clean Up
+Take your Week 7-8 RISC-V code and organize it:
 
 ```
-multi_dut_env
-   ├── alu_agent       (drives ALU DUT)
-   ├── fifo_agent      (drives FIFO DUT)
-   ├── alu_scoreboard
-   ├── fifo_scoreboard
-   └── virtual_sequencer  ← coordinates the two
+riscv-sv-cpu/
+    rtl/
+        rv32i_top.sv
+        program_counter.sv
+        instruction_memory.sv
+        register_file.sv
+        rv32i_decoder.sv
+        rv32i_alu.sv
+        imm_generator.sv
+        data_memory.sv
+        forwarding_unit.sv
+        hazard_detection_unit.sv
+        branch_unit.sv
+        pipeline_registers.sv
+    tb/
+        rv32i_tb.sv
+        test_programs/
+            test_alu.hex
+            test_memory.hex
+            test_branch.hex
+            test_hazards.hex
+            test_sum_1_to_10.hex
+    sim/
+        Makefile
+    docs/
+        pipeline_diagram.png    # draw this!
+        datapath.png           # block diagram
+    README.md
 ```
 
-Required:
-- A new `top_multi.sv` that instantiates BOTH DUTs and BOTH interfaces
-- A `multi_dut_env` (uvm_env) wiring up both agents
-- A `virtual_sequencer extends uvm_sequencer` with handles to the alu and
-  fifo sequencers
-- A virtual sequence that issues 10 ALU ops and 10 FIFO ops **in parallel**
-  (use `fork`/`join` inside the body)
+### Step 2: Add a Good Testbench
+If you only have basic tests, enhance:
+- Self-checking tests (program writes result to a known memory address, testbench reads it)
+- Assertion: PC never goes to an invalid address
+- Assertion: x0 is always 0
+- Print register file contents at end of each test
 
-This is the single most important "I can ship real verification" demo you can
-put on your CV.
+### Step 3: README
+```markdown
+# RISC-V RV32I Pipelined CPU
 
-### HW4: Built-in RAL Sequences
-The UVM RAL ships with pre-built test sequences. Run them all on your reg
-model from HW1+HW2:
-- `uvm_reg_hw_reset_seq` — confirms every register has the right reset value
-- `uvm_reg_bit_bash_seq` — toggles every bit of every R/W register
-- `uvm_reg_access_seq` — exercises the read/write/access policy of each field
-- `uvm_mem_walk_seq` (if you add a memory) — walks every memory address
+## Overview
+5-stage pipelined RISC-V processor implementing the RV32I base integer instruction set.
 
-Each is one line in your test:
-```systemverilog
-seq = uvm_reg_hw_reset_seq::type_id::create("seq");
-seq.model = reg_block;
-seq.start(null);
+## Architecture
+![Pipeline Diagram](docs/pipeline_diagram.png)
+
+## Features
+- 5-stage pipeline: IF, ID, EX, MEM, WB
+- Full data forwarding (EX-EX, MEM-EX)
+- Load-use hazard detection with pipeline stall
+- Branch handling with flush on misprediction
+- 47 RV32I instructions supported
+
+## Supported Instructions
+| Type | Instructions |
+|------|-------------|
+| R-type | ADD, SUB, AND, OR, XOR, SLL, SRL, SRA, SLT, SLTU |
+| I-type | ADDI, ANDI, ORI, XORI, SLTI, SLTIU, SLLI, SRLI, SRAI, LW, JALR |
+| S-type | SW |
+| B-type | BEQ, BNE, BLT, BGE, BLTU, BGEU |
+| U-type | LUI, AUIPC |
+| J-type | JAL |
+
+## Test Results
+| Test | Description | Result |
+|------|------------|--------|
+| ALU | Basic arithmetic/logic operations | PASS |
+| Memory | Load/store operations | PASS |
+| Branch | All branch types + flush verification | PASS |
+| Hazards | Forwarding + stall scenarios | PASS |
+| Sum 1-10 | Integration test (result = 55) | PASS |
+
+## How to Run
+```
+make compile
+make run TEST=test_sum_1_to_10
+make all  # run all tests
+```
 ```
 
-These four sequences alone are what 90% of register verification looks like in
-real chips. If you can run them on your own reg block you've covered the bulk
-of what a register-verification interview would ask.
+### Step 4: Push to GitHub
+```bash
+git init && git add . && git commit -m "5-stage pipelined RISC-V RV32I CPU"
+git remote add origin https://github.com/YOUR_USERNAME/riscv-sv-cpu.git
+git push -u origin main
+```
 
 ---
 
-## Self-Check Questions
-1. What's the difference between `set/get` (frontdoor) and `peek/poke`
-   (backdoor) on a `uvm_reg`?
-2. What does `set_auto_predict(1)` do, and when would you turn it off?
-3. Why does `uvm_reg_adapter` exist — what specifically does it convert?
-4. In a multi-UVC env, where do shared resources (clock, reset, config) live
-   so all agents can access them?
-5. What's a virtual sequencer and why isn't a regular sequencer good enough?
-6. What's the bit-bash sequence checking for?
+## Project #3: Synchronous FIFO with UVM Testbench
+
+### Step 1: RTL
+Design a parameterized synchronous FIFO:
+
+```systemverilog
+module sync_fifo #(
+    parameter DATA_WIDTH = 8,
+    parameter DEPTH = 16
+)(
+    input  logic                  clk, rst_n,
+    input  logic                  wr_en, rd_en,
+    input  logic [DATA_WIDTH-1:0] wr_data,
+    output logic [DATA_WIDTH-1:0] rd_data,
+    output logic                  full, empty,
+    output logic                  overflow, underflow,
+    output logic [$clog2(DEPTH):0] count
+);
+```
+
+Key behaviors to implement:
+- Circular buffer with read/write pointers
+- Full when count == DEPTH
+- Empty when count == 0
+- Overflow: write when full (flag it, don't write)
+- Underflow: read when empty (flag it, don't read)
+- Simultaneous read+write: always works (count stays same)
+
+### Step 2: UVM Testbench
+```
+fifo-uvm-verification/
+    rtl/
+        sync_fifo.sv
+    tb/
+        fifo_pkg.sv
+        fifo_if.sv
+        fifo_seq_item.sv       # operation (PUSH/POP/BOTH/IDLE) + data
+        fifo_driver.sv
+        fifo_monitor.sv
+        fifo_agent.sv
+        fifo_scoreboard.sv     # reference model: SV queue [$]
+        fifo_coverage.sv
+        fifo_env.sv
+        fifo_tests.sv
+        fifo_sequences.sv
+        tb_top.sv
+    sim/
+        Makefile
+    README.md
+```
+
+**Scoreboard reference model:**
+```systemverilog
+// Inside scoreboard — behavioral FIFO model
+logic [DATA_WIDTH-1:0] ref_queue[$];
+
+function void write(fifo_transaction txn);
+    case (txn.operation)
+        PUSH: begin
+            if (ref_queue.size() < DEPTH)
+                ref_queue.push_back(txn.wr_data);
+            // else: expect overflow flag
+        end
+        POP: begin
+            if (ref_queue.size() > 0) begin
+                expected = ref_queue.pop_front();
+                assert(txn.rd_data == expected);
+            end
+            // else: expect underflow flag
+        end
+        PUSH_AND_POP: begin
+            // Handle simultaneous
+        end
+    endcase
+endfunction
+```
+
+**Coverage targets:**
+- FIFO states: empty, partially filled, full
+- Transitions: empty->non-empty, non-empty->full, full->non-empty, non-empty->empty
+- Operations at each state: push when full, pop when empty, push+pop at all states
+- Data patterns: all zeros, all ones, alternating
+- Count values: every value from 0 to DEPTH hit
+- Overflow flag asserted
+- Underflow flag asserted
+
+**Tests:**
+- `fifo_fill_drain_test`: fill completely, then drain completely
+- `fifo_random_test`: random push/pop for 10000 cycles
+- `fifo_stress_test`: push+pop simultaneously at various fill levels
+- `fifo_overflow_test`: push beyond capacity, verify overflow flag
+- `fifo_underflow_test`: pop when empty, verify underflow flag
+- `fifo_coverage_test`: run until 100% coverage
+
+### Step 3: Push to GitHub
+
+---
+
+## Final Steps: Update Your CV & LinkedIn
+
+### Update plain_text_resume.yaml
+Add to the projects section:
+```yaml
+projects:
+  - name: "UART with UVM Verification"
+    description: "Designed UART TX/RX IP core with full UVM testbench including constrained random verification, coverage-driven methodology, and reference model scoreboard. Achieved 100% functional coverage."
+    link: "https://github.com/YOUR_USERNAME/uart-uvm-verification"
+  - name: "RISC-V RV32I Pipelined CPU"
+    description: "Built a 5-stage pipelined RISC-V processor in SystemVerilog with data forwarding, hazard detection, and branch handling. Verified with self-checking assembly test programs."
+    link: "https://github.com/YOUR_USERNAME/riscv-sv-cpu"
+  - name: "Synchronous FIFO with UVM Verification"
+    description: "Parameterized synchronous FIFO with complete UVM testbench. Coverage-driven verification with overflow/underflow testing and 100% functional coverage."
+    link: "https://github.com/YOUR_USERNAME/fifo-uvm-verification"
+```
+
+### Update LinkedIn
+- Add all 3 projects to your LinkedIn profile
+- Add skills: UVM, SystemVerilog Verification, Constrained Random, Functional Coverage
+- Update headline to mention verification
+
+### Update AutoApply Bot
+- Update `data_folder/plain_text_resume.yaml` with new projects
+- Add your GitHub URL to the config
+- Restart the bot — it will now include your projects when applying!
 
 ---
 
 ## Checklist
-- [ ] Read Salemi ch.16-18 (RAL)
-- [ ] Read VerificationAcademy "Register Layer" cookbook section
-- [ ] Watched Register Modeling videos (3 lessons)
-- [ ] Completed HW1 (Hand-written UVM RAL block)
-- [ ] Completed HW2 (RAL adapter plugged into existing driver)
-- [ ] Completed HW3 (Multi-UVC env with virtual sequencer)
-- [ ] Completed HW4 (4 built-in RAL sequences run cleanly)
-- [ ] Can answer all self-check questions
-- [ ] **MILESTONE: You can verify register sets and multi-IP environments —
-  the daily bread of mid-level DV engineers.**
+
+### RISC-V CPU (Project #2)
+- [ ] Code organized in clean project structure
+- [ ] All test programs pass
+- [ ] Pipeline diagram drawn
+- [ ] README written
+- [ ] Pushed to GitHub
+
+### FIFO UVM (Project #3)
+- [ ] FIFO RTL implemented and tested
+- [ ] Full UVM environment built
+- [ ] All 6 tests pass
+- [ ] Coverage >95%
+- [ ] README written
+- [ ] Pushed to GitHub
+
+### Profile Updates
+- [ ] plain_text_resume.yaml updated with 3 projects
+- [ ] LinkedIn profile updated
+- [ ] GitHub profile has 3 repos with READMEs
+- [ ] AutoApply bot restarted with new resume
+
+---
+
+## **CONGRATULATIONS!**
+
+You now have:
+- SystemVerilog verification skills (OOP, constrained random, coverage, assertions)
+- UVM methodology (full testbench from scratch)
+- Computer architecture knowledge (pipelined RISC-V CPU)
+- Protocol experience (UART, SPI, AXI-Lite)
+- 3 GitHub portfolio projects
+- An auto-apply bot sending your improved CV to relevant jobs
+
+You are ready for junior DV/FPGA/ASIC interviews in Israel. Good luck!

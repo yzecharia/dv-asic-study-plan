@@ -1,227 +1,298 @@
-# Week 7: RISC-V ISA & Single-Cycle CPU
+# Week 6: Full UVM Testbench Integration
 
 ## Why This Matters
-Computer architecture knowledge separates "I can write Verilog" from "I understand what I'm building." A CPU project on your resume proves deep understanding of digital design — datapath, control, instruction decoding, memory hierarchy. Israeli semiconductor companies (Intel, Marvell, Qualcomm) love this.
-
-You already have `DDCA_RISCV` on your machine — this week you either extend it or rebuild it properly in SystemVerilog with verification in mind.
+This is where everything comes together. You'll build a complete, working UVM testbench end-to-end for a real DUT. After this week, you can say "I know UVM" in an interview and back it up.
 
 ## What to Study
 
 ### Reading
-- **Harris & Harris ch.6**: "Architecture" — RISC-V ISA, instruction formats
-- **Harris & Harris ch.7 (7.1-7.3)**: "Microarchitecture" — single-cycle implementation
-- **RISC-V Spec Volume 1** (free PDF from riscv.org): Chapter 2 — RV32I Base Integer ISA
-  - Only 47 instructions. Manageable.
-  - Focus on: R-type, I-type, S-type, B-type, U-type, J-type formats
+- **Salemi *The UVM Primer*** (finishing up):
+  - **ch.19 UVM Reporting** — `uvm_info`, `uvm_warning`, `uvm_error`, `uvm_fatal`, verbosity
+  - **ch.20 Class Hierarchies and Deep Operations**
+  - **ch.24 Onward with the UVM** — closing perspective
+- **Rosenberg & Meade ch.8-10** (primary for scoreboard & coverage): "Scoreboard", "Coverage", "Reporting"
+  - Reference models inside scoreboard
+  - Functional coverage integration in UVM
+  - End-of-test mechanism: `phase.raise_objection()` / `phase.drop_objection()`
+  - Salemi doesn't have a dedicated scoreboard chapter — Rosenberg's production-patterns treatment is what you want here
+- **Verification Academy UVM Cookbook** (free, online): scoreboard and coverage recipes — the best single reference
 
-### Videos
-- **MIT 6.004** (YouTube/OCW): Lectures on single-cycle processor
-- **Harris & Harris lecture videos** if available from your university
+### Videos (Verification Academy)
+- "UVM Scoreboard" course
+- "UVM Coverage" course
+- "UVM Debug and Reporting" course
 
-### Reading (Design Best Practices)
-- **Dally & Harting ch.17**: "Factoring Finite-State Machines" — decomposing complex FSMs into smaller, manageable pieces. Directly applicable to the CPU control unit.
-- **Dally & Harting ch.18**: "Microcode" — microprogrammed control vs hardwired control. Understanding the tradeoff between the two approaches for instruction decoding.
-- **Dally & Harting ch.9**: "Combinational Examples" — worked examples of combinational design including decoders and control logic.
-- **Cliff Cummings** *"Full Case Parallel Case"* — understanding synthesis pragmas for case statements (critical for decoders)
-- **Cliff Cummings** *"Coding And Scripting Techniques for FSM Designs with Synthesis-Optimized, Glitch-Free Outputs"*
-- **Sutherland *SystemVerilog for Design* (2nd ed) ch.10**: tasks and functions — clean way to factor decoder/ALU helper logic out of the top module.
-- **Sutherland *SystemVerilog for Design* (2nd ed) ch.13**: RTL synthesis guidelines — apply directly to the ALU, decoder, and datapath modules so they synthesize as intended.
+### Quick Reference (ChipVerify.com)
+- https://www.chipverify.com/uvm/uvm-scoreboard
+- https://www.chipverify.com/uvm/uvm-reporting
+- https://www.chipverify.com/uvm/uvm-phases
+- https://www.chipverify.com/uvm/uvm-objection
 
-### Reference
-- RISC-V Green Card (instruction reference sheet) — Google "RISC-V reference card PDF"
-- Your existing code in `/Users/yuval/verilog_projects/DDCA_RISCV/`
-
-### Industry Design Guidelines for the CPU
-- **Separate datapath from control** — decoder/control in one module, datapath in another
-- **Use enums for opcodes and ALU operations** — not raw bit patterns
-- **Use `always_comb` with `unique case`** for the decoder — catches missing cases at simulation time
-- **Parameterize the data width** even if you only use 32-bit — shows good design habits
-- **Name your signals clearly**: `alu_result`, not `res`; `mem_write_en`, not `mw`
+### Tool
+- **Primary**: Vivado xsim via the `🧪 FLOW: XSIM UVM` VSCode task (supports UVM)
+- **Fallback**: EDA Playground if xsim chokes on a specific construct
+- Either way, organize your files properly: pkg, interface, top
 
 ---
 
 ## Homework
 
-### HW1: RISC-V Instruction Decoder
-Write a standalone instruction decoder module:
+### HW1: Scoreboard with Reference Model for ALU
+Build a scoreboard that checks every ALU transaction against a reference model:
 
+Scaffolding for `alu_scoreboard extends uvm_scoreboard`:
+- Register with the factory via ``` `uvm_component_utils ```
+- Expose a `uvm_analysis_imp #(alu_transaction, alu_scoreboard)` so the monitor can push to it
+- Track `pass_count` and `fail_count`
+
+You need to implement:
+- **`write(alu_transaction txn)`** — the TLM hook. Inside, build a small
+  reference model (a `case` on `txn.operation`) that computes the expected
+  result from `operand_a`/`operand_b`. Compare against `txn.result`, bump the
+  counters, and `` `uvm_info `` / `` `uvm_error `` as appropriate.
+- **`report_phase`** — print the final pass/fail tally and raise a
+  `` `uvm_error `` if any transaction mismatched.
+
+### HW2: Functional Coverage in UVM
+Add a coverage collector component to your environment:
+
+Build `alu_coverage extends uvm_subscriber #(alu_transaction)` with:
+- An internal `alu_transaction txn` handle that the covergroup can sample from
+- A `covergroup alu_cg` containing:
+  - a coverpoint on `txn.operation`
+  - coverpoints on `operand_a` and `operand_b`, each partitioned into
+    meaningful regions (think: zero / low / mid / high / max)
+  - cross coverpoints between operation and each operand
+- Constructor creates the covergroup
+- Override `write()` to update `txn` and call `alu_cg.sample()`
+- Override `report_phase` to print final coverage with `get_coverage()`
+
+Connect it in the env alongside the scoreboard. Run until coverage >95%.
+
+### HW3: Complete End-to-End UVM Testbench for Register File
+Build a COMPLETE testbench for a register file DUT (32 registers x 32 bits, 2 read ports, 1 write port).
+
+**RTL (write this yourself):**
 ```systemverilog
-module rv32i_decoder (
-    input  logic [31:0] instruction,
-    output logic [6:0]  opcode,
-    output logic [4:0]  rd, rs1, rs2,
-    output logic [2:0]  funct3,
-    output logic [6:0]  funct7,
-    output logic [31:0] imm,           // sign-extended immediate
-    output logic [3:0]  alu_control,   // decoded ALU operation
-    output logic        reg_write,     // write to register file
-    output logic        mem_write,     // write to memory
-    output logic        mem_read,      // read from memory
-    output logic        branch,        // branch instruction
-    output logic        jump,          // JAL/JALR
-    output logic [1:0]  alu_src        // ALU operand B source
+module register_file (
+    input  logic        clk, rst_n,
+    input  logic        wr_en,
+    input  logic [4:0]  wr_addr, rd_addr1, rd_addr2,
+    input  logic [31:0] wr_data,
+    output logic [31:0] rd_data1, rd_data2
 );
-```
-
-Supported instruction types:
-- **R-type:** ADD, SUB, AND, OR, XOR, SLL, SRL, SRA, SLT, SLTU
-- **I-type:** ADDI, ANDI, ORI, XORI, SLTI, SLTIU, SLLI, SRLI, SRAI, LW, JALR
-- **S-type:** SW
-- **B-type:** BEQ, BNE, BLT, BGE, BLTU, BGEU
-- **U-type:** LUI, AUIPC
-- **J-type:** JAL
-
-Write a testbench that feeds known instruction encodings and verifies all outputs. Use a reference table from the RISC-V spec.
-
-### HW2: ALU with All RV32I Operations
-Write the ALU module:
-
-```systemverilog
-module rv32i_alu (
-    input  logic [31:0] a, b,
-    input  logic [3:0]  alu_control,
-    output logic [31:0] result,
-    output logic        zero,          // result == 0
-    output logic        negative,      // result[31]
-    output logic        overflow       // signed overflow
-);
-    // Operations based on alu_control:
-    // ADD, SUB, AND, OR, XOR, SLL, SRL, SRA, SLT, SLTU
+    // Register x0 is always 0 (RISC-V convention)
 endmodule
 ```
 
-Write a thorough testbench:
-- All operations with corner cases (0, -1, MAX_INT, MIN_INT)
-- Overflow detection for ADD/SUB
-- Shift by 0, 1, 31
-- SLT vs SLTU difference (signed vs unsigned comparison)
+**UVM Components (build all of these):**
+- `regfile_transaction` — sequence item with wr_en, addresses, data
+- `regfile_interface` — SV interface with clocking block
+- `regfile_driver` — drives interface signals
+- `regfile_monitor` — observes interface, broadcasts transactions
+- `regfile_agent` — contains driver + monitor + sequencer
+- `regfile_scoreboard` — maintains a reference model (array of 32 regs), checks reads
+- `regfile_coverage` — covers all registers written, read, write-then-read same register
+- `regfile_env` — assembles agent + scoreboard + coverage
+- `regfile_base_test` — base test class
+- `regfile_directed_test` — writes known values, reads back, checks
+- `regfile_random_test` — random read/write sequences
+- `regfile_stress_test` — back-to-back writes and reads, concurrent read during write
 
-### HW3: Single-Cycle Datapath
-Build the complete single-cycle CPU. Key modules:
+**Top module:**
+- Instantiate DUT + interface
+- Connect via config_db
+- Run with `run_test()`
 
-```
-                    +----------+
-Instruction  ------>| Decoder  |-----> Control signals
-Memory              +----------+
-    |                                    |
-    v                                    v
-+--------+    +--------+    +-----+    +--------+
-|   PC   |--->| I-Mem  |--->| Reg |--->| ALU    |---> Data Memory
-+--------+    +--------+    | File|    +--------|     (Load/Store)
-    ^                       +--------+
-    |                           ^
-    +------ PC+4 / Branch -----+
-```
+This is a FULL project. Take your time. When done, you have a complete UVM testbench you understand inside out.
 
-Modules to implement:
-1. `program_counter` — PC register with reset
-2. `instruction_memory` — ROM initialized from file
-3. `register_file` — 32 x 32-bit (x0 hardwired to 0)
-4. `rv32i_alu` — from HW2
-5. `rv32i_decoder` — from HW1
-6. `data_memory` — RAM for loads/stores
-7. `imm_generator` — extract and sign-extend immediates
-8. `rv32i_top` — top-level connecting everything
+### HW4: Regression & Coverage Closure
+Using the register file testbench from HW3:
 
-### HW4: Assembly Test Programs
-Write small RISC-V assembly programs (or hand-encode the hex) to test your CPU:
+1. Run each test individually, record coverage:
+   - `+UVM_TESTNAME=regfile_directed_test`
+   - `+UVM_TESTNAME=regfile_random_test`
+   - `+UVM_TESTNAME=regfile_stress_test`
 
-**Test 1: Basic ALU**
-```
-addi x1, x0, 5      # x1 = 5
-addi x2, x0, 3      # x2 = 3
-add  x3, x1, x2     # x3 = 8
-sub  x4, x1, x2     # x4 = 2
-and  x5, x1, x2     # x5 = 1
-or   x6, x1, x2     # x6 = 7
-```
+2. Identify holes in coverage — which bins are not hit?
 
-**Test 2: Memory**
-```
-addi x1, x0, 42     # x1 = 42
-sw   x1, 0(x0)      # mem[0] = 42
-lw   x2, 0(x0)      # x2 = mem[0] = 42
-```
+3. Write a **new sequence** specifically targeting the uncovered bins
 
-**Test 3: Branches**
-```
-addi x1, x0, 5
-addi x2, x0, 5
-beq  x1, x2, skip   # should branch
-addi x3, x0, 1      # should NOT execute
-skip:
-addi x3, x0, 2      # x3 should be 2
-```
+4. Re-run until you achieve 100% functional coverage
 
-**Test 4: Loop (sum 1 to 10)**
-```
-addi x1, x0, 0      # sum = 0
-addi x2, x0, 1      # i = 1
-addi x3, x0, 11     # limit = 11
-loop:
-add  x1, x1, x2     # sum += i
-addi x2, x2, 1      # i++
-bne  x2, x3, loop   # if i != 11, loop
-# x1 should be 55
-```
+5. Document the process: what was uncovered, what sequence fixed it
 
-Load each program into instruction memory, simulate, verify results in waveform.
-
-Tip: Use https://riscvasm.lucasteske.dev/ (online RISC-V assembler) to convert assembly to hex.
+This simulates real DV work — coverage closure is what you'll spend most of your time doing on the job.
 
 ---
 
 ## Self-Check Questions
-1. What are the 6 RISC-V instruction formats? Draw each one with bit fields.
-2. Why is x0 hardwired to zero? What problem does it solve?
-3. How does the immediate encoding differ between I-type, S-type, and B-type?
-4. What control signals are needed to distinguish ADD from SUB? (Hint: funct7)
-5. What's the critical path of a single-cycle CPU?
-6. Why is single-cycle impractical for real CPUs? (preview for Week 8)
+1. What does `raise_objection` / `drop_objection` do? What happens if you forget it?
+2. What's the difference between `uvm_subscriber` and manually connecting with `uvm_analysis_imp`?
+3. How do you run different tests from the command line without recompiling?
+4. What's the purpose of `report_phase`? What other end-of-test phases exist?
+5. How would you merge coverage from multiple test runs?
+6. Explain the complete flow of a transaction: sequence -> sequencer -> driver -> DUT -> monitor -> scoreboard
 
 ---
 
-## Bonus: Signed Arithmetic & Fixed-Point Numbers
+## Design Track: Register File, Clock Domain Crossing & Async FIFO
 
-Most academic DV courses cover signed/fixed-point arithmetic explicitly because
-DSP and AI accelerator pipelines use it everywhere. Your RISC-V ALU already
-exercises signed comparisons (`SLT`/`SLTU`) and arithmetic shifts (`SRA`); this
-section pushes a level deeper.
+Week 6 has three design focuses: (1) the register file that feeds into your UVM testbench, (2) clock domain crossing — the single most common source of silicon bugs, and (3) the async FIFO — which combines CDC with the FIFO you already know.
 
-### Reading
-- Dally & Harting **ch.10 §10.1-10.4**: signed two's complement, sign extension,
-  overflow detection on signed adds.
-- Wikipedia **"Q (number format)"**: a 5-min read on Q1.15 / Q15.16 / general
-  Qm.n notation used in DSP.
-- ChipVerify **"SystemVerilog signed and unsigned"** (search the site).
+### Reading (Design)
+- **Dally & Harting ch.15**: "Timing Constraints" — setup time, hold time, clock skew, timing analysis. Read this before the timing exercise (Design HW4).
+- **Dally & Harting ch.28**: "Metastability and Synchronization Failure" — the physics of metastability, MTBF calculation, why synchronizers work. Essential background for CDC.
+- **Dally & Harting ch.29**: "Synchronizer Design" — 2-FF synchronizers, synchronizer architectures, design guidelines. Directly maps to Design HW2.
+- **Cliff Cummings** *"Clock Domain Crossing (CDC) Design & Verification Techniques Using SystemVerilog"* (SNUG 2008) — **essential reading**. This paper is cited in every CDC interview question. Covers metastability, 2-FF synchronizer, pulse synchronizer, gray code.
+- **Cliff Cummings** *"Simulation and Synthesis Techniques for Asynchronous FIFO Design"* (SNUG 2002) — you read the theory in Week 5, now build it.
+- **ChipVerify**: https://www.chipverify.com/verilog/verilog-clock-domain-crossing
+- **Sutherland *SystemVerilog for Design* (2nd ed) ch.9**: SV procedural blocks — `always_comb`, `always_ff`, `always_latch` and when each one is the right tool. Use this for the register-file and synchronizer code.
+- **Sutherland *SystemVerilog for Design* (2nd ed) ch.13**: RTL synthesis guidelines — what synthesizes cleanly and what doesn't. The single best chapter for writing register-file / FIFO RTL that won't surprise you in synthesis.
 
-### Bonus HW5: Signed & Fixed-Point ALU Extensions
-1. **Signed multiplication**: extend HW2's ALU to compute the full 64-bit
-   signed product `A * B` for two 32-bit signed operands. Verify against
-   Verilog's `signed'(...)` cast.
-2. **Q15.16 fixed-point multiply**: build a tiny `qmul.sv` that takes two
-   `signed [31:0]` inputs interpreted as Q15.16, multiplies, and returns the
-   correctly scaled Q15.16 result (i.e., the 64-bit product right-shifted by 16,
-   with rounding).
-3. **Saturating add**: `sat_add.sv` — signed 16-bit add that clamps at
-   `+0x7FFF` / `-0x8000` instead of wrapping. Used in DSP/audio pipelines.
-4. **Testbench**: random + directed corner cases (max+1, min-1, sign-flip).
+### Design Notes for the Register File
+- **x0 hardwired to zero** — this is a RISC-V convention; any write to x0 is ignored, reads always return 0
+- **2 read ports, 1 write port** — standard for single-issue CPUs
+- **Write-first behavior**: if you read and write the same register on the same cycle, the read should return the NEW value (forwarding within the register file)
+- **Use `always_ff`** for the write port, **`always_comb`** for read ports
+- This register file will be reused in your RISC-V CPU (Weeks 7-8)
 
-Why care: AI accelerators (Gaudi, NVIDIA Tensor Cores) and DSP IPs verify
-exactly these number formats. Even if a junior DV role doesn't ask for it,
-knowing Q-format and saturation gives you something real to discuss in
-interviews about AI / signal-processing teams.
+### Design HW1: Register File
+Build the register file as part of verification HW3, but design it as a standalone, well-tested module first. See HW3 verification spec above for the interface.
+
+### Design HW2: 2-FF Synchronizer & Pulse Synchronizer
+These are the fundamental CDC building blocks. Every ASIC has hundreds of them.
+
+```systemverilog
+// Part A: Basic 2-FF synchronizer (for slow-changing signals)
+module sync_2ff #(
+    parameter WIDTH = 1
+)(
+    input  logic             clk_dst,    // destination clock
+    input  logic             rst_n,
+    input  logic [WIDTH-1:0] data_in,    // from source clock domain
+    output logic [WIDTH-1:0] data_out    // synchronized to clk_dst
+);
+    // Two back-to-back flip-flops
+    // The first FF may go metastable — the second FF resolves it
+    // ONLY use for signals that change slowly (level signals, not pulses)
+endmodule
+
+// Part B: Pulse synchronizer (for single-cycle pulses across domains)
+module pulse_sync (
+    input  logic clk_src, clk_dst, rst_n,
+    input  logic pulse_in,    // single-cycle pulse in clk_src domain
+    output logic pulse_out    // single-cycle pulse in clk_dst domain
+);
+    // Method: toggle a flag in source domain, synchronize the toggle to
+    // destination domain, detect edges on the synchronized toggle
+    //
+    // This handles the case where clk_src pulse is too short for clk_dst
+    // to sample directly
+endmodule
+```
+
+Write a testbench with two clock domains (e.g., 100 MHz and 37 MHz — intentionally non-integer ratio):
+1. Drive level signal changes through 2-FF sync, verify they arrive (with 2-cycle latency)
+2. Drive single-cycle pulses through pulse sync, verify each pulse arrives exactly once
+3. Drive pulses very close together — verify none are lost
+
+### Design HW3: Asynchronous FIFO
+The crowning achievement of CDC design. Asked about in nearly every ASIC interview:
+
+```systemverilog
+module async_fifo #(
+    parameter DATA_WIDTH = 8,
+    parameter ADDR_WIDTH = 4    // DEPTH = 2^ADDR_WIDTH (must be power of 2!)
+)(
+    // Write domain
+    input  logic                  wr_clk, wr_rst_n,
+    input  logic                  wr_en,
+    input  logic [DATA_WIDTH-1:0] wr_data,
+    output logic                  full,
+    // Read domain
+    input  logic                  rd_clk, rd_rst_n,
+    input  logic                  rd_en,
+    output logic [DATA_WIDTH-1:0] rd_data,
+    output logic                  empty
+);
+    // Key design elements:
+    // 1. Dual-port RAM for storage (from Week 5 Design HW2)
+    // 2. Write pointer (binary) in write clock domain
+    // 3. Read pointer (binary) in read clock domain
+    // 4. Gray code conversion: binary -> gray for crossing domains
+    //    gray = binary ^ (binary >> 1)
+    // 5. Synchronize gray-coded write pointer to read domain (2-FF)
+    // 6. Synchronize gray-coded read pointer to write domain (2-FF)
+    // 7. Full detection: compare synced read pointer with write pointer
+    //    Full when gray_wr_ptr == {~gray_rd_sync[MSB:MSB-1], gray_rd_sync[MSB-2:0]}
+    // 8. Empty detection: compare synced write pointer with read pointer
+    //    Empty when gray_rd_ptr == gray_wr_sync
+    //
+    // IMPORTANT: depth MUST be power of 2 for gray code to work correctly
+endmodule
+```
+
+Write a testbench with asymmetric clocks (e.g., write at 100 MHz, read at 33 MHz):
+1. Fill the FIFO completely — verify full flag
+2. Drain completely — verify empty flag and data integrity (FIFO order)
+3. Continuous write + read at different rates — verify no data corruption
+4. Stress test: write bursts faster than read can drain
+
+### Design HW4: Timing Analysis Exercise (Pen & Paper)
+No RTL for this one — work through these on paper or a whiteboard. Understanding timing is critical for interviews:
+
+1. **Setup & hold calculation**: Given Tclk=10ns, Tsetup=0.5ns, Thold=0.3ns, Tcq=0.8ns, and combinational delay=7ns: What is the slack? Can the design meet timing?
+
+2. **Critical path identification**: Draw the datapath of your Week 4 ALU (inputs -> mux -> adder -> output register). Label each component's delay. What's the critical path? What's the maximum clock frequency?
+
+3. **Pipelining for timing**: Take the multiplier from Week 4 HW3. If it were combinational (single cycle), the critical path would be WIDTH stages of add+shift. Show how breaking it into a multi-cycle design trades latency for throughput.
+
+4. **Metastability MTBF**: Given a synchronizer with Tsetup=0.5ns, Tw=0.3ns (metastability window), clock=200MHz, input change rate=50MHz: Calculate MTBF with 1-FF vs 2-FF synchronizer. Why is 2-FF sufficient?
+
+### Design HW5: ECC — Parity + Hamming(7,4) on the Register File
+
+Memory subsystems in real chips need error detection / correction. This brings
+your week-06 deliverables in line with what most academic DV/RTL courses
+include in a "memory and reliability" module.
+
+1. **Parity bit** — extend Design HW1 (Register File) to add a single parity bit
+   per register. Write logic to detect single-bit errors on read. No correction —
+   just a fault flag.
+2. **Hamming(7,4) SECDED** — implement a small standalone module that:
+   - encodes a 4-bit data word into a 7-bit codeword (4 data + 3 parity), and
+   - decodes a 7-bit codeword back to 4 bits, **correcting** any single-bit error
+     and **detecting** double-bit errors.
+3. **Testbench** — directed tests that flip each bit position and confirm the
+   decoder corrects it; flip two bits and confirm the decoder reports an
+   uncorrectable error.
+
+Resources:
+- ChipVerify / Wikipedia "Hamming code" pages
+- Optional: Synopsys / Cadence app notes on SECDED in SRAM IP
 
 ---
 
 ## Checklist
-- [ ] Read Harris & Harris ch.6 and ch.7.1-7.3
-- [ ] Read RISC-V spec RV32I chapter
-- [ ] Downloaded RISC-V reference card
-- [ ] Watched MIT 6.004 single-cycle processor lecture
-- [ ] Completed HW1 (Instruction decoder)
-- [ ] Completed HW2 (ALU with all operations)
-- [ ] Completed HW3 (Single-cycle datapath)
-- [ ] Completed HW4 (Assembly test programs — all 4 pass)
-- [ ] *(Bonus)* Completed HW5 (Signed mul + Q15.16 fixed-point + saturating add)
+
+### Verification Track
+- [ ] Read Rosenberg ch.8-10
+- [ ] Watched Verification Academy Scoreboard + Coverage + Reporting
+- [ ] Read ChipVerify scoreboard, reporting, phases pages
+- [ ] Completed HW1 (Scoreboard with reference model)
+- [ ] Completed HW2 (UVM coverage collector)
+- [ ] Completed HW3 (Full register file UVM testbench — includes RTL design)
+- [ ] Completed HW4 (Regression & coverage closure)
 - [ ] Can answer all self-check questions
+- [ ] **MILESTONE: You can build a UVM testbench from scratch!**
+
+### Design Track
+- [ ] Read Dally ch.15 (timing constraints), ch.28 (metastability), ch.29 (synchronizer design)
+- [ ] Read Cummings CDC paper (SNUG 2008)
+- [ ] Read Cummings async FIFO paper (SNUG 2002)
+- [ ] Completed Design HW1 (Register file with x0=0 and write-first)
+- [ ] Completed Design HW2 (2-FF synchronizer + pulse synchronizer)
+- [ ] Completed Design HW3 (Asynchronous FIFO with gray code pointers)
+- [ ] Completed Design HW4 (Timing analysis pen-and-paper exercise)
+- [ ] Completed Design HW5 (Parity + Hamming SECDED on register file)
+- [ ] **MILESTONE: You understand CDC — the #1 source of silicon bugs!**

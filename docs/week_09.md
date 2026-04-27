@@ -1,176 +1,221 @@
-# Week 9: UART Design & Verification
+# Week 8: Pipelined CPU & Hazard Handling
 
 ## Why This Matters
-UART is the simplest serial protocol and the perfect first "real" IP block to design and verify. It's used everywhere — debug ports, sensor interfaces, FPGA-to-PC communication. More importantly, it's a clean project to demonstrate your full RTL + verification skillset.
+Every real CPU is pipelined. Understanding pipeline hazards (data, control, structural) and their solutions (forwarding, stalling, flushing) is essential interview knowledge. Building this proves you understand hardware at the microarchitecture level.
 
 ## What to Study
 
 ### Reading
-- **UART Protocol**: Google "UART protocol tutorial" — any good one covers:
-  - Start bit (low), 8 data bits (LSB first), optional parity, stop bit (high)
-  - Baud rate: bit period = 1/baud_rate (e.g., 9600 baud = 104.17us per bit)
-  - Oversampling (typically 16x) for reliable RX sampling
-  - No clock line — sender and receiver must agree on baud rate
-- **Nandland UART tutorial**: https://nandland.com/uart-serial-port-module/
-- **Pong P. Chu ch.7** (you have this book): UART section
+- **Harris & Harris ch.7.5-7.8**: Pipelining
+  - 5-stage pipeline: IF, ID, EX, MEM, WB
+  - Pipeline registers
+  - Data hazards: RAW (read-after-write)
+  - Forwarding (bypassing)
+  - Stalls (load-use hazard)
+  - Control hazards: branch prediction, pipeline flush
+- **Dally & Harting ch.23**: "Pipelines" — pipeline theory, throughput vs latency, pipeline hazards and interlocks. Gives a more general treatment of pipelining beyond just CPUs — applicable to any datapath.
+- **Patterson & Hennessy** (optional, deeper): Chapter 4 "The Processor"
+- **Sutherland *SystemVerilog for Design* (2nd ed) ch.9**: SV procedural blocks — cleanly modeling pipeline registers with `always_ff` and avoiding latch inference between stages.
+- **Sutherland *SystemVerilog for Design* (2nd ed) ch.13**: RTL synthesis guidelines — pipeline-friendly coding patterns; this is the chapter that keeps your forwarding muxes and hazard logic synthesizable.
 
-### Reading (Design Best Practices)
-- **Pong Chu ch.7**: UART section — you already have this book, review the design approach
-- **Cliff Cummings** *"Clock Domain Crossing"* — not needed for UART itself, but essential knowledge for protocols that cross clock domains
-- **Sutherland *SystemVerilog for Design* (2nd ed) ch.4-5**: SV interfaces and modports — wrap the UART signals (TX/RX/baud-tick/parity-error) in a proper interface instead of loose ports.
-- **Sutherland *SystemVerilog for Design* (2nd ed) ch.13**: RTL synthesis guidelines — clean coding for the TX/RX FSMs and the baud-rate generator.
+### Videos
+- **MIT 6.004**: Pipelining lectures (2-3 lectures)
+- **Harris & Harris** lecture on pipelining if available
 
-### Industry Design Guidelines for UART
-- **Use a proper FSM** for TX and RX state machines (2-block style)
-- **Parameterize baud rate and clock frequency** — don't hardcode divisor values
-- **Use `localparam`** for computed constants (e.g., `localparam DIVISOR = CLK_FREQ / (BAUD_RATE * OVERSAMPLE)`)
-- **Separate concerns**: baud_rate_gen, uart_tx, uart_rx as independent modules with clean interfaces
-- **Add a FIFO buffer** between the user interface and the TX module — this is how real UART IPs work
-
-### Reference Implementations (study, don't copy)
-- Nandland UART Verilog code
-- OpenCores UART implementations
+### Reference
+- Your single-cycle CPU from Week 7 is the starting point
 
 ---
 
 ## Homework
 
-### HW1: Baud Rate Generator
-Design a configurable baud rate generator:
+### HW1: Add Pipeline Registers
+Take your single-cycle CPU and insert pipeline registers between each stage:
+
+```
+IF/ID Register:
+    - instruction
+    - pc
+    - pc_plus4
+
+ID/EX Register:
+    - control signals (reg_write, mem_write, mem_read, branch, alu_src, alu_control, mem_to_reg)
+    - read_data1, read_data2
+    - immediate
+    - rd, rs1, rs2
+    - pc, pc_plus4
+
+EX/MEM Register:
+    - control signals (reg_write, mem_write, mem_read, branch, mem_to_reg)
+    - alu_result
+    - write_data (for store)
+    - rd
+    - zero flag
+    - branch_target
+
+MEM/WB Register:
+    - control signals (reg_write, mem_to_reg)
+    - alu_result
+    - read_data (from memory)
+    - rd
+```
+
+Implement as a struct or individual registers. Run your Week 7 test programs — they will FAIL due to hazards. That's expected!
+
+Document which tests fail and why (identify the specific hazard in each case).
+
+### HW2: Forwarding Unit
+Implement the forwarding (bypass) unit to solve most data hazards:
 
 ```systemverilog
-module baud_rate_gen #(
-    parameter CLK_FREQ  = 50_000_000,  // 50 MHz system clock
-    parameter BAUD_RATE = 9600,
-    parameter OVERSAMPLE = 16          // 16x oversampling
-)(
-    input  logic clk, rst_n,
-    output logic baud_tick,            // 1 tick per bit period (for TX)
-    output logic sample_tick           // 16 ticks per bit period (for RX)
+module forwarding_unit (
+    input  logic [4:0] rs1_ex,       // source register 1 in EX stage
+    input  logic [4:0] rs2_ex,       // source register 2 in EX stage
+    input  logic [4:0] rd_mem,       // destination register in MEM stage
+    input  logic [4:0] rd_wb,        // destination register in WB stage
+    input  logic       reg_write_mem, // writing in MEM stage?
+    input  logic       reg_write_wb,  // writing in WB stage?
+    output logic [1:0] forward_a,    // 00=reg, 01=WB, 10=MEM
+    output logic [1:0] forward_b     // 00=reg, 01=WB, 10=MEM
 );
-    // Compute divisor: CLK_FREQ / (BAUD_RATE * OVERSAMPLE)
-    // Use a counter that generates a tick when it reaches the divisor
+    // TODO: decide when to forward and from where.
+    // Questions to answer as you design:
+    //   - Which stage's result is "newer" — MEM or WB?
+    //   - What happens when both stages write the same register?
+    //   - Why does x0 need special handling?
 endmodule
 ```
 
-Testbench:
-- Verify `sample_tick` frequency = BAUD_RATE * 16
-- Verify `baud_tick` frequency = BAUD_RATE
-- Test with different BAUD_RATE parameters (9600, 115200, 921600)
+Add MUXes before the ALU inputs to select between:
+- Register file output (no hazard)
+- MEM stage result (EX-EX forwarding)
+- WB stage result (MEM-EX forwarding)
 
-### HW2: UART Transmitter
-Design the TX module:
+Re-run tests — ALU-to-ALU sequences should now work:
+```
+addi x1, x0, 5
+addi x2, x1, 3    # needs forwarding: x1 from previous instruction
+```
+
+### HW3: Hazard Detection Unit (Stall for Load-Use)
+Forwarding can't solve everything. A load followed by a use needs a 1-cycle stall:
+
+```
+lw   x1, 0(x0)    # x1 available after MEM stage
+add  x2, x1, x3   # needs x1 in EX stage — too early!
+```
 
 ```systemverilog
-module uart_tx (
-    input  logic       clk, rst_n,
-    input  logic       baud_tick,      // from baud rate generator
-    input  logic       tx_start,       // pulse to begin transmission
-    input  logic [7:0] tx_data,        // data to send
-    output logic       tx_serial,      // serial output line
-    output logic       tx_busy,        // high while transmitting
-    output logic       tx_done         // pulse when done
+module hazard_detection_unit (
+    input  logic [4:0] rs1_id,       // source registers in ID stage
+    input  logic [4:0] rs2_id,
+    input  logic [4:0] rd_ex,        // destination in EX stage
+    input  logic       mem_read_ex,  // is EX stage a load?
+    output logic       stall         // insert bubble
 );
-    // State machine:
-    // IDLE:  tx_serial = 1 (idle high), wait for tx_start
-    // START: tx_serial = 0 (start bit), wait 1 bit period
-    // DATA:  shift out 8 bits LSB first, 1 bit per baud_tick
-    // STOP:  tx_serial = 1 (stop bit), wait 1 bit period
-    // -> back to IDLE
+    // Derive the stall condition. Think about:
+    //   - When is the EX-stage instruction actually a load?
+    //   - When does its destination register collide with either ID source?
+    //   - Why must you special-case x0?
 endmodule
 ```
 
-Testbench:
-- Send byte 0x55 (alternating bits — easy to verify visually)
-- Send byte 0x00 and 0xFF (edge cases)
-- Send byte 0xA3 and verify serial output bit-by-bit
-- Verify timing matches baud rate
+When stalling:
+- Freeze PC (don't update)
+- Freeze IF/ID register (don't update)
+- Insert NOP (bubble) into ID/EX register (zero all control signals)
 
-### HW3: UART Receiver
-Design the RX module with 16x oversampling:
+Test with:
+```
+lw   x1, 0(x0)
+add  x2, x1, x3   # should stall 1 cycle, then forward
+```
+
+### HW4: Branch Handling (Flush on Misprediction)
+Implement branch handling with "predict not taken" strategy:
+
+- Always fetch the next sequential instruction (predict not taken)
+- If the branch IS taken (detected in MEM or EX stage):
+  - Flush the incorrectly fetched instructions (zero out IF/ID and ID/EX registers)
+  - Set PC to branch target
 
 ```systemverilog
-module uart_rx (
-    input  logic       clk, rst_n,
-    input  logic       sample_tick,    // 16x oversampling tick
-    input  logic       rx_serial,      // serial input line
-    output logic [7:0] rx_data,        // received data
-    output logic       rx_valid,       // pulse when data is ready
-    output logic       rx_error        // framing error (bad stop bit)
+module branch_unit (
+    input  logic        branch_mem,    // is MEM stage a branch?
+    input  logic        zero_mem,      // ALU zero flag
+    input  logic [31:0] branch_target, // computed target
+    output logic        flush,         // flush IF/ID and ID/EX
+    output logic        pc_sel         // 0=PC+4, 1=branch_target
 );
-    // State machine:
-    // IDLE:  wait for falling edge on rx_serial (start bit)
-    // START: sample at middle of start bit (count 8 sample_ticks)
-    //        if rx_serial != 0, false start — go back to IDLE
-    // DATA:  sample 8 bits at middle of each bit (every 16 sample_ticks)
-    // STOP:  check stop bit is high, else framing error
-    // -> back to IDLE
 endmodule
 ```
 
-Testbench:
-- Drive a known serial stream manually and verify rx_data matches
-- Test framing error: drive stop bit as 0
-- Test false start: drive start bit briefly then go high
-
-### HW4: TX-to-RX Loopback Test
-Connect TX output directly to RX input:
-
-```systemverilog
-module uart_top (
-    input  logic       clk, rst_n,
-    input  logic       tx_start,
-    input  logic [7:0] tx_data,
-    output logic [7:0] rx_data,
-    output logic       rx_valid,
-    output logic       tx_busy
-);
-    logic serial_line;
-    // Instantiate baud_gen, uart_tx, uart_rx
-    // Connect tx_serial -> rx_serial
-endmodule
+Test with:
+```
+addi x1, x0, 5
+addi x2, x0, 5
+beq  x1, x2, target   # taken — must flush next 2 instructions
+addi x3, x0, 99       # FLUSHED — should NOT execute
+addi x4, x0, 99       # FLUSHED — should NOT execute
+target:
+addi x5, x0, 1        # x5 = 1
 ```
 
-Testbench:
-- **Directed test**: Send 10 known bytes, verify each is received correctly
-- **Random test**: Send 1000 random bytes, compare TX data to RX data
-- **Back-to-back**: Send bytes with minimal gap, verify no data loss
-- **Error test**: Temporarily corrupt the serial line mid-transmission
+### HW5: Comprehensive Hazard Tests
+Write test programs that trigger each specific hazard:
 
-### HW5: Add Assertions & Coverage
-Add to your testbench:
+```
+# Test A: EX-EX forwarding (no stall needed)
+addi x1, x0, 1
+add  x2, x1, x1     # forward x1 from EX/MEM
 
-**Assertions:**
-- `tx_serial` is high during IDLE
-- Start bit is exactly 1 bit period wide
-- Data bits are stable for exactly 1 bit period each
-- Stop bit is high
-- `tx_busy` and `tx_done` never overlap
-- `rx_valid` only pulses for 1 clock cycle
+# Test B: MEM-EX forwarding
+addi x1, x0, 1
+nop
+add  x2, x1, x1     # forward x1 from MEM/WB
 
-**Coverage:**
-- All 256 possible data byte values transmitted and received
-- Back-to-back transmissions (tx_start while tx_busy was just cleared)
-- Framing error occurred and was detected
+# Test C: Load-use stall + forward
+lw   x1, 0(x0)
+add  x2, x1, x0     # stall 1 cycle, then forward
+
+# Test D: Branch taken — flush
+beq  x0, x0, skip
+addi x1, x0, 99     # must be flushed
+skip: addi x1, x0, 1
+
+# Test E: Back-to-back loads
+lw   x1, 0(x0)
+lw   x2, 4(x0)
+add  x3, x1, x2     # double forwarding
+
+# Test F: Store after load (no hazard for store data)
+lw   x1, 0(x0)
+sw   x1, 4(x0)      # needs forwarding for store data
+
+# Test G: Full program — sum 1 to 10 (combines everything)
+```
+
+All tests must produce correct results. Verify in waveform.
 
 ---
 
 ## Self-Check Questions
-1. Why does UART use oversampling? Why 16x specifically?
-2. How does the receiver find the middle of each bit?
-3. What happens if TX and RX have slightly different baud rates (clock drift)?
-4. What's a framing error? What causes it?
-5. How would you add parity checking? (optional extension)
-6. What's the maximum reliable baud rate for a given clock frequency?
+1. What are the three types of hazards? Give an example of each.
+2. Why can't forwarding solve the load-use hazard?
+3. What's the performance penalty of a branch misprediction in a 5-stage pipeline?
+4. What's the difference between "predict not taken" and "predict taken"?
+5. Draw the pipeline diagram for: `lw x1, 0(x0)` followed by `add x2, x1, x3` — show the stall bubble.
+6. Could you move branch resolution to the ID stage? What would change?
 
 ---
 
 ## Checklist
-- [ ] Studied UART protocol (read tutorial + Nandland)
-- [ ] Completed HW1 (Baud rate generator)
-- [ ] Completed HW2 (UART TX)
-- [ ] Completed HW3 (UART RX)
-- [ ] Completed HW4 (Loopback test — directed + random)
-- [ ] Completed HW5 (Assertions + coverage)
+- [ ] Read Harris & Harris ch.7.5-7.8
+- [ ] Watched MIT 6.004 pipelining lectures
+- [ ] Completed HW1 (Pipeline registers — tests fail due to hazards)
+- [ ] Completed HW2 (Forwarding unit — ALU-ALU tests pass)
+- [ ] Completed HW3 (Hazard detection — load-use tests pass)
+- [ ] Completed HW4 (Branch handling — branch tests pass)
+- [ ] Completed HW5 (All 7 hazard test programs pass)
 - [ ] Can answer all self-check questions
-- [ ] **RTL is clean and ready for UVM testbench in Week 11**
+- [ ] **MILESTONE: Working pipelined RISC-V CPU!**

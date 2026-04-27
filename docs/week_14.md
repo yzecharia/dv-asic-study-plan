@@ -1,161 +1,144 @@
-# Week 14 (Bonus): Design Closure — Synthesis, PPA, FPGA Implementation
+# Week 13 (Bonus): Advanced UVM — RAL + Multi-UVC + Register Verification
 
 ## Why This Matters
-The 12-week core plan focused on **simulation** — but real chips also have to
-synthesize cleanly, hit timing, fit in area, and run on FPGA for prototyping.
-This bonus week teaches the design-closure side that academic ASIC courses
-emphasize and that **interviewers ask about even for DV roles** ("what's your
-critical path? what would you optimize?").
+The 12-week core plan gets you a working junior DV foundation. This bonus week
+closes two specific gaps that **academic DV courses cover explicitly** and that
+**Israeli senior DV teams ask about in interviews**:
 
-Goals after this week:
-1. **Synthesize** your week-7/8 RISC-V CPU with an open-source flow (yosys)
-   and read the resulting netlist + report.
-2. **PPA analysis**: identify the critical path, understand area numbers, and
-   reason about tradeoffs.
-3. **FPGA implementation**: take any of your previous designs to actual
-   bitstream on a Basys3 board (or simulate the flow if you don't have one).
-4. **Synthesis constraints**: understand `create_clock`, `set_input_delay`,
-   `set_false_path`, `set_multicycle_path`.
+1. **UVM RAL (Register Abstraction Layer)** — modeling DUT registers as a
+   first-class testbench object, with auto-generated read/write APIs that the
+   sequences can use without hand-coding bus transactions every time.
+2. **Multi-UVC integration** — wiring up a verification environment that
+   contains agents from **multiple** independent UVCs (e.g., AXI + UART +
+   register interface), all driven by a coordinated virtual sequence.
+
+After this week you can claim "I have hands-on experience with RAL and
+multi-agent UVM environments" — which most junior candidates can't.
 
 ## What to Study
 
 ### Reading
-- **Dally & Harting ch.14-15** (timing analysis, critical paths, retiming)
-- **Cliff Cummings papers**:
-  - *"SystemVerilog Synthesis Coding Styles for Efficient Designs"* (essential)
-  - *"Coding And Scripting Techniques For FSM Designs With Synthesis-Optimized,
-    Glitch-Free Outputs"* (worth reading once for design instincts)
-- **Xilinx UG901**: *Vivado Design Suite User Guide — Synthesis* (skim ch.1-3
-  for the synthesis flow vocabulary)
-- **Yosys manual**: short and free at [yosyshq.net/yosys/](https://yosyshq.net/yosys/)
-- **Sutherland *SystemVerilog for Design* (2nd ed) ch.13**: RTL synthesis
-  guidelines — **the single most relevant chapter for this week**. Covers what
-  every synthesizer expects, what causes latches, how to write priority and
-  parallel logic, and which SV constructs are/aren't synthesizable. Read this
-  before running yosys on the RISC-V CPU.
-- **Sutherland *SystemVerilog for Design* (2nd ed) ch.9**: SV procedural
-  blocks — the `always_comb` / `always_ff` rules that yosys (and every
-  commercial synthesis tool) interpret unambiguously.
+- **Salemi UVM Primer ch.16-18** (final RAL chapters in the book)
+- **Verification Academy UVM Cookbook → "Register Layer"** ⭐ (free, the
+  industry-standard reference)
+- **ChipVerify**: search "UVM RAL" — quick syntax reference
+- **Mentor whitepaper**: *"UVM Register Layer Quick Start"* (Google it; Mentor
+  hosts it free)
+- **Sutherland *SystemVerilog for Design* (2nd ed) ch.5**: SV interfaces and
+  modports — when you build the RAL adapter (`uvm_reg_adapter`) you'll need to
+  understand how an interface is declared from the design side so you can
+  convert `uvm_reg_bus_op` to your bus's transaction shape.
 
-### Videos
-- **VLSI System Design YouTube channel** — short clips on synthesis flow
-- **Xilinx training**: free Vivado synthesis videos (search "Vivado Synthesis
-  101")
+### Videos (Verification Academy)
+- "Register Modeling" course (3 short lessons)
+- "UVM Multi-Domain Environments" (mentions multi-UVC patterns)
 
 ### Reference
-- **OpenSTA** (static timing analysis, open source)
-- **Yosys + nextpnr** for fully open FPGA flow
-- The Basys3 board you used in self-learning — Vivado already supports it
+- The `tools/ralgen.py` you already wrote in your `uvm_framework` repo
+  generates a basic RAL model from `regs.json` — extend it (or hand-write a
+  full one) for the homework below.
 
 ---
 
 ## Homework
 
-### HW1: Synthesize your RISC-V CPU with yosys
-Take your week-7 single-cycle CPU. Synthesize it:
+### HW1: Hand-Written UVM RAL Block (no code generation)
+Pick a small register set (4 registers max) and write a UVM RAL model **by
+hand** — no `ralgen.py`. Goal: understand every line of the model.
 
-```bash
-yosys -p "read_verilog rv32i_top.sv; \
-          synth -top rv32i_top; \
-          stat; \
-          write_verilog rv32i_synth.v"
+Required classes:
+- `my_ctrl_reg extends uvm_reg` with a few `uvm_reg_field`s (use `configure`)
+- `my_status_reg extends uvm_reg` (read-only)
+- `my_reg_block extends uvm_reg_block` containing both registers, with a
+  `default_map` (`UVM_LITTLE_ENDIAN`, 4-byte addressing)
+
+Required methods to exercise:
+- `reg_block.CTRL.write(status, 32'h0001)`
+- `reg_block.STATUS.read(status, val)`
+- `reg_block.CTRL.set(0xCAFE); reg_block.CTRL.update(status);`
+- `reg_block.CTRL.predict(...)` and `reg_block.CTRL.get_mirrored_value()`
+
+### HW2: RAL Adapter — Plug Into Your Existing Driver
+Write `my_reg_adapter extends uvm_reg_adapter`:
+- `reg2bus()`: convert a `uvm_reg_bus_op` into your bus's transaction type
+  (e.g., your `alu_transaction` or a new `apb_transaction`)
+- `bus2reg()`: the reverse direction
+
+Connect adapter to the existing sequencer:
+```systemverilog
+reg_block.default_map.set_sequencer(env.agt.sqr, env.adapter);
+reg_block.default_map.set_auto_predict(1);
 ```
 
-Capture the `stat` output — it gives you cell counts (FFs, LUTs, multipliers,
-etc.). This is your **area** number.
+Verify: write a sequence that does `reg_block.CTRL.write(...)` and watch the
+real bus transactions hit the DUT exactly as if you'd hand-coded them.
 
-Repeat for the **week-8 pipelined** CPU. Compare the cell counts. The
-pipelined version should have more FFs (pipeline registers) but possibly
-similar LUT count.
+### HW3: Multi-UVC Environment
+Take your existing `uvm_framework` repo. It already has **two independent
+DUTs** (ALU + FIFO) with full UVCs each. Build a NEW env that contains BOTH
+agents simultaneously:
 
-**Deliverable**: a small markdown table comparing single-cycle vs pipelined:
-- # of FFs
-- # of LUTs / cells
-- Brief commentary on why each number changed
-
-### HW2: Critical Path Analysis (Pen + Paper + STA)
-For your single-cycle CPU, identify the critical path **on paper**:
-1. Start from the clock edge that latches the PC.
-2. Walk through: I-Mem → decoder → reg-file read → ALU → branch logic →
-   PC mux → PC register input.
-3. Estimate the delay of each stage from the gate-level netlist (yosys's
-   `stat` plus typical ASIC cell delays of 50-100 ps).
-
-Now run **OpenSTA** on the synthesized netlist:
-```bash
-sta
-read_verilog rv32i_synth.v
-read_liberty <some_open_lib.lib>
-create_clock -period 5 [get_ports clk]
-report_checks
+```
+multi_dut_env
+   ├── alu_agent       (drives ALU DUT)
+   ├── fifo_agent      (drives FIFO DUT)
+   ├── alu_scoreboard
+   ├── fifo_scoreboard
+   └── virtual_sequencer  ← coordinates the two
 ```
 
-Compare your hand-calculated critical path against what STA reports. Did you
-identify the right path?
+Required:
+- A new `top_multi.sv` that instantiates BOTH DUTs and BOTH interfaces
+- A `multi_dut_env` (uvm_env) wiring up both agents
+- A `virtual_sequencer extends uvm_sequencer` with handles to the alu and
+  fifo sequencers
+- A virtual sequence that issues 10 ALU ops and 10 FIFO ops **in parallel**
+  (use `fork`/`join` inside the body)
 
-### HW3: FPGA Implementation on Basys3
-Take any of your designs (week 4 ALU, week 9 UART, or the single-cycle CPU)
-and bring it up on a real Basys3 (or simulate the flow if you don't have one):
+This is the single most important "I can ship real verification" demo you can
+put on your CV.
 
-1. Create a Vivado project, add the design + a constraint file (`.xdc`)
-   mapping your ports to actual Basys3 pins (switches, LEDs, buttons).
-2. Run **Synthesize** → **Implement** → **Generate Bitstream**.
-3. Read the **Timing Report** — note the worst negative slack (WNS).
-   If WNS is negative, your design fails timing at the requested clock; lower
-   the clock until it passes.
-4. (If you have a Basys3) — flash the bitstream and toggle the inputs.
+### HW4: Built-in RAL Sequences
+The UVM RAL ships with pre-built test sequences. Run them all on your reg
+model from HW1+HW2:
+- `uvm_reg_hw_reset_seq` — confirms every register has the right reset value
+- `uvm_reg_bit_bash_seq` — toggles every bit of every R/W register
+- `uvm_reg_access_seq` — exercises the read/write/access policy of each field
+- `uvm_mem_walk_seq` (if you add a memory) — walks every memory address
 
-**Deliverable**:
-- The `.xdc` constraints file
-- Screenshot of the Vivado timing report
-- Brief markdown noting the achieved Fmax
+Each is one line in your test:
+```systemverilog
+seq = uvm_reg_hw_reset_seq::type_id::create("seq");
+seq.model = reg_block;
+seq.start(null);
+```
 
-### HW4: Synthesis Constraint Cheat-Sheet
-Build a small reference document for yourself listing the 8-10 most common
-`xdc` / `sdc` constraints with one-line explanations:
-- `create_clock -period <ns> [get_ports clk]`
-- `set_input_delay -clock clk <ns> [get_ports {data*}]`
-- `set_output_delay -clock clk <ns> [get_ports {result*}]`
-- `set_false_path -from [get_clocks clk_a] -to [get_clocks clk_b]`
-- `set_multicycle_path -setup 2 -from [get_pins .../pipe1*]`
-- `set_clock_groups -asynchronous -group {clk_a} -group {clk_b}`
-- `set_max_delay`, `set_min_delay`
-- `set_case_analysis` for mode pins
-
-This goes in your cheatsheets folder. You'll need it again for any synthesis
-question in interviews.
-
-### HW5 (optional): Retiming Experiment
-Take an unbalanced pipeline (e.g., a multiplier with a long stage and a short
-stage). Apply yosys's `retime` pass and measure the WNS before/after.
-Demonstrate that retiming moved registers to balance the stages.
+These four sequences alone are what 90% of register verification looks like in
+real chips. If you can run them on your own reg block you've covered the bulk
+of what a register-verification interview would ask.
 
 ---
 
 ## Self-Check Questions
-1. What's the difference between **WNS** and **WHS**? Which one is harder to
-   fix and why?
-2. What is `set_false_path` and when do you use it?
-3. What's the difference between **synthesis** and **implementation** in the
-   Vivado flow?
-4. Why does pipelining typically *not* shrink the critical path of a single
-   stage but does increase total throughput?
-5. What does `(* keep = "true" *)` do and when would you ever use it?
-6. Power: difference between **dynamic** and **static** (leakage) power, and
-   which one dominates at advanced nodes (7nm, 5nm)?
+1. What's the difference between `set/get` (frontdoor) and `peek/poke`
+   (backdoor) on a `uvm_reg`?
+2. What does `set_auto_predict(1)` do, and when would you turn it off?
+3. Why does `uvm_reg_adapter` exist — what specifically does it convert?
+4. In a multi-UVC env, where do shared resources (clock, reset, config) live
+   so all agents can access them?
+5. What's a virtual sequencer and why isn't a regular sequencer good enough?
+6. What's the bit-bash sequence checking for?
 
 ---
 
 ## Checklist
-- [ ] Read Dally ch.14-15
-- [ ] Read Cummings synthesis-coding-styles paper
-- [ ] Skimmed Vivado UG901 ch.1-3
-- [ ] Skimmed yosys manual basics
-- [ ] Completed HW1 (yosys synth + cell-count comparison single vs pipelined)
-- [ ] Completed HW2 (Critical-path analysis pen + STA)
-- [ ] Completed HW3 (Basys3 implementation: .xdc + timing report + Fmax)
-- [ ] Completed HW4 (Synthesis-constraint cheat-sheet → `cheatsheets/`)
-- [ ] *(Optional)* Completed HW5 (Retiming experiment)
+- [ ] Read Salemi ch.16-18 (RAL)
+- [ ] Read VerificationAcademy "Register Layer" cookbook section
+- [ ] Watched Register Modeling videos (3 lessons)
+- [ ] Completed HW1 (Hand-written UVM RAL block)
+- [ ] Completed HW2 (RAL adapter plugged into existing driver)
+- [ ] Completed HW3 (Multi-UVC env with virtual sequencer)
+- [ ] Completed HW4 (4 built-in RAL sequences run cleanly)
 - [ ] Can answer all self-check questions
-- [ ] **MILESTONE: You can talk about timing, area, and synthesis in interview
-  questions — even as a verification engineer.**
+- [ ] **MILESTONE: You can verify register sets and multi-IP environments —
+  the daily bread of mid-level DV engineers.**
