@@ -2,7 +2,7 @@
 
 ![Progress](https://img.shields.io/badge/progress-3%2F15_weeks-brightgreen)
 ![Current Week](https://img.shields.io/badge/current_week-4-blue)
-![Week 4 Progress](https://img.shields.io/badge/week_4_progress-43%25-yellow)
+![Week 4 Progress](https://img.shields.io/badge/week_4_progress-48%25-yellow)
 ![Language](https://img.shields.io/badge/language-SystemVerilog-blue)
 ![UVM](https://img.shields.io/badge/UVM-in_progress-yellow)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)
