@@ -1,0 +1,2760 @@
+{
+  "creator": "Yosys 0.63 (git sha1 70a11c6bf0e8dd669f56c7da3587f78b405138e2, clang++ 16.0.0 -fPIC -O3)",
+  "modules": {
+    "my_divide": {
+      "attributes": {
+        "dynports": "00000000000000000000000000000001",
+        "top": "00000000000000000000000000000001",
+        "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:19.1-47.22"
+      },
+      "ports": {
+        "y": {
+          "direction": "input",
+          "bits": [ 2, 3, 4, 5, 6, 7 ]
+        },
+        "x": {
+          "direction": "input",
+          "bits": [ 8, 9, 10 ]
+        },
+        "q": {
+          "direction": "output",
+          "bits": [ 11, 12, 13, 14, 15, 16 ]
+        },
+        "r": {
+          "direction": "output",
+          "bits": [ 17, 18, 19 ]
+        }
+      },
+      "cells": {
+        "$auto$opt_expr.cc:609:replace_const_cells$532": {
+          "hide_name": 1,
+          "type": "$_NOT_",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 20 ],
+            "Y": [ 21 ]
+          }
+        },
+        "$auto$opt_expr.cc:609:replace_const_cells$534": {
+          "hide_name": 1,
+          "type": "$_NOT_",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 22 ],
+            "Y": [ 23 ]
+          }
+        },
+        "$auto$opt_expr.cc:609:replace_const_cells$538": {
+          "hide_name": 1,
+          "type": "$_NOT_",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 24 ],
+            "Y": [ 25 ]
+          }
+        },
+        "$auto$opt_expr.cc:609:replace_const_cells$540": {
+          "hide_name": 1,
+          "type": "$_NOT_",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 26 ],
+            "Y": [ 27 ]
+          }
+        },
+        "$auto$opt_expr.cc:609:replace_const_cells$544": {
+          "hide_name": 1,
+          "type": "$_NOT_",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 28 ],
+            "Y": [ 29 ]
+          }
+        },
+        "$auto$opt_expr.cc:609:replace_const_cells$546": {
+          "hide_name": 1,
+          "type": "$_NOT_",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 30 ],
+            "Y": [ 31 ]
+          }
+        },
+        "$auto$opt_expr.cc:609:replace_const_cells$550": {
+          "hide_name": 1,
+          "type": "$_NOT_",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 32 ],
+            "Y": [ 33 ]
+          }
+        },
+        "$auto$opt_expr.cc:609:replace_const_cells$552": {
+          "hide_name": 1,
+          "type": "$_NOT_",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 34 ],
+            "Y": [ 35 ]
+          }
+        },
+        "$auto$opt_expr.cc:609:replace_const_cells$556": {
+          "hide_name": 1,
+          "type": "$_NOT_",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 36 ],
+            "Y": [ 37 ]
+          }
+        },
+        "$auto$opt_expr.cc:609:replace_const_cells$558": {
+          "hide_name": 1,
+          "type": "$_NOT_",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 38 ],
+            "Y": [ 39 ]
+          }
+        },
+        "$auto$opt_expr.cc:609:replace_const_cells$562": {
+          "hide_name": 1,
+          "type": "$_NOT_",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 40 ],
+            "Y": [ 41 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$182": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:296.13-296.25"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 42 ],
+            "B": [ 43 ],
+            "Y": [ 44 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$183": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:296.13-296.25"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 45 ],
+            "B": [ 46 ],
+            "Y": [ 47 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$221": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:296.13-296.25"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 48 ],
+            "B": [ 49 ],
+            "Y": [ 50 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$222": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:296.13-296.25"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 51 ],
+            "B": [ 52 ],
+            "Y": [ 53 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$237": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:296.13-296.25"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 54 ],
+            "B": [ 55 ],
+            "Y": [ 56 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$238": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:296.13-296.25"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 57 ],
+            "B": [ 58 ],
+            "Y": [ 59 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$253": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:296.13-296.25"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 60 ],
+            "B": [ 61 ],
+            "Y": [ 62 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$254": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:296.13-296.25"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 63 ],
+            "B": [ 64 ],
+            "Y": [ 65 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$269": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:296.13-296.25"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 66 ],
+            "B": [ 67 ],
+            "Y": [ 68 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$270": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:296.13-296.25"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 69 ],
+            "B": [ 70 ],
+            "Y": [ 71 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$285": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:296.13-296.25"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 72 ],
+            "B": [ 73 ],
+            "Y": [ 74 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$286": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:296.13-296.25"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 75 ],
+            "B": [ 76 ],
+            "Y": [ 77 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$315": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.26-205.31"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 7 ],
+            "B": [ 78 ],
+            "Y": [ 79 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$320": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.14-205.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 7 ],
+            "B": [ 78 ],
+            "Y": [ 22 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$329": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 45 ],
+            "B": [ 46 ],
+            "Y": [ 16 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$335": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 42 ],
+            "B": [ 43 ],
+            "Y": [ 46 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$336": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:231.10-231.28"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 79 ],
+            "B": [ 22 ],
+            "Y": [ 43 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$353": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.26-205.31"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 6 ],
+            "B": [ 78 ],
+            "Y": [ 80 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$354": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.26-205.31"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 81 ],
+            "B": [ 42 ],
+            "Y": [ 82 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$355": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.26-205.31"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 83 ],
+            "B": [ 45 ],
+            "Y": [ 84 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$358": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.14-205.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 6 ],
+            "B": [ 78 ],
+            "Y": [ 26 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$359": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.14-205.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 81 ],
+            "B": [ 42 ],
+            "Y": [ 48 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$360": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.14-205.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 83 ],
+            "B": [ 45 ],
+            "Y": [ 51 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$366": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.12-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 85 ],
+            "B": [ 86 ],
+            "Y": [ 15 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$367": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 87 ],
+            "B": [ 52 ],
+            "Y": [ 86 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$368": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:241.12-241.34"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 21 ],
+            "B": [ 51 ],
+            "Y": [ 87 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$369": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.12-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 20 ],
+            "B": [ 88 ],
+            "Y": [ 85 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$370": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 21 ],
+            "B": [ 84 ],
+            "Y": [ 88 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$372": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.12-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 82 ],
+            "B": [ 89 ],
+            "Y": [ 52 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$373": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 48 ],
+            "B": [ 49 ],
+            "Y": [ 89 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$374": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:231.10-231.28"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 80 ],
+            "B": [ 26 ],
+            "Y": [ 49 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$391": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.26-205.31"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 5 ],
+            "B": [ 78 ],
+            "Y": [ 90 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$392": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.26-205.31"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 91 ],
+            "B": [ 42 ],
+            "Y": [ 92 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$393": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.26-205.31"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 93 ],
+            "B": [ 45 ],
+            "Y": [ 94 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$396": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.14-205.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 5 ],
+            "B": [ 78 ],
+            "Y": [ 30 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$397": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.14-205.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 91 ],
+            "B": [ 42 ],
+            "Y": [ 54 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$398": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.14-205.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 93 ],
+            "B": [ 45 ],
+            "Y": [ 57 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$404": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.12-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 95 ],
+            "B": [ 96 ],
+            "Y": [ 14 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$405": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 97 ],
+            "B": [ 58 ],
+            "Y": [ 96 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$406": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:241.12-241.34"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 25 ],
+            "B": [ 57 ],
+            "Y": [ 97 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$407": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.12-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 24 ],
+            "B": [ 98 ],
+            "Y": [ 95 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$408": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 25 ],
+            "B": [ 94 ],
+            "Y": [ 98 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$410": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.12-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 92 ],
+            "B": [ 99 ],
+            "Y": [ 58 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$411": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 54 ],
+            "B": [ 55 ],
+            "Y": [ 99 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$412": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:231.10-231.28"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 90 ],
+            "B": [ 30 ],
+            "Y": [ 55 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$429": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.26-205.31"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4 ],
+            "B": [ 78 ],
+            "Y": [ 100 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$430": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.26-205.31"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 101 ],
+            "B": [ 42 ],
+            "Y": [ 102 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$431": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.26-205.31"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 103 ],
+            "B": [ 45 ],
+            "Y": [ 104 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$434": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.14-205.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4 ],
+            "B": [ 78 ],
+            "Y": [ 34 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$435": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.14-205.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 101 ],
+            "B": [ 42 ],
+            "Y": [ 60 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$436": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.14-205.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 103 ],
+            "B": [ 45 ],
+            "Y": [ 63 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$442": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.12-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 105 ],
+            "B": [ 106 ],
+            "Y": [ 13 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$443": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 107 ],
+            "B": [ 64 ],
+            "Y": [ 106 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$444": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:241.12-241.34"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 29 ],
+            "B": [ 63 ],
+            "Y": [ 107 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$445": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.12-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 28 ],
+            "B": [ 108 ],
+            "Y": [ 105 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$446": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 29 ],
+            "B": [ 104 ],
+            "Y": [ 108 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$448": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.12-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 102 ],
+            "B": [ 109 ],
+            "Y": [ 64 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$449": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 60 ],
+            "B": [ 61 ],
+            "Y": [ 109 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$450": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:231.10-231.28"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 100 ],
+            "B": [ 34 ],
+            "Y": [ 61 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$467": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.26-205.31"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 3 ],
+            "B": [ 78 ],
+            "Y": [ 110 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$468": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.26-205.31"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 111 ],
+            "B": [ 42 ],
+            "Y": [ 112 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$469": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.26-205.31"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 113 ],
+            "B": [ 45 ],
+            "Y": [ 114 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$472": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.14-205.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 3 ],
+            "B": [ 78 ],
+            "Y": [ 36 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$473": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.14-205.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 111 ],
+            "B": [ 42 ],
+            "Y": [ 66 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$474": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.14-205.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 113 ],
+            "B": [ 45 ],
+            "Y": [ 69 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$480": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.12-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 115 ],
+            "B": [ 116 ],
+            "Y": [ 12 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$481": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 117 ],
+            "B": [ 70 ],
+            "Y": [ 116 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$482": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:241.12-241.34"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 33 ],
+            "B": [ 69 ],
+            "Y": [ 117 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$483": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.12-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 32 ],
+            "B": [ 118 ],
+            "Y": [ 115 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$484": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 33 ],
+            "B": [ 114 ],
+            "Y": [ 118 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$486": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.12-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 112 ],
+            "B": [ 119 ],
+            "Y": [ 70 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$487": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 66 ],
+            "B": [ 67 ],
+            "Y": [ 119 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$488": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:231.10-231.28"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 110 ],
+            "B": [ 36 ],
+            "Y": [ 67 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$505": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.26-205.31"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "B": [ 78 ],
+            "Y": [ 120 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$506": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.26-205.31"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 121 ],
+            "B": [ 42 ],
+            "Y": [ 122 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$507": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.26-205.31"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 123 ],
+            "B": [ 45 ],
+            "Y": [ 124 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$510": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.14-205.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "B": [ 78 ],
+            "Y": [ 40 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$511": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.14-205.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 121 ],
+            "B": [ 42 ],
+            "Y": [ 72 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$512": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:205.14-205.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 123 ],
+            "B": [ 45 ],
+            "Y": [ 75 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$518": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.12-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 125 ],
+            "B": [ 126 ],
+            "Y": [ 11 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$519": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 127 ],
+            "B": [ 76 ],
+            "Y": [ 126 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$520": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:241.12-241.34"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 39 ],
+            "B": [ 75 ],
+            "Y": [ 127 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$521": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.12-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 38 ],
+            "B": [ 128 ],
+            "Y": [ 125 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$522": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 39 ],
+            "B": [ 124 ],
+            "Y": [ 128 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$524": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.12-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 122 ],
+            "B": [ 129 ],
+            "Y": [ 76 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$525": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 72 ],
+            "B": [ 73 ],
+            "Y": [ 129 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$526": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:231.10-231.28"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 120 ],
+            "B": [ 40 ],
+            "Y": [ 73 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$148": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:39.40-39.82"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 7 ],
+            "B": [ 23 ],
+            "S": [ 16 ],
+            "Y": [ 81 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$149": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:39.40-39.82"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0" ],
+            "B": [ 44 ],
+            "S": [ 16 ],
+            "Y": [ 83 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$150": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:39.40-39.82"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0" ],
+            "B": [ 47 ],
+            "S": [ 16 ],
+            "Y": [ 20 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$153": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:39.40-39.82"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 6 ],
+            "B": [ 27 ],
+            "S": [ 15 ],
+            "Y": [ 91 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$154": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:39.40-39.82"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 81 ],
+            "B": [ 50 ],
+            "S": [ 15 ],
+            "Y": [ 93 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$155": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:39.40-39.82"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 83 ],
+            "B": [ 53 ],
+            "S": [ 15 ],
+            "Y": [ 24 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$158": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:39.40-39.82"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 5 ],
+            "B": [ 31 ],
+            "S": [ 14 ],
+            "Y": [ 101 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$159": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:39.40-39.82"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 91 ],
+            "B": [ 56 ],
+            "S": [ 14 ],
+            "Y": [ 103 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$160": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:39.40-39.82"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 93 ],
+            "B": [ 59 ],
+            "S": [ 14 ],
+            "Y": [ 28 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$163": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:39.40-39.82"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4 ],
+            "B": [ 35 ],
+            "S": [ 13 ],
+            "Y": [ 111 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$164": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:39.40-39.82"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 101 ],
+            "B": [ 62 ],
+            "S": [ 13 ],
+            "Y": [ 113 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$165": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:39.40-39.82"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 103 ],
+            "B": [ 65 ],
+            "S": [ 13 ],
+            "Y": [ 32 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$168": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:39.40-39.82"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 3 ],
+            "B": [ 37 ],
+            "S": [ 12 ],
+            "Y": [ 121 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$169": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:39.40-39.82"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 111 ],
+            "B": [ 68 ],
+            "S": [ 12 ],
+            "Y": [ 123 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$170": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:39.40-39.82"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 113 ],
+            "B": [ 71 ],
+            "S": [ 12 ],
+            "Y": [ 38 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$173": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:39.40-39.82"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "B": [ 41 ],
+            "S": [ 11 ],
+            "Y": [ 17 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$174": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:39.40-39.82"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 121 ],
+            "B": [ 74 ],
+            "S": [ 11 ],
+            "Y": [ 18 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$175": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:39.40-39.82"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 123 ],
+            "B": [ 77 ],
+            "S": [ 11 ],
+            "Y": [ 19 ]
+          }
+        },
+        "$auto$simplemap.cc:46:simplemap_not$279": {
+          "hide_name": 1,
+          "type": "$_NOT_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:279.31-279.37"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 8 ],
+            "Y": [ 78 ]
+          }
+        },
+        "$auto$simplemap.cc:46:simplemap_not$280": {
+          "hide_name": 1,
+          "type": "$_NOT_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:279.31-279.37"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 9 ],
+            "Y": [ 42 ]
+          }
+        },
+        "$auto$simplemap.cc:46:simplemap_not$281": {
+          "hide_name": 1,
+          "type": "$_NOT_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:279.31-279.37"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10 ],
+            "Y": [ 45 ]
+          }
+        }
+      },
+      "netnames": {
+        "$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$58.$auto$alumacc.cc:512:replace_alu$145.BB": {
+          "hide_name": 1,
+          "bits": [ 78, 42, 45, "1", "1" ],
+          "attributes": {
+            "force_downto": "00000000000000000000000000000001",
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:279.21-279.23"
+          }
+        },
+        "$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$58.$auto$alumacc.cc:512:replace_alu$145.CO": {
+          "hide_name": 1,
+          "bits": [ 43, 46, 16, 16, 16 ],
+          "attributes": {
+            "force_downto": "00000000000000000000000000000001",
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:274.23-274.25"
+          }
+        },
+        "$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$58.$auto$alumacc.cc:512:replace_alu$145.P": {
+          "hide_name": 1,
+          "bits": [ 22, 42, 45, "1", "1" ],
+          "attributes": {
+            "force_downto": "00000000000000000000000000000001",
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:287.21-287.22"
+          }
+        },
+        "$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$58.$auto$alumacc.cc:512:replace_alu$145.Y": {
+          "hide_name": 1,
+          "bits": [ 23, 44, 47, 130, 130 ],
+          "attributes": {
+            "force_downto": "00000000000000000000000000000001",
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:270.26-270.27",
+            "unused_bits": "3 4"
+          }
+        },
+        "$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$58.$auto$alumacc.cc:512:replace_alu$145.fa.X": {
+          "hide_name": 1,
+          "bits": [ 79, "0", "0", "0", "0" ],
+          "attributes": {
+            "force_downto": "00000000000000000000000000000001",
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:200.21-200.22"
+          }
+        },
+        "$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$60.$auto$alumacc.cc:512:replace_alu$145.A": {
+          "hide_name": 1,
+          "bits": [ 6, 81, 83, 20, "0" ],
+          "attributes": {
+            "force_downto": "00000000000000000000000000000001",
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:266.22-266.23"
+          }
+        },
+        "$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$60.$auto$alumacc.cc:512:replace_alu$145.CO": {
+          "hide_name": 1,
+          "bits": [ 49, 52, 131, 15, 15 ],
+          "attributes": {
+            "force_downto": "00000000000000000000000000000001",
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:274.23-274.25",
+            "unused_bits": "2"
+          }
+        },
+        "$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$60.$auto$alumacc.cc:512:replace_alu$145.P": {
+          "hide_name": 1,
+          "bits": [ 26, 48, 51, 21, "1" ],
+          "attributes": {
+            "force_downto": "00000000000000000000000000000001",
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:287.21-287.22"
+          }
+        },
+        "$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$60.$auto$alumacc.cc:512:replace_alu$145.Y": {
+          "hide_name": 1,
+          "bits": [ 27, 50, 53, 132, 133 ],
+          "attributes": {
+            "force_downto": "00000000000000000000000000000001",
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:270.26-270.27",
+            "unused_bits": "3 4"
+          }
+        },
+        "$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$60.$auto$alumacc.cc:512:replace_alu$145.fa.X": {
+          "hide_name": 1,
+          "bits": [ 80, 82, 84, 20, "0" ],
+          "attributes": {
+            "force_downto": "00000000000000000000000000000001",
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:200.21-200.22"
+          }
+        },
+        "$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$62.$auto$alumacc.cc:512:replace_alu$145.A": {
+          "hide_name": 1,
+          "bits": [ 5, 91, 93, 24, "0" ],
+          "attributes": {
+            "force_downto": "00000000000000000000000000000001",
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:266.22-266.23"
+          }
+        },
+        "$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$62.$auto$alumacc.cc:512:replace_alu$145.CO": {
+          "hide_name": 1,
+          "bits": [ 55, 58, 134, 14, 14 ],
+          "attributes": {
+            "force_downto": "00000000000000000000000000000001",
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:274.23-274.25",
+            "unused_bits": "2"
+          }
+        },
+        "$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$62.$auto$alumacc.cc:512:replace_alu$145.P": {
+          "hide_name": 1,
+          "bits": [ 30, 54, 57, 25, "1" ],
+          "attributes": {
+            "force_downto": "00000000000000000000000000000001",
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:287.21-287.22"
+          }
+        },
+        "$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$62.$auto$alumacc.cc:512:replace_alu$145.Y": {
+          "hide_name": 1,
+          "bits": [ 31, 56, 59, 135, 136 ],
+          "attributes": {
+            "force_downto": "00000000000000000000000000000001",
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:270.26-270.27",
+            "unused_bits": "3 4"
+          }
+        },
+        "$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$62.$auto$alumacc.cc:512:replace_alu$145.fa.X": {
+          "hide_name": 1,
+          "bits": [ 90, 92, 94, 24, "0" ],
+          "attributes": {
+            "force_downto": "00000000000000000000000000000001",
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:200.21-200.22"
+          }
+        },
+        "$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$64.$auto$alumacc.cc:512:replace_alu$145.A": {
+          "hide_name": 1,
+          "bits": [ 4, 101, 103, 28, "0" ],
+          "attributes": {
+            "force_downto": "00000000000000000000000000000001",
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:266.22-266.23"
+          }
+        },
+        "$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$64.$auto$alumacc.cc:512:replace_alu$145.CO": {
+          "hide_name": 1,
+          "bits": [ 61, 64, 137, 13, 13 ],
+          "attributes": {
+            "force_downto": "00000000000000000000000000000001",
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:274.23-274.25",
+            "unused_bits": "2"
+          }
+        },
+        "$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$64.$auto$alumacc.cc:512:replace_alu$145.P": {
+          "hide_name": 1,
+          "bits": [ 34, 60, 63, 29, "1" ],
+          "attributes": {
+            "force_downto": "00000000000000000000000000000001",
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:287.21-287.22"
+          }
+        },
+        "$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$64.$auto$alumacc.cc:512:replace_alu$145.Y": {
+          "hide_name": 1,
+          "bits": [ 35, 62, 65, 138, 139 ],
+          "attributes": {
+            "force_downto": "00000000000000000000000000000001",
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:270.26-270.27",
+            "unused_bits": "3 4"
+          }
+        },
+        "$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$64.$auto$alumacc.cc:512:replace_alu$145.fa.X": {
+          "hide_name": 1,
+          "bits": [ 100, 102, 104, 28, "0" ],
+          "attributes": {
+            "force_downto": "00000000000000000000000000000001",
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:200.21-200.22"
+          }
+        },
+        "$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$66.$auto$alumacc.cc:512:replace_alu$145.A": {
+          "hide_name": 1,
+          "bits": [ 3, 111, 113, 32, "0" ],
+          "attributes": {
+            "force_downto": "00000000000000000000000000000001",
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:266.22-266.23"
+          }
+        },
+        "$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$66.$auto$alumacc.cc:512:replace_alu$145.CO": {
+          "hide_name": 1,
+          "bits": [ 67, 70, 140, 12, 12 ],
+          "attributes": {
+            "force_downto": "00000000000000000000000000000001",
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:274.23-274.25",
+            "unused_bits": "2"
+          }
+        },
+        "$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$66.$auto$alumacc.cc:512:replace_alu$145.P": {
+          "hide_name": 1,
+          "bits": [ 36, 66, 69, 33, "1" ],
+          "attributes": {
+            "force_downto": "00000000000000000000000000000001",
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:287.21-287.22"
+          }
+        },
+        "$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$66.$auto$alumacc.cc:512:replace_alu$145.Y": {
+          "hide_name": 1,
+          "bits": [ 37, 68, 71, 141, 142 ],
+          "attributes": {
+            "force_downto": "00000000000000000000000000000001",
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:270.26-270.27",
+            "unused_bits": "3 4"
+          }
+        },
+        "$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$66.$auto$alumacc.cc:512:replace_alu$145.fa.X": {
+          "hide_name": 1,
+          "bits": [ 110, 112, 114, 32, "0" ],
+          "attributes": {
+            "force_downto": "00000000000000000000000000000001",
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:200.21-200.22"
+          }
+        },
+        "$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$68.$auto$alumacc.cc:512:replace_alu$145.CO": {
+          "hide_name": 1,
+          "bits": [ 73, 76, 143, 11, 11 ],
+          "attributes": {
+            "force_downto": "00000000000000000000000000000001",
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:274.23-274.25",
+            "unused_bits": "2"
+          }
+        },
+        "$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$68.$auto$alumacc.cc:512:replace_alu$145.P": {
+          "hide_name": 1,
+          "bits": [ 40, 72, 75, 39, "1" ],
+          "attributes": {
+            "force_downto": "00000000000000000000000000000001",
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:287.21-287.22"
+          }
+        },
+        "$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$68.$auto$alumacc.cc:512:replace_alu$145.fa.X": {
+          "hide_name": 1,
+          "bits": [ 120, 122, 124, 38, "0" ],
+          "attributes": {
+            "force_downto": "00000000000000000000000000000001",
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:292.26-292.70|/opt/homebrew/bin/../share/yosys/techmap.v:200.21-200.22"
+          }
+        },
+        "$techmap$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$60.$auto$alumacc.cc:512:replace_alu$145.lcu.$and$/opt/homebrew/bin/../share/yosys/techmap.v:240$195_Y": {
+          "hide_name": 1,
+          "bits": [ 89 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          }
+        },
+        "$techmap$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$60.$auto$alumacc.cc:512:replace_alu$145.lcu.$and$/opt/homebrew/bin/../share/yosys/techmap.v:240$198_Y": {
+          "hide_name": 1,
+          "bits": [ 88 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          }
+        },
+        "$techmap$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$60.$auto$alumacc.cc:512:replace_alu$145.lcu.$and$/opt/homebrew/bin/../share/yosys/techmap.v:240$201_Y": {
+          "hide_name": 1,
+          "bits": [ 86 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          }
+        },
+        "$techmap$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$60.$auto$alumacc.cc:512:replace_alu$145.lcu.$and$/opt/homebrew/bin/../share/yosys/techmap.v:241$200_Y": {
+          "hide_name": 1,
+          "bits": [ 87 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:241.12-241.34"
+          }
+        },
+        "$techmap$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$60.$auto$alumacc.cc:512:replace_alu$145.lcu.$or$/opt/homebrew/bin/../share/yosys/techmap.v:240$199_Y": {
+          "hide_name": 1,
+          "bits": [ 85 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.12-240.41"
+          }
+        },
+        "$techmap$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$62.$auto$alumacc.cc:512:replace_alu$145.lcu.$and$/opt/homebrew/bin/../share/yosys/techmap.v:240$195_Y": {
+          "hide_name": 1,
+          "bits": [ 99 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          }
+        },
+        "$techmap$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$62.$auto$alumacc.cc:512:replace_alu$145.lcu.$and$/opt/homebrew/bin/../share/yosys/techmap.v:240$198_Y": {
+          "hide_name": 1,
+          "bits": [ 98 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          }
+        },
+        "$techmap$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$62.$auto$alumacc.cc:512:replace_alu$145.lcu.$and$/opt/homebrew/bin/../share/yosys/techmap.v:240$201_Y": {
+          "hide_name": 1,
+          "bits": [ 96 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          }
+        },
+        "$techmap$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$62.$auto$alumacc.cc:512:replace_alu$145.lcu.$and$/opt/homebrew/bin/../share/yosys/techmap.v:241$200_Y": {
+          "hide_name": 1,
+          "bits": [ 97 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:241.12-241.34"
+          }
+        },
+        "$techmap$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$62.$auto$alumacc.cc:512:replace_alu$145.lcu.$or$/opt/homebrew/bin/../share/yosys/techmap.v:240$199_Y": {
+          "hide_name": 1,
+          "bits": [ 95 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.12-240.41"
+          }
+        },
+        "$techmap$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$64.$auto$alumacc.cc:512:replace_alu$145.lcu.$and$/opt/homebrew/bin/../share/yosys/techmap.v:240$195_Y": {
+          "hide_name": 1,
+          "bits": [ 109 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          }
+        },
+        "$techmap$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$64.$auto$alumacc.cc:512:replace_alu$145.lcu.$and$/opt/homebrew/bin/../share/yosys/techmap.v:240$198_Y": {
+          "hide_name": 1,
+          "bits": [ 108 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          }
+        },
+        "$techmap$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$64.$auto$alumacc.cc:512:replace_alu$145.lcu.$and$/opt/homebrew/bin/../share/yosys/techmap.v:240$201_Y": {
+          "hide_name": 1,
+          "bits": [ 106 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          }
+        },
+        "$techmap$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$64.$auto$alumacc.cc:512:replace_alu$145.lcu.$and$/opt/homebrew/bin/../share/yosys/techmap.v:241$200_Y": {
+          "hide_name": 1,
+          "bits": [ 107 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:241.12-241.34"
+          }
+        },
+        "$techmap$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$64.$auto$alumacc.cc:512:replace_alu$145.lcu.$or$/opt/homebrew/bin/../share/yosys/techmap.v:240$199_Y": {
+          "hide_name": 1,
+          "bits": [ 105 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.12-240.41"
+          }
+        },
+        "$techmap$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$66.$auto$alumacc.cc:512:replace_alu$145.lcu.$and$/opt/homebrew/bin/../share/yosys/techmap.v:240$195_Y": {
+          "hide_name": 1,
+          "bits": [ 119 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          }
+        },
+        "$techmap$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$66.$auto$alumacc.cc:512:replace_alu$145.lcu.$and$/opt/homebrew/bin/../share/yosys/techmap.v:240$198_Y": {
+          "hide_name": 1,
+          "bits": [ 118 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          }
+        },
+        "$techmap$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$66.$auto$alumacc.cc:512:replace_alu$145.lcu.$and$/opt/homebrew/bin/../share/yosys/techmap.v:240$201_Y": {
+          "hide_name": 1,
+          "bits": [ 116 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          }
+        },
+        "$techmap$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$66.$auto$alumacc.cc:512:replace_alu$145.lcu.$and$/opt/homebrew/bin/../share/yosys/techmap.v:241$200_Y": {
+          "hide_name": 1,
+          "bits": [ 117 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:241.12-241.34"
+          }
+        },
+        "$techmap$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$66.$auto$alumacc.cc:512:replace_alu$145.lcu.$or$/opt/homebrew/bin/../share/yosys/techmap.v:240$199_Y": {
+          "hide_name": 1,
+          "bits": [ 115 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.12-240.41"
+          }
+        },
+        "$techmap$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$68.$auto$alumacc.cc:512:replace_alu$145.lcu.$and$/opt/homebrew/bin/../share/yosys/techmap.v:240$195_Y": {
+          "hide_name": 1,
+          "bits": [ 129 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          }
+        },
+        "$techmap$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$68.$auto$alumacc.cc:512:replace_alu$145.lcu.$and$/opt/homebrew/bin/../share/yosys/techmap.v:240$198_Y": {
+          "hide_name": 1,
+          "bits": [ 128 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          }
+        },
+        "$techmap$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$68.$auto$alumacc.cc:512:replace_alu$145.lcu.$and$/opt/homebrew/bin/../share/yosys/techmap.v:240$201_Y": {
+          "hide_name": 1,
+          "bits": [ 126 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.19-240.41"
+          }
+        },
+        "$techmap$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$68.$auto$alumacc.cc:512:replace_alu$145.lcu.$and$/opt/homebrew/bin/../share/yosys/techmap.v:241$200_Y": {
+          "hide_name": 1,
+          "bits": [ 127 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:241.12-241.34"
+          }
+        },
+        "$techmap$techmap$sub$/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38$68.$auto$alumacc.cc:512:replace_alu$145.lcu.$or$/opt/homebrew/bin/../share/yosys/techmap.v:240$199_Y": {
+          "hide_name": 1,
+          "bits": [ 125 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:38.17-38.47|/opt/homebrew/bin/../share/yosys/techmap.v:293.27-293.63|/opt/homebrew/bin/../share/yosys/techmap.v:240.12-240.41"
+          }
+        },
+        "d": {
+          "hide_name": 0,
+          "bits": [ 41, 74, 77, 144, 145 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:29.17-29.18",
+            "unused_bits": "3 4"
+          }
+        },
+        "i": {
+          "hide_name": 0,
+          "bits": [ "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1" ],
+          "signed": 1,
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:30.13-30.14"
+          }
+        },
+        "partial_reminder": {
+          "hide_name": 0,
+          "bits": [ 17, 18, 19, 146 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:27.17-27.33",
+            "unused_bits": "3"
+          }
+        },
+        "q": {
+          "hide_name": 0,
+          "bits": [ 11, 12, 13, 14, 15, 16 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:22.24-22.25"
+          }
+        },
+        "r": {
+          "hide_name": 0,
+          "bits": [ 17, 18, 19 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:23.24-23.25"
+          }
+        },
+        "r_internal": {
+          "hide_name": 0,
+          "bits": [ 2, 121, 123, 38 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:28.17-28.27"
+          }
+        },
+        "x": {
+          "hide_name": 0,
+          "bits": [ 8, 9, 10 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:21.23-21.24"
+          }
+        },
+        "y": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5, 6, 7 ],
+          "attributes": {
+            "src": "/Users/yuval/sv_projects/StudyPlan/week_04_uvm_architecture/learning/dally/my_divide.sv:20.23-20.24"
+          }
+        }
+      }
+    }
+  }
+}

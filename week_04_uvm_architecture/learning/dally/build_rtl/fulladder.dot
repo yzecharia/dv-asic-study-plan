@@ -1,0 +1,27 @@
+digraph "fulladder" {
+label="fulladder";
+rankdir="LR";
+remincross=true;
+n1 [ shape=diamond, label="cp", color="black", fontcolor="black"];
+n2 [ shape=diamond, label="g", color="black", fontcolor="black"];
+n3 [ shape=diamond, label="p", color="black", fontcolor="black"];
+n4 [ shape=octagon, label="cout", color="black", fontcolor="black"];
+n5 [ shape=octagon, label="s", color="black", fontcolor="black"];
+n6 [ shape=octagon, label="cin", color="black", fontcolor="black"];
+n7 [ shape=octagon, label="b", color="black", fontcolor="black"];
+n8 [ shape=octagon, label="a", color="black", fontcolor="black"];
+c12 [ shape=record, label="{{<p9> A|<p10> B}|$3\n$or|{<p11> Y}}",  ];
+c14 [ shape=record, label="{{<p8> a|<p7> b}|ha2\nhalfadder|{<p13> c|<p5> s}}",  ];
+c15 [ shape=record, label="{{<p8> a|<p7> b}|ha1\nhalfadder|{<p13> c|<p5> s}}",  ];
+c14:p13:e -> n1:w [colorscheme="dark28", color="5", fontcolor="5", label=""];
+n1:e -> c12:p9:w [colorscheme="dark28", color="5", fontcolor="5", label=""];
+c15:p13:e -> n2:w [colorscheme="dark28", color="1", fontcolor="1", label=""];
+n2:e -> c12:p10:w [colorscheme="dark28", color="1", fontcolor="1", label=""];
+c15:p5:e -> n3:w [colorscheme="dark28", color="1", fontcolor="1", label=""];
+n3:e -> c14:p7:w [colorscheme="dark28", color="1", fontcolor="1", label=""];
+c12:p11:e -> n4:w [colorscheme="dark28", color="3", fontcolor="3", label=""];
+c14:p5:e -> n5:w [colorscheme="dark28", color="4", fontcolor="4", label=""];
+n6:e -> c14:p8:w [colorscheme="dark28", color="4", fontcolor="4", label=""];
+n7:e -> c15:p7:w [colorscheme="dark28", color="3", fontcolor="3", label=""];
+n8:e -> c15:p8:w [colorscheme="dark28", color="2", fontcolor="2", label=""];
+}

@@ -51,7 +51,8 @@ Update this file as you go. Show it to Claude anytime to pick up where you left 
 - [ ] HW2: Build skeleton UVM env (test/env/agent/driver/monitor)
 - [ ] HW3: Implement uvm_sequence_item for ALU transaction
 - [ ] HW4: Factory override exercise
-- [ ] Design: Read Dally ch.10 (arithmetic) and ch.12 (fast arithmetic / barrel shifter)
+- [x] Design: Read Dally ch.10 (arithmetic)
+- [ ] Design: Read Dally ch.12 (fast arithmetic / barrel shifter)
 - [ ] Design HW3: Sequential shift-add multiplier
 - [ ] Design HW4: Barrel shifter
 

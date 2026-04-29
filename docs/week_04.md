@@ -289,7 +289,7 @@ After all reading + HW, you should answer these without looking:
 - [ ] Can answer all self-check questions
 
 ### Design Track
-- [ ] Read Dally ch.10 (arithmetic circuits)
+- [x] Read Dally ch.10 (arithmetic circuits)
 - [ ] Read Dally ch.12 (fast arithmetic)
 - [ ] Read Sutherland *SV for Design* ch.10 (interfaces)
 - [ ] Drill Dally ch.10 (ripple-carry adder)
