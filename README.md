@@ -2,7 +2,7 @@
 
 ![Progress](https://img.shields.io/badge/progress-3%2F20_weeks-brightgreen)
 ![Current Week](https://img.shields.io/badge/current_week-4-blue)
-![Week 4 Progress](https://img.shields.io/badge/week_4_progress-48%25-yellow)
+![Week 4 Progress](https://img.shields.io/badge/week_4_progress-52%25-yellow)
 ![Phase](https://img.shields.io/badge/phase-2_UVM_Methodology-blue)
 ![Toolchain](https://img.shields.io/badge/toolchain-arm64_native_+_Vivado_Docker_for_UVM-lightgrey)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)
@@ -206,11 +206,19 @@ open week_01_sv_oop/README.md       # your daily driver for the week
 Setup details: [`docs/OBSIDIAN_GUIDE.md`](docs/OBSIDIAN_GUIDE.md).
 
 ### Running a sample sim (W1 baseline)
+
+The W1 testbenches use class-based randomization (`obj.randomize()`),
+which Icarus 13.0's class support doesn't yet implement. Use Vivado
+xsim via Docker for class-based SV — the same path the UVM weeks
+(W4–W7) take:
+
 ```
-cd week_01_sv_oop
-iverilog -g2012 -o /tmp/hw1 tb/HomeWork/HW1/hw1_packet_tb.sv
-vvp /tmp/hw1
+cd week_01_sv_oop/tb/HomeWork/HW1
+bash ../../../../run_xsim.sh hw1_packet_tb.sv
 ```
+
+Pure-RTL Phase-1/2 work (e.g. W2 Sync FIFO, W3 FSMs, W4+ design
+side) runs natively on Icarus / Verilator without Docker.
 
 ### Running a UVM sim (W4)
 ```
