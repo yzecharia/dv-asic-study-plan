@@ -21,6 +21,9 @@ xsim.dir/
 xsim.covdb/
 *.covinfo
 
+# Negate: keep Iron-Rule PASS logs that live under sim/
+!**/sim/*.log
+
 # ── Simulation outputs ───────────────────────────────────────────
 *.vcd
 *.fst

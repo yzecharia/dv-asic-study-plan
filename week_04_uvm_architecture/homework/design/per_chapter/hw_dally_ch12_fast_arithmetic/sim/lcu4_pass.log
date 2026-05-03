@@ -1,0 +1,2 @@
+Test PASS - 512 vectors
+lcu4_tb.sv:22: $finish called at 512 (1s)

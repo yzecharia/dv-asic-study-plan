@@ -1,0 +1,2 @@
+Test PASS - 1008 vectors
+cla_adder_tb.sv:25: $finish called at 1008 (1s)

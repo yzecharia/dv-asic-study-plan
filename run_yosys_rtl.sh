@@ -37,13 +37,20 @@ OUT_DIR="$TOP_DIR/build_rtl"
 mkdir -p "$OUT_DIR"
 
 # Collect every .sv file in the folder so dependencies (e.g. halfadder.sv
-# next to fulladder.sv) compile together.
+# next to fulladder.sv) compile together. Skip *_tb.sv — testbenches use
+# $fatal/$urandom/tasks/etc. which Yosys cannot synthesize.
 shopt -s nullglob
-SV_FILES=("$TOP_DIR"/*.sv)
+SV_FILES=()
+for f in "$TOP_DIR"/*.sv; do
+    case "$(basename "$f")" in
+        *_tb.sv|tb_*.sv) ;;          # skip testbenches
+        *) SV_FILES+=("$f") ;;
+    esac
+done
 shopt -u nullglob
 
 if [[ ${#SV_FILES[@]} -eq 0 ]]; then
-    echo "Error: no .sv files found in $TOP_DIR"
+    echo "Error: no synthesizable .sv files found in $TOP_DIR (only testbenches?)"
     exit 1
 fi
 

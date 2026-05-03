@@ -44,6 +44,8 @@ endmodule : ripple_adder
 
 ## Cross-links
 
+- `[[carry_lookahead_adder]]` — deep dive on CLA hierarchy, BG/BP
+  block descriptors, and the cla4/lcu4/cla16 architecture.
 - `[[multipliers]]` — carry-save structures inside Wallace/Dadda
   trees.
 - `[[signed_arithmetic]]` — sign-extend before adding signed numbers.

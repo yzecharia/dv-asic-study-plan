@@ -1,0 +1,2 @@
+Test PASS — 8 directed + 1000 random = 1008 vectors
+ripple_carry_adder_tb.sv:39: $finish called at 5040 (1s)

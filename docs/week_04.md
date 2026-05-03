@@ -290,10 +290,10 @@ After all reading + HW, you should answer these without looking:
 
 ### Design Track
 - [x] Read Dally ch.10 (arithmetic circuits)
-- [ ] Read Dally ch.12 (fast arithmetic)
+- [x] Read Dally ch.12 (fast arithmetic)
 - [ ] Read Sutherland *SV for Design* ch.10 (interfaces)
-- [ ] Drill Dally ch.10 (ripple-carry adder)
-- [ ] Drill Dally ch.12 (carry-lookahead adder)
+- [x] Drill Dally ch.10 (ripple-carry adder)
+- [x] Drill Dally ch.12 (carry-lookahead adder)
 - [ ] Drill Sutherland ch.10 (ALU SV interface)
 - [ ] HW1: ALU DUT (registered, valid handshake)
 - [ ] HW2: shift-add multiplier
