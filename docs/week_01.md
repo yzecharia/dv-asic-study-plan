@@ -157,3 +157,280 @@ Write a clear `$display` in each method so the output makes the difference obvio
 - [x] Completed HW3 (Deep vs shallow copy)
 - [x] Completed HW4 (Virtual methods)
 - [x] Can answer all self-check questions
+
+<!-- AUTO-SYNC: per-week views below — regenerate via tools/sync_week_docs.py; do not edit by hand below this line -->
+
+## Daily-driver views
+
+*Auto-mirrored from `week_01_sv_oop/` — edit those files, then run `python3 tools/sync_week_docs.py` to refresh this section.*
+
+
+---
+
+### `README.md`
+
+# Week 1 — SystemVerilog OOP
+
+> **Phase 1 — SV Fundamentals** · Spear ch.2 + ch.5 + ch.8 §1–5 · ✅ Done
+
+The OOP foundation under everything that follows. Every UVM
+transaction, sequence, scoreboard, and test is just a SystemVerilog
+class. If polymorphism doesn't feel natural after this week, you'll
+fight UVM in W4.
+
+## Prerequisites
+
+- HDLBits-level Verilog (assumed background per `CLAUDE.md` §6).
+- No previous OOP experience required — Spear ch.5 starts from zero.
+
+## Estimated time split (24h total)
+
+```
+Reading        8h   Spear ch.2 + ch.5 + ch.8 §1–5; Verification Academy lessons 1–6
+Verification  10h   HW1 (Packet) + HW2 (Transaction hierarchy) + HW3 (deep copy) + HW4 (virtual methods)
+Design         4h   none — Phase 1 is verif-only by design
+AI + Power     2h   AI: verify SV terminology against Spear ch.5; Power: write LinkedIn headline draft
+```
+
+## Portfolio value (what this week proves)
+
+- You can model a transaction as a class with `rand` fields,
+  constraints, `display`, `copy`, and `compare` methods.
+- You understand the inheritance hierarchy that UVM relies on
+  (`uvm_object` → `uvm_transaction` → `uvm_sequence_item` →
+  user transaction).
+- You know when to use `virtual` methods — and what breaks without
+  them when polymorphism is required.
+
+## Iron-Rule deliverables
+
+- [x] **(a)** RTL committed — n/a (Phase-1 verif-only).
+- [x] **(b)** Gold-TB PASS log — all 4 HWs run clean.
+- [x] **(c)** `verification_report.md` — Phase-1 retrospective.
+
+## Daily-driver files
+
+- [[learning_assignment]] · [[homework]] · [[checklist]] · [[notes]]
+
+Canonical syllabus: [`docs/week_01.md`](../docs/week_01.md).
+
+
+---
+
+### `learning_assignment.md`
+
+# Week 1 — Learning Assignment
+
+## Reading
+
+| Source | Chapter / Section | Why |
+|---|---|---|
+| Spear & Tumbush *SV for Verification* (3e) | ch.1 (skim) | Verification guidelines context. |
+| Spear & Tumbush | ch.2 §2.1–2.10 | Data types — `enum`, `struct`, `union`, `typedef`, `string`, queues, dynamic & associative arrays. |
+| Spear & Tumbush | **ch.5** (full) | Basic OOP — class, `new()`, `this`, static, shallow vs deep copy, packages. |
+| Spear & Tumbush | ch.8 §8.1–§8.5 | Inheritance + polymorphism. The first half of ch.8 is **mandatory** for UVM; §8.6+ deferred to W2. |
+
+Concept notes to read/update:
+- [[concepts/boolean_algebra]] — refresher (5 min skim).
+- (none specific to OOP yet — write [[concepts/uvm_factory_config_db]]
+  notes during W4 from the OOP foundation built here.)
+
+Cheatsheets to skim:
+- `cheatsheets/oop_basics.sv` (your own, symlinked from W1 examples)
+- `cheatsheets/data_types.sv`
+
+## Verification Academy (free signup) — 6 lessons
+
+From the **SystemVerilog OOP for UVM Verification** course:
+
+1. Introduction to Classes in SystemVerilog
+2. Class Basics
+3. Class Properties and Methods
+4. Static Properties, Methods and Lists
+5. Inheritance
+6. Polymorphism
+
+## ChipVerify quick refs
+
+- chipverify.com/systemverilog/systemverilog-class
+- chipverify.com/systemverilog/systemverilog-inheritance
+- chipverify.com/systemverilog/systemverilog-polymorphism
+- chipverify.com/systemverilog/systemverilog-virtual-methods
+
+## AI productivity task (Type 1 — Verify)
+
+Per `docs/AI_LEARNING_GUIDE.md` §2.1: paste any AI explanation of
+"shallow vs deep copy in SystemVerilog" into the
+[`prompts/verify-explanation.md`](../docs/prompts/verify-explanation.md)
+template. Cross-check claim by claim against Spear ch.5.
+
+Time budget: 30 min. Output goes to `notes.md` under
+`## AI corrections` if AI got anything wrong.
+
+## Power-skill task
+
+Per `docs/POWER_SKILLS.md` §2: write your **first** LinkedIn headline
+using Pattern A:
+
+```
+Junior Design Verification Engineer | SystemVerilog · UVM · RISC-V |
+Building a 20-week portfolio in the open
+```
+
+Update LinkedIn → save. Note in `notes.md` how many profile views
+you had this week as a baseline for later iterations.
+
+Time budget: 30 min.
+
+
+---
+
+### `homework.md`
+
+# Week 1 — Homework
+
+All four HWs are ✅ DONE in this repo. Files preserved verbatim from
+the StudyPlan beta. Use this doc as a reference for what each HW
+proved.
+
+## HW1 — Packet Transaction Class ✅
+
+Files: `tb/HomeWork/HW1/hw1_packet.sv`, `hw1_packet_tb.sv`.
+
+Spec: `Packet` class with `rand bit [7:0] src_addr`, `dst_addr`,
+`rand bit [31:0] data`, `rand bit [3:0] length`, computed
+`bit [15:0] crc`. Methods: `new`, `display`, `compute_crc`,
+`post_randomize`. TB instantiates 5 random packets and prints them.
+
+Acceptance: PASS log captured.
+
+## HW2 — Transaction Hierarchy + Polymorphism ✅
+
+Files: `tb/HomeWork/HW2/hw2_transaction.sv`,
+`hw2_read_transaction.sv`, `hw2_write_transaction.sv`, `hw2_tb.sv`.
+
+Spec: base `Transaction` class with virtual `display()` and
+`get_type()`. Subclasses `ReadTransaction` and `WriteTransaction`
+override both. TB stores all transactions in a base-class array,
+loops, calls `display()` — polymorphic dispatch.
+
+Acceptance: prints distinct subclass output through base-class handle.
+
+## HW3 — Deep vs Shallow Copy ✅
+
+File: `tb/HomeWork/HW3/hw3.sv`.
+
+Spec: a `Container` class holding a handle to a `Header` class. Show
+that `c2 = c1` shares the `Header` instance (shallow), then write a
+`do_copy` method that allocates a new `Header` and confirms changes
+to `c2.header` no longer affect `c1`.
+
+## HW4 — Virtual Methods + `$cast` ✅
+
+File: `tb/HomeWork/HW4/hw4_tb.sv`.
+
+Spec: same hierarchy as HW2; `$cast` from base handle into a derived
+handle and vice versa. Show `$cast` returning 0 on illegal downcast.
+
+## Per-chapter drills (smaller exercises) ✅
+
+Folders: `tb/ch2_questions/`, `tb/ch5_questions/`, `tb/ch8/`. ~15 small
+files demonstrating data types, OOP basics, inheritance, polymorphism.
+
+## Run commands
+
+```bash
+cd week_01_sv_oop
+iverilog -g2012 -o /tmp/hw1 tb/HomeWork/HW1/hw1_packet_tb.sv
+vvp /tmp/hw1
+
+iverilog -g2012 -o /tmp/hw2 tb/HomeWork/HW2/hw2_tb.sv tb/HomeWork/HW2/hw2_transaction.sv \
+  tb/HomeWork/HW2/hw2_read_transaction.sv tb/HomeWork/HW2/hw2_write_transaction.sv
+vvp /tmp/hw2
+```
+
+## Self-check questions (answers in `notes.md`)
+
+1. Why does the array of `Transaction` handles in HW2 dispatch to the
+   *subclass* `display()` method instead of the base?
+2. What's the difference between a `local` property and a `protected`
+   property?
+3. When does `$cast` return 0?
+4. What's the difference between calling `super.new(...)` from a
+   derived constructor vs calling `new(...)` from the base directly?
+5. Why is the `Header` field in HW3 shared by default in `c2 = c1`?
+
+## Stretch (optional)
+
+- Add a `compare(Transaction other)` virtual method to HW2's base
+  class; subclasses compare their type-specific fields.
+- Add a `pack/unpack` pair to HW1's Packet (preview of what UVM
+  `do_pack` will do later).
+
+
+---
+
+### `checklist.md`
+
+# Week 1 — Checklist
+
+✅ Week complete (all items ticked from beta).
+
+## Reading
+
+- [x] Spear ch.1 (skim)
+- [x] Spear ch.2 (data types)
+- [x] Spear ch.5 (basic OOP)
+- [x] Spear ch.8 §8.1–§8.5 (inheritance + polymorphism)
+- [x] Verification Academy OOP-for-UVM lessons 1–6
+- [x] ChipVerify class / inheritance / polymorphism / virtual-methods
+      pages
+
+## Per-chapter drills
+
+- [x] ch.2 data-type drills (queues, dyn arrays, assoc arrays)
+- [x] ch.5 OOP drills (class basics, methods, static)
+- [x] ch.8 §1–5 drills (inheritance, polymorphism, virtual methods)
+
+## Homework
+
+- [x] HW1 — Packet transaction class
+- [x] HW2 — Transaction hierarchy + polymorphism
+- [x] HW3 — Deep vs shallow copy
+- [x] HW4 — Virtual methods + `$cast`
+
+## Iron-Rule deliverables
+
+- [x] (a) RTL committed — n/a (verif-only week)
+- [x] (b) Gold-TB PASS log captured — all 4 HWs PASS
+- [x] (c) `verification_report.md` — Phase-1 retrospective
+
+## Cross-cutting
+
+- [x] **AI productivity task** — Verify shallow vs deep copy
+      explanation against Spear ch.5
+- [x] **Power-skill task** — LinkedIn headline draft (Pattern A)
+- [x] `notes.md` updated
+
+
+---
+
+### `notes.md`
+
+# Week 1 — Notes
+
+## Aha moments
+
+> Add yours.
+
+## AI corrections
+
+> Add when AI gets something wrong.
+
+## Carryover into Week 2
+
+- §8.6 (`$cast`), §8.7 (parameterised classes), §8.8 (callbacks)
+  deferred from this week.
+- HW2 hierarchy is the seed for the W2 ConstrainedPacket — same
+  classes, add `rand` constraints.
+

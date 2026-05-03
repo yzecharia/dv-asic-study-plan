@@ -40,8 +40,15 @@ def latest_week() -> int:
 
 
 def count_checklist(week_path: Path) -> tuple[int, int]:
-    """Return (done, total) by counting [x] vs [ ] markers in week doc."""
+    """Return (done, total) by counting [x] vs [ ] markers in week doc.
+
+    Stops at the AUTO-SYNC marker if present — per-week file content
+    appended by sync_week_docs.py would otherwise double-count.
+    """
     text = week_path.read_text()
+    idx = text.find("<!-- AUTO-SYNC:")
+    if idx >= 0:
+        text = text[:idx]
     done  = len(re.findall(r"^- \[x\]", text, re.MULTILINE))
     pend  = len(re.findall(r"^- \[ \]", text, re.MULTILINE))
     return done, done + pend
