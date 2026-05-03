@@ -1,0 +1,34 @@
+{
+    "folders": [
+        { "name": "📚 StudyPlan (root)",            "path": "." },
+        { "name": "Week 01 — SV OOP",               "path": "week_01_sv_oop" },
+        { "name": "Week 02 — Constrained Random",   "path": "week_02_constrained_random" },
+        { "name": "Week 03 — Coverage & SVA",       "path": "week_03_coverage_assertions" },
+        { "name": "Week 04 — UVM Architecture",     "path": "week_04_uvm_architecture" },
+        { "name": "Week 05 — UVM Communication",    "path": "week_05_uvm_communication" },
+        { "name": "Week 06 — UVM Stimulus",         "path": "week_06_uvm_stimulus" },
+        { "name": "Week 07 — UVM Full Testbench",   "path": "week_07_uvm_full_testbench" },
+        { "name": "Week 08 — RISC-V Single-Cycle",  "path": "week_08_riscv_single_cycle" },
+        { "name": "Week 09 — RISC-V Pipeline",      "path": "week_09_riscv_pipeline" },
+        { "name": "Week 10 — UART",                 "path": "week_10_uart" },
+        { "name": "Week 11 — SPI + AXI-Lite",       "path": "week_11_spi_axi" },
+        { "name": "Week 12 — UART UVM Project",     "path": "week_12_uart_uvm_project" },
+        { "name": "Week 13 — RISC-V + FIFO Project","path": "week_13_riscv_fifo_projects" },
+        { "name": "Week 14 — Advanced UVM (bonus)", "path": "week_14_advanced_uvm" },
+        { "name": "Week 15 — Design Closure (bonus)","path": "week_15_design_closure" }
+    ],
+    "settings": {
+        "files.associations": {
+            "*.sv":  "systemverilog",
+            "*.svh": "systemverilog",
+            "*.v":   "verilog",
+            "*.vh":  "verilog"
+        },
+        "files.exclude": {
+            "**/.Xil":      true,
+            "**/xsim.dir":  true,
+            "**/build":     true,
+            "**/__pycache__": true
+        }
+    }
+}

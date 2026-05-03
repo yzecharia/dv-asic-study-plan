@@ -1,0 +1,45 @@
+# ── OS / Editor junk ─────────────────────────────────────────────
+.DS_Store
+._*
+*.swp
+*.swo
+*~
+*.bak
+*.orig
+
+# ── Python (ad-hoc scripts) ──────────────────────────────────────
+__pycache__/
+*.pyc
+
+# ── Vivado / xsim artifacts ──────────────────────────────────────
+xsim.dir/
+.Xil/
+*.jou
+*.log
+*.pb
+*.wdb
+xsim.covdb/
+*.covinfo
+
+# ── Simulation outputs ───────────────────────────────────────────
+*.vcd
+*.fst
+*.ghw
+*.out
+*.vvp
+
+# ── Synthesis / build temp ───────────────────────────────────────
+.yosys_tmp/
+build/
+waves/
+
+# ── Yosys schematic outputs (regen via run_yosys_rtl.sh) ─────────
+build_rtl/
+*.dot
+# .svg/.json kept tracked only when explicitly added; build artifacts ignored
+*.synth.json
+*.netlist.json
+
+# ── Project-specific ─────────────────────────────────────────────
+week_03_coverage_assertions/learning/misc/mailbox_example.sv
+week_04_uvm_architecture/learning/salemi_uvm_primer/ch11_uvm_tests/skeleton/

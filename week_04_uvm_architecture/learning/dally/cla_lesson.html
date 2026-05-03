@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Carry Look-Ahead Adder — Visual Lesson</title>
+<style>
+  :root {
+    --bg: #0e1116;
+    --panel: #161b22;
+    --ink: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --gen: #f78166;       /* generate = orange */
+    --prop: #3fb950;      /* propagate = green */
+    --carry: #d2a8ff;     /* carry    = purple */
+    --sum:   #f2cc60;     /* sum      = yellow */
+    --grid: #30363d;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    line-height: 1.55;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 32px 28px 80px; }
+  h1 { font-size: 30px; margin: 0 0 6px; letter-spacing: -0.02em; }
+  h2 { font-size: 22px; margin: 0 0 14px; color: var(--accent); letter-spacing: -0.01em; }
+  h3 { font-size: 16px; margin: 18px 0 8px; color: var(--ink); }
+  p, li { color: var(--muted); font-size: 15px; }
+  .lede { color: var(--ink); font-size: 16px; }
+
+  .step {
+    background: var(--panel);
+    border: 1px solid var(--grid);
+    border-radius: 14px;
+    padding: 24px 26px;
+    margin: 22px 0;
+  }
+  .step-num {
+    display: inline-block;
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 2px 10px;
+    font-size: 12px;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  /* legend chip */
+  .chip {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #0d1117;
+    margin-right: 4px;
+  }
+  .chip.g { background: var(--gen); }
+  .chip.p { background: var(--prop); }
+  .chip.c { background: var(--carry); }
+  .chip.s { background: var(--sum); }
+
+  /* SVG common */
+  svg { display: block; margin: 14px auto; max-width: 100%; }
+  text { font-family: "SF Mono", ui-monospace, Menlo, monospace; fill: var(--ink); }
+  .label-muted { fill: var(--muted); font-size: 11px; }
+
+  /* equation block */
+  .eq {
+    background: #0d1117;
+    border: 1px solid var(--grid);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-family: "SF Mono", ui-monospace, Menlo, monospace;
+    font-size: 14px;
+    overflow-x: auto;
+    margin: 12px 0;
+    line-height: 1.9;
+  }
+  .eq .g { color: var(--gen); font-weight: 600; }
+  .eq .p { color: var(--prop); font-weight: 600; }
+  .eq .c { color: var(--carry); font-weight: 600; }
+  .eq .s { color: var(--sum); font-weight: 600; }
+  .eq .mute { color: var(--muted); }
+
+  table {
+    width: 100%; border-collapse: collapse; margin: 14px 0;
+    font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 13px;
+  }
+  th, td { border: 1px solid var(--grid); padding: 8px 10px; text-align: left; }
+  th { background: #0d1117; color: var(--accent); }
+  td { color: var(--ink); }
+
+  /* carry propagation animation */
+  @keyframes ripple {
+    0%   { fill: var(--grid); }
+    20%  { fill: var(--carry); }
+    100% { fill: var(--grid); }
+  }
+  .ripple-bit { animation: ripple 4s linear infinite; }
+  .rb0 { animation-delay: 0.0s; }
+  .rb1 { animation-delay: 0.5s; }
+  .rb2 { animation-delay: 1.0s; }
+  .rb3 { animation-delay: 1.5s; }
+
+  @keyframes flash {
+    0%, 100% { fill: var(--carry); }
+    50%      { fill: #fff; }
+  }
+  .cla-burst { animation: flash 1.6s ease-in-out infinite; }
+
+  .two-col {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start;
+  }
+  @media (max-width: 760px) { .two-col { grid-template-columns: 1fr; } }
+
+  ul.checklist { list-style: none; padding-left: 0; }
+  ul.checklist li::before { content: "☐ "; color: var(--accent); margin-right: 4px; }
+
+  .callout {
+    background: rgba(88,166,255,0.08);
+    border-left: 3px solid var(--accent);
+    padding: 10px 14px;
+    border-radius: 6px;
+    color: var(--ink);
+    font-size: 14px;
+    margin: 10px 0;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Carry Look-Ahead Adder</h1>
+  <p class="lede">A visual walkthrough — built so that by the end, the SystemVerilog module almost writes itself.</p>
+
+  <!-- LEGEND -->
+  <div class="step">
+    <h3>Color legend (used everywhere below)</h3>
+    <span class="chip g">g</span> generate &nbsp;
+    <span class="chip p">p</span> propagate &nbsp;
+    <span class="chip c">c</span> carry &nbsp;
+    <span class="chip s">s</span> sum
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- STEP 1: Big picture                                          -->
+  <!-- ============================================================ -->
+  <div class="step">
+    <h2><span class="step-num">1</span>What CLA is — and what it is NOT</h2>
+
+    <svg viewBox="0 0 980 220" width="980" height="220" aria-label="Adder family tree">
+      <!-- root -->
+      <rect x="380" y="10"  width="220" height="46" rx="8" fill="#21262d" stroke="#58a6ff"/>
+      <text x="490" y="38" text-anchor="middle" font-size="15" font-weight="700">Binary adder (a + b + cin → s, cout)</text>
+
+      <!-- branches -->
+      <line x1="490" y1="56" x2="180" y2="100" stroke="#30363d"/>
+      <line x1="490" y1="56" x2="490" y2="100" stroke="#30363d"/>
+      <line x1="490" y1="56" x2="800" y2="100" stroke="#30363d"/>
+
+      <!-- behavioral / + -->
+      <rect x="60"  y="100" width="240" height="50" rx="8" fill="#0d1117" stroke="#30363d"/>
+      <text x="180" y="122" text-anchor="middle" font-size="13" fill="#8b949e">Behavioral: assign s = a + b + cin</text>
+      <text x="180" y="140" text-anchor="middle" font-size="11" fill="#8b949e">(synthesizer chooses)</text>
+
+      <!-- structural ripple -->
+      <rect x="370" y="100" width="240" height="50" rx="8" fill="#0d1117" stroke="#f78166"/>
+      <text x="490" y="122" text-anchor="middle" font-size="13" font-weight="600" fill="#f78166">Ripple-Carry (RCA)</text>
+      <text x="490" y="140" text-anchor="middle" font-size="11" fill="#8b949e">simple, slow O(n)</text>
+
+      <!-- CLA -->
+      <rect x="680" y="100" width="240" height="50" rx="8" fill="#0d1117" stroke="#3fb950"/>
+      <text x="800" y="122" text-anchor="middle" font-size="13" font-weight="600" fill="#3fb950">Carry Look-Ahead (CLA)</text>
+      <text x="800" y="140" text-anchor="middle" font-size="11" fill="#8b949e">smart carry, fast O(log n)</text>
+
+      <text x="490" y="195" text-anchor="middle" font-size="12" fill="#e6edf3">
+        CLA is still an adder. It is a <tspan font-weight="700" fill="#3fb950">restructured carry network</tspan>
+        on top of the same per-bit XOR/AND.
+      </text>
+    </svg>
+
+    <div class="callout">
+      <b>Key idea:</b> CLA does not replace the full-adder math.
+      Sum is still <span class="chip s">sᵢ</span> = aᵢ ⊕ bᵢ ⊕ cᵢ.
+      What changes is <i>how the carry cᵢ is computed</i> — instead of waiting for the previous bit, every cᵢ is computed in parallel from the inputs.
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- STEP 2: The problem with ripple                              -->
+  <!-- ============================================================ -->
+  <div class="step">
+    <h2><span class="step-num">2</span>The problem CLA solves</h2>
+    <p>In a 4-bit ripple-carry adder, bit 3 cannot finish until bit 0 → bit 1 → bit 2 → bit 3 carries have all settled. Watch the carry crawl:</p>
+
+    <svg viewBox="0 0 720 160" width="720" height="160" aria-label="Ripple animation">
+      <!-- 4 full-adder boxes -->
+      <g font-size="13">
+        <!-- bit 0 -->
+        <rect x="40"  y="50" width="120" height="60" rx="6" fill="#21262d" stroke="#30363d"/>
+        <text x="100" y="78" text-anchor="middle">FA bit 0</text>
+        <text x="100" y="96" text-anchor="middle" class="label-muted">a0,b0,cin</text>
+
+        <rect x="200" y="50" width="120" height="60" rx="6" fill="#21262d" stroke="#30363d"/>
+        <text x="260" y="78" text-anchor="middle">FA bit 1</text>
+        <text x="260" y="96" text-anchor="middle" class="label-muted">a1,b1,c1</text>
+
+        <rect x="360" y="50" width="120" height="60" rx="6" fill="#21262d" stroke="#30363d"/>
+        <text x="420" y="78" text-anchor="middle">FA bit 2</text>
+        <text x="420" y="96" text-anchor="middle" class="label-muted">a2,b2,c2</text>
+
+        <rect x="520" y="50" width="120" height="60" rx="6" fill="#21262d" stroke="#30363d"/>
+        <text x="580" y="78" text-anchor="middle">FA bit 3</text>
+        <text x="580" y="96" text-anchor="middle" class="label-muted">a3,b3,c3</text>
+
+        <!-- carry wires -->
+        <rect x="160" y="76" width="40" height="8" class="ripple-bit rb0"/>
+        <rect x="320" y="76" width="40" height="8" class="ripple-bit rb1"/>
+        <rect x="480" y="76" width="40" height="8" class="ripple-bit rb2"/>
+        <rect x="640" y="76" width="40" height="8" class="ripple-bit rb3"/>
+
+        <text x="180" y="38" text-anchor="middle" class="label-muted">c1</text>
+        <text x="340" y="38" text-anchor="middle" class="label-muted">c2</text>
+        <text x="500" y="38" text-anchor="middle" class="label-muted">c3</text>
+        <text x="660" y="38" text-anchor="middle" class="label-muted">cout</text>
+      </g>
+      <text x="360" y="145" text-anchor="middle" font-size="12" fill="#8b949e">
+        Worst-case delay = (n × full-adder delay). For 64 bits this is brutal.
+      </text>
+    </svg>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- STEP 3: G and P                                              -->
+  <!-- ============================================================ -->
+  <div class="step">
+    <h2><span class="step-num">3</span>The two magic signals: <span class="chip g">g</span> and <span class="chip p">p</span></h2>
+    <p>For each bit position i, ask two yes/no questions about (aᵢ, bᵢ) <i>before</i> a carry even arrives:</p>
+
+    <div class="two-col">
+      <div>
+        <h3><span class="chip g">gᵢ</span> — <i>Generate</i></h3>
+        <p>"Will this column produce a carry-out <b>on its own</b>, no matter what comes in?"</p>
+        <div class="eq"><span class="g">gᵢ</span> = aᵢ <span class="mute">AND</span> bᵢ</div>
+        <p>Only true when both bits are 1 (1+1 = 10 → carry).</p>
+      </div>
+      <div>
+        <h3><span class="chip p">pᵢ</span> — <i>Propagate</i></h3>
+        <p>"If a carry shows up at this column, will it pass through?"</p>
+        <div class="eq"><span class="p">pᵢ</span> = aᵢ <span class="mute">XOR</span> bᵢ</div>
+        <p>True when exactly one bit is 1 (0+1+carry = 10 → forwards the carry).</p>
+      </div>
+    </div>
+
+    <h3>Truth table — read the rightmost two columns</h3>
+    <table>
+      <tr><th>aᵢ</th><th>bᵢ</th><th>aᵢ + bᵢ</th><th><span style="color:var(--gen)">gᵢ</span></th><th><span style="color:var(--prop)">pᵢ</span></th><th>Meaning</th></tr>
+      <tr><td>0</td><td>0</td><td>00</td><td>0</td><td>0</td><td>kills any incoming carry</td></tr>
+      <tr><td>0</td><td>1</td><td>01</td><td>0</td><td>1</td><td>propagates if carry-in</td></tr>
+      <tr><td>1</td><td>0</td><td>01</td><td>0</td><td>1</td><td>propagates if carry-in</td></tr>
+      <tr><td>1</td><td>1</td><td>10</td><td>1</td><td>0</td><td>generates a carry</td></tr>
+    </table>
+    <div class="callout">
+      Once you have <span class="chip g">g</span> and <span class="chip p">p</span> for every bit (one XOR and one AND each — all in parallel), you can write every carry as a pure function of those signals plus cin. <b>No waiting in line.</b>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- STEP 4: Carry recurrence                                     -->
+  <!-- ============================================================ -->
+  <div class="step">
+    <h2><span class="step-num">4</span>The recurrence — and why it goes flat</h2>
+    <p>Start from the basic full-adder carry-out:</p>
+    <div class="eq">
+      cᵢ₊₁ = <span class="g">gᵢ</span> <span class="mute">OR</span> ( <span class="p">pᵢ</span> <span class="mute">AND</span> cᵢ )
+    </div>
+    <p>That looks recursive (cᵢ₊₁ depends on cᵢ). The trick: <b>unroll it</b> all the way down to c₀ (= cin), so every carry is a flat formula:</p>
+
+    <div class="eq">
+      <span class="c">c₁</span> = <span class="g">g₀</span> + <span class="p">p₀</span>·cin<br>
+      <span class="c">c₂</span> = <span class="g">g₁</span> + <span class="p">p₁</span><span class="g">g₀</span> + <span class="p">p₁p₀</span>·cin<br>
+      <span class="c">c₃</span> = <span class="g">g₂</span> + <span class="p">p₂</span><span class="g">g₁</span> + <span class="p">p₂p₁</span><span class="g">g₀</span> + <span class="p">p₂p₁p₀</span>·cin<br>
+      <span class="c">c₄</span> = <span class="g">g₃</span> + <span class="p">p₃</span><span class="g">g₂</span> + <span class="p">p₃p₂</span><span class="g">g₁</span> + <span class="p">p₃p₂p₁</span><span class="g">g₀</span> + <span class="p">p₃p₂p₁p₀</span>·cin
+    </div>
+
+    <p>Read each line in English: "<i>I get a carry into bit k if some bit j &lt; k generated one AND every bit between j and k propagated it.</i>"</p>
+
+    <div class="callout">
+      Every carry above is just <b>two gate levels</b> deep (one big AND, one big OR). Add the 1 level for g/p and 1 for the final sum XOR → <b>4 gate delays total, regardless of n</b>. That is the whole win.
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- STEP 5: 4-bit CLA block diagram                              -->
+  <!-- ============================================================ -->
+  <div class="step">
+    <h2><span class="step-num">5</span>4-bit CLA — block diagram</h2>
+    <p>Three layers, all wires flowing left → right, no feedback:</p>
+
+    <svg viewBox="0 0 820 360" width="820" height="360" aria-label="4-bit CLA block diagram">
+      <!-- column labels for inputs -->
+      <g font-size="11" fill="#8b949e">
+        <text x="80"  y="20" text-anchor="middle">a₀ b₀</text>
+        <text x="240" y="20" text-anchor="middle">a₁ b₁</text>
+        <text x="400" y="20" text-anchor="middle">a₂ b₂</text>
+        <text x="560" y="20" text-anchor="middle">a₃ b₃</text>
+        <text x="720" y="20" text-anchor="middle">cin</text>
+      </g>
+
+      <!-- LAYER 1: PG cells -->
+      <g>
+        <rect x="40"  y="40" width="80" height="50" rx="6" fill="#0d1117" stroke="#3fb950"/>
+        <text x="80"  y="60" text-anchor="middle" font-size="12">PG cell 0</text>
+        <text x="80"  y="78" text-anchor="middle" font-size="11" fill="#8b949e">g₀, p₀</text>
+
+        <rect x="200" y="40" width="80" height="50" rx="6" fill="#0d1117" stroke="#3fb950"/>
+        <text x="240" y="60" text-anchor="middle" font-size="12">PG cell 1</text>
+        <text x="240" y="78" text-anchor="middle" font-size="11" fill="#8b949e">g₁, p₁</text>
+
+        <rect x="360" y="40" width="80" height="50" rx="6" fill="#0d1117" stroke="#3fb950"/>
+        <text x="400" y="60" text-anchor="middle" font-size="12">PG cell 2</text>
+        <text x="400" y="78" text-anchor="middle" font-size="11" fill="#8b949e">g₂, p₂</text>
+
+        <rect x="520" y="40" width="80" height="50" rx="6" fill="#0d1117" stroke="#3fb950"/>
+        <text x="560" y="60" text-anchor="middle" font-size="12">PG cell 3</text>
+        <text x="560" y="78" text-anchor="middle" font-size="11" fill="#8b949e">g₃, p₃</text>
+      </g>
+
+      <text x="20" y="65" font-size="10" fill="#8b949e">layer 1</text>
+
+      <!-- LAYER 2: Look-ahead carry generator -->
+      <rect x="40" y="130" width="680" height="80" rx="8" fill="#21262d" stroke="#d2a8ff"/>
+      <text x="380" y="158" text-anchor="middle" font-size="14" font-weight="700" fill="#d2a8ff">Look-Ahead Carry Generator</text>
+      <text x="380" y="180" text-anchor="middle" font-size="11" fill="#8b949e">computes c₁, c₂, c₃, c₄ from g₀..g₃, p₀..p₃, cin (the flat equations from step 4)</text>
+
+      <text x="20" y="170" font-size="10" fill="#8b949e">layer 2</text>
+
+      <!-- vertical wires from PG to CLG -->
+      <line x1="80"  y1="90" x2="80"  y2="130" stroke="#3fb950" stroke-width="1.5"/>
+      <line x1="240" y1="90" x2="240" y2="130" stroke="#3fb950" stroke-width="1.5"/>
+      <line x1="400" y1="90" x2="400" y2="130" stroke="#3fb950" stroke-width="1.5"/>
+      <line x1="560" y1="90" x2="560" y2="130" stroke="#3fb950" stroke-width="1.5"/>
+      <line x1="720" y1="40" x2="720" y2="170" stroke="#d2a8ff" stroke-width="1.5"/>
+      <line x1="720" y1="170" x2="720" y2="170" stroke="#d2a8ff"/>
+
+      <!-- LAYER 3: Sum XORs -->
+      <g>
+        <rect x="40"  y="250" width="80" height="50" rx="6" fill="#0d1117" stroke="#f2cc60"/>
+        <text x="80"  y="272" text-anchor="middle" font-size="12">XOR</text>
+        <text x="80"  y="290" text-anchor="middle" font-size="11" fill="#f2cc60">s₀ = p₀⊕cin</text>
+
+        <rect x="200" y="250" width="80" height="50" rx="6" fill="#0d1117" stroke="#f2cc60"/>
+        <text x="240" y="272" text-anchor="middle" font-size="12">XOR</text>
+        <text x="240" y="290" text-anchor="middle" font-size="11" fill="#f2cc60">s₁ = p₁⊕c₁</text>
+
+        <rect x="360" y="250" width="80" height="50" rx="6" fill="#0d1117" stroke="#f2cc60"/>
+        <text x="400" y="272" text-anchor="middle" font-size="12">XOR</text>
+        <text x="400" y="290" text-anchor="middle" font-size="11" fill="#f2cc60">s₂ = p₂⊕c₂</text>
+
+        <rect x="520" y="250" width="80" height="50" rx="6" fill="#0d1117" stroke="#f2cc60"/>
+        <text x="560" y="272" text-anchor="middle" font-size="12">XOR</text>
+        <text x="560" y="290" text-anchor="middle" font-size="11" fill="#f2cc60">s₃ = p₃⊕c₃</text>
+
+        <rect x="660" y="250" width="120" height="50" rx="6" fill="#0d1117" stroke="#d2a8ff"/>
+        <text x="720" y="280" text-anchor="middle" font-size="12" fill="#d2a8ff">cout = c₄</text>
+      </g>
+
+      <text x="20" y="280" font-size="10" fill="#8b949e">layer 3</text>
+
+      <!-- carry wires from CLG down to XORs -->
+      <line x1="80"  y1="210" x2="80"  y2="250" stroke="#d2a8ff" stroke-width="1.5"/>
+      <line x1="240" y1="210" x2="240" y2="250" stroke="#d2a8ff" stroke-width="1.5"/>
+      <line x1="400" y1="210" x2="400" y2="250" stroke="#d2a8ff" stroke-width="1.5"/>
+      <line x1="560" y1="210" x2="560" y2="250" stroke="#d2a8ff" stroke-width="1.5"/>
+      <line x1="720" y1="210" x2="720" y2="250" stroke="#d2a8ff" stroke-width="1.5"/>
+
+      <!-- propagate wires from PG down to XOR (skip layer 2) -->
+      <path d="M 60 90 Q 30 200 60 250" stroke="#3fb950" fill="none" stroke-dasharray="3 3"/>
+      <path d="M 220 90 Q 190 200 220 250" stroke="#3fb950" fill="none" stroke-dasharray="3 3"/>
+      <path d="M 380 90 Q 350 200 380 250" stroke="#3fb950" fill="none" stroke-dasharray="3 3"/>
+      <path d="M 540 90 Q 510 200 540 250" stroke="#3fb950" fill="none" stroke-dasharray="3 3"/>
+
+      <!-- output labels -->
+      <g font-size="11" fill="#8b949e">
+        <text x="80"  y="325" text-anchor="middle">s₀</text>
+        <text x="240" y="325" text-anchor="middle">s₁</text>
+        <text x="400" y="325" text-anchor="middle">s₂</text>
+        <text x="560" y="325" text-anchor="middle">s₃</text>
+      </g>
+    </svg>
+
+    <p style="text-align:center"><span class="chip g">green</span> = layer 1 PG &nbsp;
+      <span class="chip c">purple</span> = layer 2 carry net &nbsp;
+      <span class="chip s">yellow</span> = layer 3 sum</p>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- STEP 6: Hierarchical CLA                                     -->
+  <!-- ============================================================ -->
+  <div class="step">
+    <h2><span class="step-num">6</span>Scaling up — hierarchical CLA (this is what your 8-bit code is doing)</h2>
+    <p>For wide adders, the equation for c₆₄ would have 64 product terms. Bad. The fix: treat each 4-bit CLA as a single "super-bit" with its own block-level G and P.</p>
+
+    <div class="eq">
+      <span class="g">G_block</span> = g₃ + p₃g₂ + p₃p₂g₁ + p₃p₂p₁g₀ &nbsp;<span class="mute">// the block generates a carry</span><br>
+      <span class="p">P_block</span> = p₃ · p₂ · p₁ · p₀ &nbsp;<span class="mute">// the block passes a carry through</span>
+    </div>
+
+    <svg viewBox="0 0 820 220" width="820" height="220" aria-label="Hierarchical CLA">
+      <!-- 4 small CLA blocks (16-bit example) -->
+      <g>
+        <rect x="40"  y="100" width="140" height="60" rx="6" fill="#0d1117" stroke="#3fb950"/>
+        <text x="110" y="125" text-anchor="middle" font-size="12">4-bit CLA [3:0]</text>
+        <text x="110" y="145" text-anchor="middle" font-size="11" fill="#8b949e">→ G₀, P₀</text>
+
+        <rect x="200" y="100" width="140" height="60" rx="6" fill="#0d1117" stroke="#3fb950"/>
+        <text x="270" y="125" text-anchor="middle" font-size="12">4-bit CLA [7:4]</text>
+        <text x="270" y="145" text-anchor="middle" font-size="11" fill="#8b949e">→ G₁, P₁</text>
+
+        <rect x="360" y="100" width="140" height="60" rx="6" fill="#0d1117" stroke="#3fb950"/>
+        <text x="430" y="125" text-anchor="middle" font-size="12">4-bit CLA [11:8]</text>
+        <text x="430" y="145" text-anchor="middle" font-size="11" fill="#8b949e">→ G₂, P₂</text>
+
+        <rect x="520" y="100" width="140" height="60" rx="6" fill="#0d1117" stroke="#3fb950"/>
+        <text x="590" y="125" text-anchor="middle" font-size="12">4-bit CLA [15:12]</text>
+        <text x="590" y="145" text-anchor="middle" font-size="11" fill="#8b949e">→ G₃, P₃</text>
+      </g>
+
+      <!-- top-level CLG -->
+      <rect x="40" y="20" width="620" height="50" rx="8" fill="#21262d" stroke="#d2a8ff"/>
+      <text x="350" y="42" text-anchor="middle" font-size="13" font-weight="700" fill="#d2a8ff">Second-level Look-Ahead Carry Generator</text>
+      <text x="350" y="60" text-anchor="middle" font-size="11" fill="#8b949e">uses block G/P to compute c₄, c₈, c₁₂, c₁₆ — same equations, just up one level</text>
+
+      <!-- arrows up: G/P -->
+      <line x1="110" y1="100" x2="110" y2="70" stroke="#3fb950"/>
+      <line x1="270" y1="100" x2="270" y2="70" stroke="#3fb950"/>
+      <line x1="430" y1="100" x2="430" y2="70" stroke="#3fb950"/>
+      <line x1="590" y1="100" x2="590" y2="70" stroke="#3fb950"/>
+
+      <!-- arrows down: c into next block -->
+      <line x1="200" y1="70" x2="200" y2="100" stroke="#d2a8ff"/>
+      <line x1="360" y1="70" x2="360" y2="100" stroke="#d2a8ff"/>
+      <line x1="520" y1="70" x2="520" y2="100" stroke="#d2a8ff"/>
+      <text x="200" y="95" font-size="10" fill="#d2a8ff">c₄</text>
+      <text x="360" y="95" font-size="10" fill="#d2a8ff">c₈</text>
+      <text x="520" y="95" font-size="10" fill="#d2a8ff">c₁₂</text>
+
+      <!-- cin in, cout out -->
+      <line x1="20" y1="130" x2="40" y2="130" stroke="#d2a8ff"/>
+      <text x="20" y="125" font-size="10" fill="#8b949e">cin</text>
+      <line x1="660" y1="130" x2="690" y2="130" stroke="#d2a8ff"/>
+      <text x="700" y="135" font-size="10" fill="#8b949e">cout</text>
+
+      <text x="350" y="200" text-anchor="middle" font-size="12" fill="#e6edf3">
+        Two levels = 16 bits. Three levels = 64 bits. <b>Delay grows like log₄(n).</b>
+      </text>
+    </svg>
+
+    <div class="callout">
+      Your <code>carry_look_ahead.sv</code> is heading exactly this direction — the names <code>p2, g2, p4, g4, p8, g8</code> are widths of the spans (2-bit group, 4-bit group, 8-bit group). That is the recursive doubling pattern of a <b>Kogge–Stone / Brent–Kung style prefix tree</b>, which is the modern industrial form of CLA.
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- STEP 7: Side-by-side comparison                              -->
+  <!-- ============================================================ -->
+  <div class="step">
+    <h2><span class="step-num">7</span>Visual delay comparison</h2>
+    <svg viewBox="0 0 820 200" width="820" height="200" aria-label="Delay comparison">
+      <text x="20" y="30" font-size="13" fill="#f78166" font-weight="700">RCA — carry crawls</text>
+      <g>
+        <rect x="20"  y="50" width="160" height="20" fill="#f78166"/>
+        <rect x="180" y="50" width="160" height="20" fill="#f78166" opacity="0.8"/>
+        <rect x="340" y="50" width="160" height="20" fill="#f78166" opacity="0.6"/>
+        <rect x="500" y="50" width="160" height="20" fill="#f78166" opacity="0.4"/>
+        <text x="660" y="65" font-size="11" fill="#8b949e">→ time</text>
+      </g>
+      <text x="340" y="92" text-anchor="middle" font-size="11" fill="#8b949e">delay ∝ n</text>
+
+      <text x="20" y="130" font-size="13" fill="#3fb950" font-weight="700">CLA — all carries fire together</text>
+      <g>
+        <rect x="20"  y="150" width="120" height="20" fill="#3fb950" class="cla-burst"/>
+        <text x="160" y="165" font-size="11" fill="#8b949e">→ done</text>
+      </g>
+      <text x="80" y="192" font-size="11" fill="#8b949e">delay ∝ log n (constant for small n)</text>
+    </svg>
+
+    <table>
+      <tr><th>Metric</th><th>Ripple-Carry (RCA)</th><th>Carry Look-Ahead (CLA)</th></tr>
+      <tr><td>Gate delay (n bits)</td><td>~ 2n</td><td>~ 4 (or O(log n) hierarchical)</td></tr>
+      <tr><td>Gate area</td><td>small</td><td>larger (more gates per bit)</td></tr>
+      <tr><td>Wiring</td><td>simple, regular</td><td>more wires, fan-in heavy</td></tr>
+      <tr><td>Used when</td><td>narrow / area-tight</td><td>wide ALUs, fast pipelines</td></tr>
+    </table>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- STEP 8: Build checklist                                      -->
+  <!-- ============================================================ -->
+  <div class="step">
+    <h2><span class="step-num">8</span>Now build it — your module checklist</h2>
+    <p>You already have <code>fulladder.sv</code> and <code>halfadder.sv</code>. For a flat 4-bit CLA you need three things:</p>
+    <ul class="checklist">
+      <li><b>PG cell</b> — one XOR (p) and one AND (g) per bit. Just an <code>assign</code>.</li>
+      <li><b>Look-ahead carry generator</b> — the four flat equations from step 4. Hard-code them for 4 bits, or write them in a generate loop.</li>
+      <li><b>Sum XOR</b> — one per bit: <code>s[i] = p[i] ^ c[i]</code>.</li>
+    </ul>
+
+    <h3>Suggested skeleton (do not copy — type it)</h3>
+    <div class="eq">
+<span class="mute">module</span> cla4 ( <span class="mute">input  logic [3:0]</span> a, b, <span class="mute">input logic</span> cin,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mute">output logic [3:0]</span> s, <span class="mute">output logic</span> cout );<br>
+<br>
+&nbsp;&nbsp;<span class="mute">logic [3:0]</span> <span class="g">g</span>, <span class="p">p</span>;<br>
+&nbsp;&nbsp;<span class="mute">logic [4:0]</span> <span class="c">c</span>;&nbsp;&nbsp;<span class="mute">// c[0] = cin, c[4] = cout</span><br>
+<br>
+&nbsp;&nbsp;<span class="mute">assign</span> <span class="g">g</span> = a & b;<br>
+&nbsp;&nbsp;<span class="mute">assign</span> <span class="p">p</span> = a ^ b;<br>
+&nbsp;&nbsp;<span class="mute">assign</span> <span class="c">c[0]</span> = cin;<br>
+&nbsp;&nbsp;<span class="mute">assign</span> <span class="c">c[1]</span> = ... ; <span class="mute">// fill in from step 4</span><br>
+&nbsp;&nbsp;<span class="mute">assign</span> <span class="c">c[2]</span> = ... ;<br>
+&nbsp;&nbsp;<span class="mute">assign</span> <span class="c">c[3]</span> = ... ;<br>
+&nbsp;&nbsp;<span class="mute">assign</span> <span class="c">c[4]</span> = ... ;<br>
+&nbsp;&nbsp;<span class="mute">assign</span> <span class="s">s</span> = <span class="p">p</span> ^ <span class="c">c[3:0]</span>;<br>
+&nbsp;&nbsp;<span class="mute">assign</span> cout = <span class="c">c[4]</span>;<br>
+<span class="mute">endmodule</span>
+    </div>
+
+    <h3>Then test it the cheap way</h3>
+    <p>Sweep all 2⁹ = 512 input combinations of (a,b,cin) and compare against <code>a + b + cin</code>. If it matches for all 512, you are done.</p>
+
+    <div class="callout">
+      Once cla4 works, <b>that becomes your "super-bit"</b> — instantiate four of them and a second-level CLG using the same equations, and you have a 16-bit hierarchical CLA. The 8-bit version in your existing file is the same idea at a smaller scale.
+    </div>
+  </div>
+
+  <p style="color:var(--muted); text-align:center; margin-top:30px; font-size:13px">
+    ✦ Open this file in a browser — animations run automatically. Re-read step 4 until the carry equations feel obvious before you start coding.
+  </p>
+
+</div>
+</body>
+</html>

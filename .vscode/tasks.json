@@ -1,0 +1,113 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+
+    {
+      "label": "🔍 Lint (xvlog syntax check on current file)",
+      "type": "shell",
+      "command": "${workspaceFolder}/xvlog_lint.sh",
+      "args": ["${file}"],
+      "group": "build",
+      "presentation": { "clear": true, "reveal": "always" },
+      "problemMatcher": {
+        "owner": "xvlog",
+        "fileLocation": ["relative", "${workspaceFolder}"],
+        "pattern": {
+          "regexp": "^ERROR:\\s+\\[\\w+ \\d+-\\d+\\]\\s+(.*?)\\s+\\[(.+?):(\\d+)\\]",
+          "message": 1,
+          "file": 2,
+          "line": 3
+        }
+      }
+    },
+
+    {
+      "label": "🌊 SIM (xsim run on current file, auto-includes *_pkg.sv siblings)",
+      "type": "shell",
+      "command": "${workspaceFolder}/run_xsim_auto.sh",
+      "args": ["${file}"],
+      "group": { "kind": "build", "isDefault": true },
+      "presentation": { "clear": true, "reveal": "always", "group": "xsim" },
+      "problemMatcher": {
+        "owner": "xsim",
+        "fileLocation": ["relative", "${workspaceFolder}"],
+        "pattern": {
+          "regexp": "^ERROR:\\s+\\[\\w+ \\d+-\\d+\\]\\s+(.*?)\\s+\\[(.+?):(\\d+)\\]",
+          "message": 1,
+          "file": 2,
+          "line": 3
+        }
+      }
+    },
+
+    {
+      "label": "🔧 RTL SCHEMATIC (yosys synth + schematic of current file)",
+      "type": "shell",
+      "command": "${workspaceFolder}/run_yosys_rtl.sh",
+      "args": ["${file}"],
+      "group": "build",
+      "presentation": { "clear": true, "reveal": "always", "group": "yosys" }
+    },
+
+    {
+      "label": "📁 SIM FOLDER (xsim, all *.sv siblings — multi-file class TBs)",
+      "type": "shell",
+      "command": "${workspaceFolder}/run_xsim_folder.sh",
+      "args": ["${file}"],
+      "group": "build",
+      "presentation": { "clear": true, "reveal": "always", "group": "xsim" },
+      "problemMatcher": {
+        "owner": "xsim",
+        "fileLocation": ["relative", "${workspaceFolder}"],
+        "pattern": {
+          "regexp": "^ERROR:\\s+\\[\\w+ \\d+-\\d+\\]\\s+(.*?)\\s+\\[(.+?):(\\d+)\\]",
+          "message": 1,
+          "file": 2,
+          "line": 3
+        }
+      }
+    },
+
+    {
+      "label": "🧪 SIM UVM (xsim + -L uvm + UVM_TESTNAME plusarg)",
+      "type": "shell",
+      "command": "UVM_TESTNAME=${input:uvmTestName} SV_SEED=${input:svSeed} ${workspaceFolder}/run_xsim_auto.sh ${file}",
+      "group": "build",
+      "presentation": { "clear": true, "reveal": "always", "group": "xsim" },
+      "problemMatcher": {
+        "owner": "xsim",
+        "fileLocation": ["relative", "${workspaceFolder}"],
+        "pattern": {
+          "regexp": "^ERROR:\\s+\\[\\w+ \\d+-\\d+\\]\\s+(.*?)\\s+\\[(.+?):(\\d+)\\]",
+          "message": 1,
+          "file": 2,
+          "line": 3
+        }
+      }
+    },
+
+    {
+      "label": "📈 Update progress badges",
+      "type": "shell",
+      "command": "python3",
+      "args": ["${workspaceFolder}/tools/update_progress_badges.py"],
+      "group": "build",
+      "presentation": { "clear": true, "reveal": "always" }
+    }
+
+  ],
+  "inputs": [
+    {
+      "id": "uvmTestName",
+      "type": "promptString",
+      "description": "UVM test name (e.g. random_test). Leave empty if no run_test() in code.",
+      "default": ""
+    },
+    {
+      "id": "svSeed",
+      "type": "promptString",
+      "description": "SV random seed (leave empty for default)",
+      "default": ""
+    }
+  ]
+}

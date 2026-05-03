@@ -1,0 +1,26 @@
+# Normalize line endings across platforms
+* text=auto eol=lf
+
+# Shell scripts stay LF always
+*.sh text eol=lf
+
+# ── GitHub language detection (Linguist) ────────────────────────
+# Force the correct language for HDL files — Linguist sometimes
+# misclassifies .sv as "Scala" or .v as "Coq" otherwise.
+*.sv    linguist-language=SystemVerilog
+*.svh   linguist-language=SystemVerilog
+*.v     linguist-language=Verilog
+*.vh    linguist-language=Verilog
+*.vhd   linguist-language=VHDL
+*.vhdl  linguist-language=VHDL
+
+# Keep docs/markdown out of the repo's primary language bar
+docs/*        linguist-documentation
+*.md          linguist-documentation
+
+# Cheatsheets are reference material, not production code
+cheatsheets/* linguist-documentation
+
+# Binary / generated — don't diff or stat as code
+*.svg   binary
+*.pdf   binary
