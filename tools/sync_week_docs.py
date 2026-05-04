@@ -116,6 +116,50 @@ def main() -> int:
         print("ERROR: no week_*/ folders found", file=sys.stderr)
         return 1
 
+    # Step 1: flip drill statuses in homework.md based on checklist ticks.
+    # Done BEFORE the doc-sync below so the appended homework.md reflects
+    # the latest status emojis.
+    try:
+        import sync_drill_status  # type: ignore
+    except ModuleNotFoundError:
+        # Same dir import — load by path
+        import importlib.util
+        _spec = importlib.util.spec_from_file_location(
+            "sync_drill_status", Path(__file__).parent / "sync_drill_status.py"
+        )
+        sync_drill_status = importlib.util.module_from_spec(_spec)  # type: ignore
+        _spec.loader.exec_module(sync_drill_status)  # type: ignore
+
+    print("── Drill-status sync ──")
+    drill_total = 0
+    for week_num, week_dir in weeks:
+        if weeks_filter is not None and week_num not in weeks_filter:
+            continue
+        ticked = sync_drill_status.parse_ticked(week_dir / "checklist.md")
+        if dry_run:
+            text = (week_dir / "homework.md").read_text() if (week_dir / "homework.md").exists() else ""
+            n_table = sum(
+                1
+                for m in sync_drill_status.TABLE_ROW_RE.finditer(text)
+                if sync_drill_status.match(m.group(2), ticked)
+            )
+            n_head = sum(
+                1
+                for m in sync_drill_status.HEADING_RE.finditer(text)
+                if sync_drill_status.match(
+                    re.sub(r"^#+\s*", "", m.group(1)).strip().strip("`"), ticked
+                )
+            )
+            n_drill = n_table + n_head
+        else:
+            n_drill = sync_drill_status.update_homework(week_dir / "homework.md", ticked)
+        if n_drill > 0:
+            verb = "would flip" if dry_run else "flipped"
+            print(f"  w{week_num:02d}: {verb} {n_drill}")
+        drill_total += n_drill
+
+    # Step 2: append the per-week files into docs/week_NN.md.
+    print("── Doc-sync ──")
     n = 0
     for week_num, week_dir in weeks:
         if weeks_filter is not None and week_num not in weeks_filter:
@@ -124,7 +168,8 @@ def main() -> int:
             n += 1
 
     verb = "would update" if dry_run else "synced"
-    print(f"\n{verb.capitalize()} {n} week(s).")
+    print(f"\nDrill rows {('would-be-' if dry_run else '')}flipped: {drill_total}")
+    print(f"{verb.capitalize()} {n} week(s).")
     return 0
 
 

@@ -468,17 +468,17 @@ Continue from where the canonical syllabus leaves off.
 | Salemi ch.12 | `homework/verif/per_chapter/hw_ch12_uvm_components/phases_demo.sv` | ✅ DONE | `my_component` overrides `build_phase` + `run_phase` only. |
 | Salemi ch.13 | `homework/verif/per_chapter/hw_ch13_uvm_environments/base_tester_override.sv` | ✅ DONE | Abstract `base_tester` with `random_tester` and `add_tester` subclasses; `set_type_override` flips behaviour. |
 
-## Per-chapter drills — Design (TODO — Yuval's current focus)
+## Per-chapter drills — Design
 
 | Chapter | File path | Status | Acceptance |
 |---|---|---|---|
-| Dally ch.10 | `homework/design/per_chapter/hw_dally_ch10_arithmetic_basics/ripple_carry_adder.sv` + `_tb.sv` | ⬜ TODO | Parameterised N-bit ripple-carry adder; TB drives a few vectors and asserts sum. |
-| Dally ch.12 | `homework/design/per_chapter/hw_dally_ch12_fast_arithmetic/cla_adder.sv` + `_tb.sv` | ⬜ TODO | 4-bit CLA. Compare gate count and critical-path delay vs ripple-carry on paper (write up in `notes.md`). |
-| Sutherland ch.10 | `homework/design/per_chapter/hw_sutherland_ch4_interfaces/alu_if.sv` | ⬜ TODO | `alu_if` with `modport dut`, `modport tb`, `modport monitor`, `clocking` block. (Folder slug says `ch4` but reading is ch.10 — beta filename artefact; don't rename, just use it.) |
+| Dally ch.10 | `homework/design/per_chapter/hw_dally_ch10_arithmetic_basics/ripple_carry_adder.sv` + `_tb.sv` | ✅ DONE | Parameterised N-bit ripple-carry adder; TB drives a few vectors and asserts sum. |
+| Dally ch.12 | `homework/design/per_chapter/hw_dally_ch12_fast_arithmetic/cla_adder.sv` + `_tb.sv` | ✅ DONE | 4-bit CLA. Compare gate count and critical-path delay vs ripple-carry on paper (write up in `notes.md`). |
+| Sutherland ch.10 | `homework/design/per_chapter/hw_sutherland_ch4_interfaces/alu_if.sv` | ✅ DONE | `alu_if` with `modport dut`, `modport tb`, `modport monitor`, `clocking` block. (Folder slug says `ch4` but reading is ch.10 — beta filename artefact; don't rename, just use it.) |
 
 ## Connector exercise — Design
 
-### `homework/design/connector/alu/alu.sv` ⬜ TODO
+### `homework/design/connector/alu/alu.sv` ✅ DONE
 
 Spec (industry style):
 
