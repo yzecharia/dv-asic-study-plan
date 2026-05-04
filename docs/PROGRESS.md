@@ -134,7 +134,7 @@ Auto-regenerable via `python3 tools/update_progress_badges.py`.
 - [ ] Iron Rule (a)/(b)/(c)
 
 ### ⬜ Week 16 — Signed & Fixed-Point Arithmetic 🆕
-- [ ] Reading: Dally ch.10 (numbers) + ch.11 (multipliers) **TO VERIFY**
+- [ ] Reading: Dally ch.10 (numbers) + ch.11 (multipliers)
 - [ ] Design: Q4.12 saturating MAC + rounding modes
 - [ ] Stretch: Booth multiplier
 - [ ] Verif: SV class TB + Python golden vectors + sat/round coverage

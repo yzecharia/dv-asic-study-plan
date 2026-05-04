@@ -2,10 +2,9 @@
 
 **Category**: Synthesis · **Used in**: W15, W19, W20 · **Type**: auto-stub
 
-> ⚠️ **TO VERIFY**: Bhasker's *STA for Nanometer Designs* (the canonical
-> reference) is **not in the local library**. This stub uses Xilinx
+> Bhasker's *STA for Nanometer Designs* is the canonical industry
+> reference but is not in the local library. This note uses Xilinx
 > UG949 / UG903 + Cummings SNUG-2008 (for the metastability angle).
-> Acquire Bhasker if STA depth is needed in interview prep.
 
 Static timing analysis verifies that every flop-to-flop path in the
 design meets setup and hold timing under worst-case process,

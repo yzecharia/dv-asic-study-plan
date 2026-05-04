@@ -232,8 +232,7 @@ log-depth carry timing that synthesisers can't always rediscover.
 ## Reading
 
 - Dally & Harting *Digital Design: A Systems Approach* ch.12 (fast
-  arithmetic) — primary reference for hierarchical CLA. **TO VERIFY**
-  exact section pages.
+  arithmetic) — primary reference for hierarchical CLA.
 - Harris & Harris *Digital Design and Computer Architecture: RISC-V*
   ch.5 §5.2 — adder structures comparison.
 - Sutherland *RTL Modeling with SystemVerilog* — operators chapter,

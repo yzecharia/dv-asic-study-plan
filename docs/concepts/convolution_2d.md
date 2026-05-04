@@ -78,7 +78,7 @@ W18 verifies all three modes via functional coverage.
 ## Reading
 
 - Bailey *Design for Embedded Image Processing on FPGAs*, ch.7
-  (windowed processing) — TO VERIFY by Yuval.
+  (windowed processing).
 - Xilinx XAPP933 — alternative reference (free).
 - Smith DSP ch.24 (linear image processing) — free online.
 

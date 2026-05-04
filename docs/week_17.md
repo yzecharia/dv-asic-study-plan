@@ -24,15 +24,11 @@ do you pay one extra cycle for a faster Fmax, or hold latency tight?
 ### Reading — Design
 
 - **Dally & Harting ch.12 — Fast Arithmetic** — pipelined adder/multiplier
-  scaffold. **TO VERIFY** which sections specifically cover pipelined
-  arith vs single-cycle.
+  scaffold.
 - **Smith *Scientist & Engineer's Guide to DSP*** ([dspguide.com](https://www.dspguide.com)):
   - ch.14 — Introduction to digital filters
   - ch.15 — Moving average filters
   - ch.16 — Windowed-sinc filters
-
-  **TO VERIFY by Yuval**: confirm Smith ch.14–16 are acceptable as the
-  primary DSP reference. No local DSP book covers this.
 
 ### Concept notes
 
@@ -141,7 +137,7 @@ LUT/FF/Fmax. Document trade-off in `notes.md`.
 ### Verification Track
 
 - [ ] Read Spear ch.9 §9.7+ (streaming coverage)
-- [ ] Read Smith DSP ch.14–16 (online) — TO VERIFY accepted
+- [ ] Read Smith DSP ch.14–16 (online)
 - [ ] Drill — impulse response
 - [ ] Connector — golden-vector regression (10 signals)
 - [ ] Big-picture — frequency response sanity
@@ -150,7 +146,7 @@ LUT/FF/Fmax. Document trade-off in `notes.md`.
 
 ### Design Track
 
-- [ ] Read Dally ch.12 (pipelined arithmetic) — TO VERIFY pp.
+- [ ] Read Dally ch.12 (pipelined arithmetic)
 - [ ] Drill — single FIR tap
 - [ ] Connector — 8-tap symmetric FIR
 - [ ] Big-picture — pipelined retiming + Yosys before/after

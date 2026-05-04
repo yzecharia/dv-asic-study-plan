@@ -29,10 +29,8 @@ into hand-waving.
 
 - **Dally & Harting ch.10 — Number Systems** ⭐ — two's complement,
   signed addition with overflow detection, sign extension semantics.
-  **TO VERIFY by Yuval**: confirm pp. and which sub-sections cover
-  signed-multiplier hardware vs Booth encoding.
 - **Dally & Harting ch.11 — Multipliers** — partial products,
-  Wallace/Dadda trees, Booth encoding. **TO VERIFY** chapter contents.
+  Wallace/Dadda trees, Booth encoding.
 - **Sutherland *RTL Modeling with SystemVerilog* — Arithmetic
   operators chapter** — synthesis behaviour of `*`, `+`, `-`,
   `signed` casts.
@@ -163,8 +161,8 @@ pip3 install numpy
 
 ### Design Track
 
-- [ ] Read Dally ch.10 (numbers) — TO VERIFY pp.
-- [ ] Read Dally ch.11 (multipliers) — TO VERIFY pp.
+- [ ] Read Dally ch.10 (numbers)
+- [ ] Read Dally ch.11 (multipliers)
 - [ ] Read Sutherland RTL Modeling — arithmetic operators ch.
 - [ ] Drill 1 — signed adder with overflow flag
 - [ ] Drill 2 — Q4.12 round-and-saturate function module

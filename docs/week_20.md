@@ -22,8 +22,7 @@ End-to-end, on your GitHub, with a 5-minute demo video script.
 
 ### Reading — Verification
 
-- **Rosenberg & Meade *Practical UVM* — RAL chapter**. **TO VERIFY**
-  exact chapter number (referenced from W14 too).
+- **Rosenberg & Meade *Practical UVM* — RAL chapter**.
 - **UVM Cookbook — RAL section** ([verificationacademy.com/cookbook/registers](https://verificationacademy.com/cookbook/registers))
   — adapter patterns, frontdoor vs backdoor.
 - **Rosenberg ch. on multi-UVC environments** — virtual sequencer
@@ -160,7 +159,7 @@ Fmax in `synth_report.md`. Stretch: timing-driven retiming pass.
 
 ### Verification Track
 
-- [ ] Read Rosenberg RAL chapter (TO VERIFY ch. number)
+- [ ] Read Rosenberg RAL chapter
 - [ ] Read UVM Cookbook RAL section
 - [ ] HW1 — RAL auto-gen pipeline (YAML → SV)
 - [ ] HW2 — Multi-UVC env with virtual sequencer

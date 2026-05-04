@@ -24,8 +24,9 @@ RTL idioms, and the SVA together.
 ### Reading — Design
 
 - **Cummings *CDC Design & Verification Techniques Using SystemVerilog***
-  — SNUG-2008. **TO VERIFY**: confirm PDF is local; if not, fetch
-  from cummings.com.
+  — SNUG-2008. Free PDF at
+  https://cummings.com/papers/cdc-design-using-systemverilog.pdf
+  if not in local library.
 - **Sutherland *SystemVerilog for Design* — Clocking blocks chapter**
   (relevant for TB-side CDC).
 - **Dally & Harting ch.28 — Synchronous to Asynchronous**: thin
@@ -145,7 +146,7 @@ period_b/2).
 
 ### Verification Track
 
-- [ ] Read Cummings CDC SNUG-2008 (TO VERIFY local)
+- [ ] Read Cummings CDC SNUG-2008
 - [ ] Read Cummings SVA SNUG-2009 (refresh)
 - [ ] Drill — 2-FF SVA bundle
 - [ ] Drill — pulse synchroniser

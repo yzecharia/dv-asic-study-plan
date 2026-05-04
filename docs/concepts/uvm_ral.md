@@ -93,8 +93,7 @@ bb_seq.start(null);
 
 ## Reading
 
-- Rosenberg *Practical Guide to Adopting the UVM* — RAL chapter
-  (chapter number TO VERIFY by Yuval).
+- Rosenberg *Practical Guide to Adopting the UVM* — RAL chapter.
 - UVM Cookbook RAL section — patterns and adapter examples
   (https://verificationacademy.com/cookbook/registers).
 - IEEE 1800.2-2020 §18 (uvm_reg).

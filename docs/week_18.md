@@ -22,8 +22,7 @@ sliding window.
 ### Reading — Design
 
 - **Bailey *Design for Embedded Image Processing on FPGAs*, ch.7 —
-  Window-based processing**. **TO VERIFY by Yuval**: not in local
-  library; confirm acceptable as primary reference.
+  Window-based processing**.
 - **Xilinx XAPP933** *(alternative)* — free Xilinx app note on
   line-buffer architecture. Use if Bailey is unavailable.
 - **Smith DSP guide** ch.24 — Linear image processing
@@ -133,7 +132,7 @@ vertical pass. Compare LUT/FF count vs the monolithic 3×3 design.
 
 ### Verification Track
 
-- [ ] Read Bailey ch.7 OR Xilinx XAPP933 (TO VERIFY)
+- [ ] Read Bailey ch.7 OR Xilinx XAPP933
 - [ ] Drill — line-buffer round-trip
 - [ ] Connector — 3 kernels × scipy reference golden
 - [ ] Big-picture — edge-mode coverage

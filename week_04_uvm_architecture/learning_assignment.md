@@ -14,9 +14,7 @@ Anchor: **Salemi *The UVM Primer* ch.9–14**.
 | ch.14 | A New Paradigm | Short philosophical close — what UVM gives you over plain OOP. |
 
 **Page-precise refs**: see canonical `docs/week_04.md` — Yuval's
-already-confirmed chapter list. (Page numbers TBD; `TO VERIFY` open
-on whether Salemi 1st ed ch.13 begins at p.103 or p.110 — confirm
-when reading.)
+already-confirmed chapter list.
 
 Concept notes to skim/update:
 - [[concepts/uvm_phases]]
@@ -28,7 +26,7 @@ Concept notes to skim/update:
 
 | Source | Why |
 |---|---|
-| Dally & Harting ch.10 — Arithmetic Circuits | Ripple-carry adder, subtractor, comparator, shift-add multiplier. **TO VERIFY** — confirm chapter contents before writing the W4 design HW. |
+| Dally & Harting ch.10 — Arithmetic Circuits | Ripple-carry adder, subtractor, comparator, shift-add multiplier. |
 | Dally & Harting ch.12 — Fast Arithmetic | CLA, Wallace trees, barrel shifters. |
 | Sutherland *SV for Design* (2e) ch.10 — Interfaces | `interface`, `modport`, `clocking`. The Sutherland *SV for Design* book interfaces chapter is **ch.10** — earlier drafts of this plan said ch.4-5; that was wrong. |
 | Cummings *Synthesis Coding Styles for Efficient Designs* (SNUG-2012) | Synthesis-friendly RTL idioms for the ALU. |

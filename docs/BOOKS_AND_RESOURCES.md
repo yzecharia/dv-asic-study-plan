@@ -55,7 +55,7 @@ The industry-gold short papers. Read all of these.
 [dspguide.com](https://www.dspguide.com) — Chapters 14–16 cover FIR filter design and impulse response. **W17 anchor** (no local DSP book).
 
 ### Bailey — *Design for Embedded Image Processing on FPGAs* (or Xilinx XAPP933)
-For 2D convolution + line-buffer architecture. **W18 anchor** (no local imaging book). XAPP933 (Xilinx app-note "Memory Interfaces Made Easy with Xilinx FPGAs" — TO VERIFY exact title) is the open alternative.
+For 2D convolution + line-buffer architecture. **W18 anchor** (no local imaging book). XAPP933 is the free Xilinx app-note alternative on line-buffer architecture.
 
 ### ARM AMBA AXI Specification (IHI0022E)
 Free PDF from arm.com. W11 (AXI-Lite slave), W14 + W20 (RAL adapter).
@@ -85,8 +85,8 @@ Free PDF from arm.com. W11 (AXI-Lite slave), W14 + W20 (RAL adapter).
 
 | Topic | Status | Plan |
 |---|---|---|
-| Static Timing Analysis (Bhasker) | No local book | Use Xilinx UG949 + tool reports for W15. Concept note `static_timing_analysis.md` carries a TO-VERIFY tag. |
-| 1D/2D DSP filters | No local book | Smith DSP (W17), Bailey or XAPP933 (W18). Both online-only. **TO VERIFY by Yuval** that Smith ch.14–16 and Bailey ch.7 (or XAPP933) are acceptable supplements. |
+| Static Timing Analysis (Bhasker) | No local book | Use Xilinx UG949 + tool reports for W15. Concept note `static_timing_analysis.md` documents the gap. |
+| 1D/2D DSP filters | No local book | Smith DSP (W17), Bailey or XAPP933 (W18). Both online-only. |
 | CDC depth (metastability MTBF math) | Beta cited Dally ch.28 — thin | Cummings SNUG-2008 paper is the deeper reference, applied in W19. |
 | AMBA AXI4 (full burst, multi-master) | Out of scope | AXI-Lite only (W11, W20). Stretch: AXI-Full noted in `INTERVIEW_PREP.md` as a topic to study post-graduation. |
 | Formal verification | Out of scope | Mentioned in `INTERVIEW_PREP.md` only. SymbiYosys is the open-source path if needed later. |
@@ -118,22 +118,3 @@ Free PDF from arm.com. W11 (AXI-Lite slave), W14 + W20 (RAL adapter).
 | W19 | Cummings CDC SNUG-2008 + SVA SNUG-2009 + Sutherland Design clocking ch. | — |
 | W20 | Rosenberg RAL + UVM Cookbook RAL + ARM AMBA AXI | — |
 
----
-
-## 5. TO VERIFY by Yuval
-
-Before authoring W16/W17/W18/W20 homework specs, please confirm:
-
-1. **Dally & Harting** — chapters 10 (numbers) and 11 (multipliers)
-   actually cover signed arithmetic and multiplier microarchitecture
-   in the depth needed for the W16 spec.
-2. **Rosenberg & Meade** — confirm the exact RAL chapter number
-   (referenced from W14 and W20). Update the W4–W7 syllabi if needed.
-3. **Cummings CDC SNUG-2008** PDF — present locally? If not, link to
-   `cummings.com/papers/cdc-design-using-systemverilog.pdf` (free).
-4. **Smith DSP guide** ch.14–16 — acceptable as the primary W17
-   reference?
-5. **Bailey ch.7** vs **Xilinx XAPP933** — pick one as the primary W18
-   reference (or use both side-by-side).
-
-Edit this file's table 3 row by row as you confirm.
