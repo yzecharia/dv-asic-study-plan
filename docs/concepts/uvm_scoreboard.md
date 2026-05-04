@@ -76,9 +76,15 @@ endgroup
 
 ## Reading
 
-- Salemi ch.24 — scoreboard chapter.
-- Rosenberg ch.6 — production scoreboard patterns.
-- Verification Academy UVM Cookbook — scoreboard recipes (free).
+- Salemi *UVM Primer* ch.10 (OO testbench — scoreboard as a class),
+  pp. 59, 62–65.
+- Salemi ch.12 (UVM Components — scoreboard as a `uvm_component`,
+  `build_phase` / `connect_phase` overrides), pp. 76–79.
+- Salemi ch.16 (Analysis Ports in a Testbench — wiring monitor.ap
+  → scoreboard.imp), pp. 106–114.
+- Rosenberg & Meade ch.6 — production scoreboard patterns.
+- Verification Academy UVM Cookbook — scoreboard recipes:
+  https://verificationacademy.com/cookbook/scoreboards
 
 ## Cross-links
 
