@@ -8,7 +8,7 @@
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)
 
 > **Work in progress.** Personal self-study curriculum aimed at
-> NVIDIA-tier Junior RTL Design / Design Verification roles. I build in
+> top-tier Junior RTL Design / Design Verification roles. I build in
 > the open and commit as I go.
 
 This is the **2.0 rewrite** of my earlier 15-week beta plan. It
