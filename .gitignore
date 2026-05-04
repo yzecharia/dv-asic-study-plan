@@ -43,6 +43,14 @@ build_rtl/
 *.synth.json
 *.netlist.json
 
+# ── Obsidian (personal vault config + scratch) ───────────────────
+.obsidian/
+Untitled*.canvas
+Untitled*.base
+Untitled*.md
+# Empty daily-note scratch at repo root (YYYY-MM-DD.md)
+/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].md
+
 # ── Project-specific ─────────────────────────────────────────────
 week_03_coverage_assertions/learning/misc/mailbox_example.sv
 week_04_uvm_architecture/learning/salemi_uvm_primer/ch11_uvm_tests/skeleton/
