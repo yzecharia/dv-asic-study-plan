@@ -11,11 +11,11 @@ State as of bootstrap (2026-05-03): 48% done per badge.
 - [x] Read Salemi *UVM Primer* ch.13 (uvm_environments)
 - [x] Read Salemi *UVM Primer* ch.14 (a new paradigm)
 - [ ] Watched Verification Academy UVM Basics
-- [x] Drill ch.9 (factory pattern — plain SV)
-- [x] Drill ch.10 (OO testbench, no UVM)
-- [x] Drill ch.11 (hello UVM)
-- [x] Drill ch.12 (component phases — build + run only)
-- [x] Drill ch.13 (abstract base_tester + factory override)
+- [ ] Drill ch.9 (factory pattern — plain SV)
+- [ ] Drill ch.10 (OO testbench, no UVM)
+- [ ] Drill ch.11 (hello UVM)
+- [ ] Drill ch.12 (component phases — build + run only)
+- [ ] Drill ch.13 (abstract base_tester + factory override)
 - [x] HW1: architecture diagram from memory
 - [ ] HW2: ALU UVM TB, Salemi-ch.13 style (no sequences)
 - [ ] HW3: standalone factory override demo
