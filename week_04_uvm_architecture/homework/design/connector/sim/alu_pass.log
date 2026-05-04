@@ -1,0 +1,48 @@
+[0;36m╔══════════════════════════════════════════════════════╗[0m
+[0;36m║  [1;33mVivado xsim via Docker[0;36m                              ║[0m
+[0;36m╚══════════════════════════════════════════════════════╝[0m
+[0;36m  Project:[0m  /Users/yuval/sv_projects/study_plan_2.0/week_04_uvm_architecture/homework/design/connector
+[0;36m  Files:[0m    alu.sv alu_if.sv alu_tb.sv
+[0;36m  Top:[0m      alu_tb
+
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/work/alu.sv" into library work
+INFO: [VRFC 10-311] analyzing module alu
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/work/alu_if.sv" into library work
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/work/alu_tb.sv" into library work
+INFO: [VRFC 10-311] analyzing module alu_tb
+Vivado Simulator v2024.1
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+Running: /home/user/Xilinx/Vivado/2024.1/bin/unwrapped/lnx64.o/xelab -L uvm alu_tb -s sim --debug off 
+Multi-threading is on. Using 6 slave threads.
+Starting static elaboration
+Pass Through NonSizing Optimizer
+Completed static elaboration
+Starting simulation data flow analysis
+Completed simulation data flow analysis
+Time Resolution for simulation is 1ps
+Compiling module work.cb
+Compiling module work.alu_if_default
+Compiling module work.alu
+Compiling module work.alu_tb
+Built simulation snapshot sim
+
+****** xsim v2024.1 (64-bit)
+  **** SW Build 5076996 on Wed May 22 18:36:09 MDT 2024
+  **** IP Build 5075265 on Wed May 22 21:45:21 MDT 2024
+  **** SharedData Build 5076995 on Wed May 22 18:29:18 MDT 2024
+  **** Start of session at: Mon May  4 11:09:57 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source xsim.dir/sim/xsim_script.tcl
+# xsim {sim} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+Test Pass
+$finish called at time : 20656 ns : File "/work/alu_tb.sv" Line 46
+exit
+INFO: xsimkernel Simulation Memory Usage: 581576 KB (Peak: 637932 KB), Simulation CPU Usage: 70 ms
+INFO: [Common 17-206] Exiting xsim at Mon May  4 11:10:01 2026...
+
+[0;32m✓ Simulation completed successfully[0m

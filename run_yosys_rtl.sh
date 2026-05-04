@@ -37,20 +37,29 @@ OUT_DIR="$TOP_DIR/build_rtl"
 mkdir -p "$OUT_DIR"
 
 # Collect every .sv file in the folder so dependencies (e.g. halfadder.sv
-# next to fulladder.sv) compile together. Skip *_tb.sv — testbenches use
-# $fatal/$urandom/tasks/etc. which Yosys cannot synthesize.
+# next to fulladder.sv) compile together. Skip files Yosys cannot
+# synthesize:
+#   - *_tb.sv / tb_*.sv : testbenches (use $fatal/$urandom/tasks/int)
+#   - *_if.sv  / if_*.sv : TB-side interfaces (often contain `clocking`)
+#   - any file with a `clocking` block (Yosys cannot parse it at all)
 shopt -s nullglob
 SV_FILES=()
 for f in "$TOP_DIR"/*.sv; do
-    case "$(basename "$f")" in
-        *_tb.sv|tb_*.sv) ;;          # skip testbenches
-        *) SV_FILES+=("$f") ;;
+    base="$(basename "$f")"
+    case "$base" in
+        *_tb.sv|tb_*.sv) continue ;;
+        *_if.sv|if_*.sv) continue ;;
     esac
+    if grep -qE '^[[:space:]]*clocking[[:space:]]+[A-Za-z_]' "$f"; then
+        continue
+    fi
+    SV_FILES+=("$f")
 done
 shopt -u nullglob
 
 if [[ ${#SV_FILES[@]} -eq 0 ]]; then
-    echo "Error: no synthesizable .sv files found in $TOP_DIR (only testbenches?)"
+    echo "Error: no synthesizable .sv files found in $TOP_DIR"
+    echo "       (TBs and clocking-block interfaces were filtered out)"
     exit 1
 fi
 

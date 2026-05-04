@@ -28,8 +28,8 @@ State as of bootstrap (2026-05-03): 48% done per badge.
 - [ ] Read Sutherland *SV for Design* ch.10 (interfaces)
 - [x] Drill Dally ch.10 (ripple-carry adder)
 - [x] Drill Dally ch.12 (carry-lookahead adder)
-- [ ] Drill Sutherland ch.10 (ALU SV interface)
-- [ ] HW1: ALU DUT (registered, valid handshake)
+- [x] Drill Sutherland ch.10 (ALU SV interface)
+- [x] HW1: ALU DUT (registered, valid handshake)
 - [ ] HW2: shift-add multiplier
 - [ ] HW3: barrel shifter
 
