@@ -2,7 +2,7 @@
 
 ![Progress](https://img.shields.io/badge/progress-3%2F20_weeks-brightgreen)
 ![Current Week](https://img.shields.io/badge/current_week-4-blue)
-![Week 4 Progress](https://img.shields.io/badge/week_4_progress-72%25-orange)
+![Week 4 Progress](https://img.shields.io/badge/week_4_progress-76%25-orange)
 ![Phase](https://img.shields.io/badge/phase-2_UVM_Methodology-blue)
 ![Toolchain](https://img.shields.io/badge/toolchain-arm64_native_+_Vivado_Docker_for_UVM-lightgrey)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)
@@ -107,7 +107,7 @@ study_plan_2.0/
 │   ├── INTERVIEW_PREP.md              # junior RTL/DV question categories
 │   ├── PORTFOLIO_PROJECTS.md          # the 3+2 flagship repos
 │   ├── prompts/                       # reusable AI prompt templates
-│   ├── concepts/                      # ~58 reusable [[wikilink]]-able concept notes
+│   ├── concepts/                      # ~61 reusable [[wikilink]]-able concept notes
 │   └── uvm_consolidation_salemi_ch9-15.pdf
 │
 ├── cheatsheets/                       # runnable .sv reference snippets

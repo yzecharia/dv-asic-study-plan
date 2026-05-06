@@ -11,7 +11,7 @@ State as of bootstrap (2026-05-03): 48% done per badge.
 - [x] Read Salemi *UVM Primer* ch.13 (uvm_environments)
 - [x] Read Salemi *UVM Primer* ch.14 (a new paradigm)
 - [ ] Watched Verification Academy UVM Basics
-- [ ] Drill ch.9 (factory pattern — plain SV)
+- [x] Drill ch.9 (factory pattern — plain SV)
 - [x] Drill ch.10 (OO testbench, no UVM)
 - [x] Drill ch.11 (hello UVM)
 - [x] Drill ch.12 (component phases — build + run only)
