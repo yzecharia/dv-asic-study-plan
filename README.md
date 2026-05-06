@@ -107,7 +107,7 @@ study_plan_2.0/
 │   ├── INTERVIEW_PREP.md              # junior RTL/DV question categories
 │   ├── PORTFOLIO_PROJECTS.md          # the 3+2 flagship repos
 │   ├── prompts/                       # reusable AI prompt templates
-│   ├── concepts/                      # ~52 reusable [[wikilink]]-able concept notes
+│   ├── concepts/                      # ~58 reusable [[wikilink]]-able concept notes
 │   └── uvm_consolidation_salemi_ch9-15.pdf
 │
 ├── cheatsheets/                       # runnable .sv reference snippets
