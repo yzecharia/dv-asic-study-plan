@@ -9,10 +9,10 @@ moving to HW2 (ALU UVM TB). Design side stubbed.
 | Chapter | File path | Status | Acceptance |
 |---|---|---|---|
 | Salemi ch.9 | `homework/verif/per_chapter/hw_ch09_factory_pattern/factory_demo_pkg.sv` + `factory_demo_top.sv` | ⬜ TODO | Animal factory using plain SV `case`+`$cast`; no UVM macros. |
-| Salemi ch.10 | `homework/verif/per_chapter/hw_ch10_oo_testbench/oo_tb_demo.sv` | ⬜ TODO | `testbench` class composes `tester`/`scoreboard`/`coverage`; `execute()` via `fork/join_none`. |
-| Salemi ch.11 | `homework/verif/per_chapter/hw_ch11_uvm_tests/hello_uvm_test.sv` | ⬜ TODO | Minimal `uvm_test`; `+UVM_TESTNAME` selection works. |
-| Salemi ch.12 | `homework/verif/per_chapter/hw_ch12_uvm_components/phases_demo.sv` | ⬜ TODO | `my_component` overrides `build_phase` + `run_phase` only. |
-| Salemi ch.13 | `homework/verif/per_chapter/hw_ch13_uvm_environments/base_tester_override.sv` | ⬜ TODO | Abstract `base_tester` with `random_tester` and `add_tester` subclasses; `set_type_override` flips behaviour. |
+| Salemi ch.10 | `homework/verif/per_chapter/hw_ch10_oo_testbench/oo_tb_demo.sv` | ✅ DONE | `testbench` class composes `tester`/`scoreboard`/`coverage`; `execute()` via `fork/join_none`. |
+| Salemi ch.11 | `homework/verif/per_chapter/hw_ch11_uvm_tests/hello_uvm_test.svh` | ✅ DONE | Minimal `uvm_test`; `+UVM_TESTNAME` selection works. |
+| Salemi ch.12 | `homework/verif/per_chapter/hw_ch12_uvm_components/phase_demo.sv` | ✅ DONE | `my_component` overrides `build_phase` + `run_phase` only. |
+| Salemi ch.13 | `homework/verif/per_chapter/hw_ch13_uvm_environments/{base_tester,random_tester,add_tester,env,random_test,add_test}.svh + ch13_pkg.svh + top.sv` | ✅ DONE | Abstract `base_tester` with `random_tester` and `add_tester` subclasses; `set_type_override` flips behaviour. |
 
 ## Per-chapter drills — Design
 

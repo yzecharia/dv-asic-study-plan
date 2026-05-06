@@ -1,0 +1,45 @@
+Vivado xsim UVM run (reusing existing snapshot)
+  Project:  week_04_uvm_architecture/homework/verif/per_chapter/hw_ch13_uvm_environments
+  Test:     add_test
+
+xsim {sim} -testplusarg UVM_TESTNAME=add_test -autoloadwcfg -runall
+run -all
+
+UVM-1.2
+
+UVM_INFO @ 0: reporter [NO_DPI_TSTNAME] UVM_NO_DPI defined
+UVM_INFO @ 0: reporter [RNTST] Running test add_test...
+UVM_INFO @ 0: reporter [UVM/COMP/NAMECHECK] component name checks require DPI
+base_tester: data=87, op=1
+base_tester: data=9a, op=1
+base_tester: data=0,  op=1
+base_tester: data=92, op=1
+base_tester: data=dc, op=1
+base_tester: data=0,  op=1
+base_tester: data=0,  op=1
+base_tester: data=0,  op=1
+base_tester: data=f6, op=1
+base_tester: data=49, op=1
+UVM_INFO @ 0: reporter [TEST_DONE] 'run' phase ready to proceed to 'extract'
+
+--- UVM Report Summary ---
+** Report counts by severity
+UVM_INFO    : 5
+UVM_WARNING : 0
+UVM_ERROR   : 0
+UVM_FATAL   : 0
+
+$finish called at time : 0 fs
+exit
+
+Test 'add_test' completed
+ADD_TEST PASS
+
+Op distribution observed (10 transactions): op=1 (add_op) x 10.
+add_tester::get_op() returns 1 unconditionally — observed 100% which
+matches the override. The factory's set_type_override(base_tester ->
+add_tester) successfully replaced random_tester's behaviour without
+any change to env, base_tester, or top.sv.
+
+Same compiled snapshot as random_test_pass.log → confirms
+"compile-once, swap tests via +UVM_TESTNAME" works end to end.
