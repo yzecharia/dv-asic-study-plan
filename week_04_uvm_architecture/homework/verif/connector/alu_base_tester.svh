@@ -18,10 +18,6 @@ virtual class alu_base_tester extends uvm_component;
         operation_e op;
 
         phase.raise_objection(this);
-            // See docs/concepts/uvm_reset_synchronisation.md.
-            // Wait for reset deassertion + one clocking edge before driving;
-            // otherwise the first valid_in pulse is consumed inside the reset
-            // window and the handshake hangs.
             wait (aluif.rst_n === 1'b1);
             @(aluif.driver_cb);
             repeat (NUM_TXN) begin
