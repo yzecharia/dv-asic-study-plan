@@ -72,7 +72,7 @@ fully.
 > chapter — the goal is to feel each concept under your fingers in
 > isolation, not to build a real testbench.
 
-- **Drill ch.9 — Plain-SV factory** ✅ already done
+- **Drill ch.9 — Plain-SV factory**
   *Files:* `homework/verif/per_chapter/hw_ch09_factory_pattern/`
   Recreate Salemi's animal/lion/chicken factory **as Salemi writes it**:
   an `animal_factory` class with a static `make_animal(string species,
@@ -81,7 +81,7 @@ fully.
   / `chicken`. **No UVM macros, no `type_id::create`, no
   `set_type_override`** — those belong to ch.11+ drills.
 
-- **Drill ch.10 — OO testbench (no UVM)** ✅ partly done
+- **Drill ch.10 — OO testbench (no UVM)**
   *File:* `homework/verif/per_chapter/hw_ch10_oo_testbench/oo_tb_demo.sv`
   Build a `testbench` class composing `tester` + `scoreboard` +
   `coverage` (all plain SV classes). Each holds `virtual <bfm>`. The
@@ -121,7 +121,7 @@ fully.
 
 ### Main HWs
 
-#### HW1: Architecture diagram from memory ✅ done
+#### HW1: Architecture diagram from memory
 *Folder:* `homework/verif/big_picture/architecture_diagram/`
 Drew the canonical UVM architecture (test → env → agent
 {seq+drv+mon} + scoreboard + coverage) from memory and exported as
