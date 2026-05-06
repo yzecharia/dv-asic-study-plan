@@ -50,7 +50,9 @@ This DUT is reused by Verif HW2 below.
 
 ## Connector exercise — Verification
 
-### `homework/verif/connector/hw2_alu_uvm_tb/` ⬜ IN PROGRESS
+### `homework/verif/connector/` ✅ DONE
+(files live directly under `connector/`, not under `hw2_alu_uvm_tb/`
+as the original spec sketched — beta naming artefact, kept flat.)
 
 Build a UVM TB for the ALU **using only ch.9–14 concepts** (no
 sequences, no TLM, no analysis ports — those are W5).

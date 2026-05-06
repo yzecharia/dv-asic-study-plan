@@ -17,7 +17,7 @@ State as of bootstrap (2026-05-03): 48% done per badge.
 - [x] Drill ch.12 (component phases — build + run only)
 - [x] Drill ch.13 (abstract base_tester + factory override)
 - [x] HW1: architecture diagram from memory
-- [ ] HW2: ALU UVM TB, Salemi-ch.13 style (no sequences)
+- [x] HW2: ALU UVM TB, Salemi-ch.13 style (no sequences)
 - [ ] HW3: standalone factory override demo
 - [ ] Can answer all self-check questions
 
@@ -37,8 +37,10 @@ State as of bootstrap (2026-05-03): 48% done per badge.
 
 - [ ] (a) RTL committed and lint-clean (`verilator --lint-only -Wall`)
 - [x] (b) Gold-TB PASS log captured for verif drills (`sim/uvm_drills_pass.log`)
-- [ ] (b) Gold-TB PASS log captured for ALU TB (`sim/alu_uvm_pass.log`)
-- [ ] (c) `verification_report.md` written
+- [x] (b) Gold-TB PASS log captured for ALU TB
+  (`sim/connector_alu_random_pass.log`,
+  `sim/connector_alu_directed_pass.log`)
+- [x] (c) `verification_report.md` written
 
 ## Cross-cutting weekly tasks
 
