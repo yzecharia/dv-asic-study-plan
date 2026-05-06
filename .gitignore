@@ -35,6 +35,7 @@ xsim.covdb/
 .yosys_tmp/
 build/
 waves/
+obj_dir/
 
 # ── Yosys schematic outputs (regen via run_yosys_rtl.sh) ─────────
 build_rtl/
@@ -53,6 +54,10 @@ Untitled*.md
 
 # ── Yuval's personal TODO (out of public repo by design) ─────────
 TODO_PRIVATE.md
+
+# ── Salemi reference copies in per-chapter HW folders ────────────
+# (book-derived code, the originals live under learning/salemi_uvm_primer/)
+**/salemi_reference/
 
 # ── Project-specific ─────────────────────────────────────────────
 week_03_coverage_assertions/learning/misc/mailbox_example.sv
