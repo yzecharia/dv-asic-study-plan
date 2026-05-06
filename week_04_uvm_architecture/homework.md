@@ -80,10 +80,17 @@ Multi-cycle multiplier using FSM (IDLE → COMPUTE → DONE). WIDTH cycles
 per multiply. Test corner cases: 0×N, 1×N, MAX×MAX, plus 100 random
 pairs cross-checked against the `*` operator.
 
-### `homework/design/big_picture/barrel_shifter/barrel_shifter.sv` ⬜ TODO
+### `homework/design/big_picture/barrel_shifter/barrel_shifter.sv` ✅ DONE
 
 Single-cycle barrel shifter, `log2(WIDTH)` cascaded MUX layers. SLL /
-SRL / SRA. Test sign-fill on SRA.
+SRL / SRA / ROL / ROR (extended past spec). Pure combinational, no
+FSM. Lint-clean under `verilator --lint-only -Wall`.
+
+Companion file `barrel_shifter_alt.sv` lives in the same folder — an
+alternative implementation using `{d_in, d_in}` concatenation +
+indexed part-select for the rotates instead of the halve-and-OR
+trick. Both synthesise to the same mux cascade; kept as a side-by-side
+reference for the W4-portfolio writeup.
 
 ## Big-picture exercise — Verification
 

@@ -1,6 +1,6 @@
 # Week 4 — UVM Architecture & Components
 
-> **Phase 2 — UVM Methodology** · Salemi ch.9–14 · 🟡 In progress (verif drills + ALU UVM TB done; design big-picture HWs + Iron-Rule (a) lint TODO)
+> **Phase 2 — UVM Methodology** · Salemi ch.9–14 · 🟡 In progress (verif drills + ALU UVM TB + barrel shifter done; shift-add multiplier + factory override demo TODO)
 
 The week where the UVM static architecture clicks: factory pattern,
 `uvm_test`, `uvm_component`, `uvm_env`. Sequences, TLM, transactions
@@ -35,7 +35,7 @@ AI + Power     2h   AI: interview Qs on UVM phases; Power: STAR — UVM bug
 ## Iron-Rule deliverables
 
 - [x] **(b)** Gold TB PASS log — Salemi drills ch.9–13 PASS captured.
-- [ ] **(a)** RTL committed — ALU + adders + multiplier + barrel shifter (in progress).
+- [x] **(a)** RTL committed and lint-clean — ALU + adders + barrel shifter (multiplier still TODO).
 - [x] **(b)** Gold TB PASS log — ALU UVM TB random + directed (`sim/connector_alu_*_pass.log`).
 - [x] **(c)** `verification_report.md` — UVM env walkthrough, factory override flip evidence, bug log.
 

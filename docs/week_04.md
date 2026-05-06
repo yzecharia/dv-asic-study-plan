@@ -297,7 +297,7 @@ After all reading + HW, you should answer these without looking:
 - [x] Drill Sutherland ch.10 (ALU SV interface)
 - [x] HW1: ALU DUT (registered, valid handshake)
 - [ ] HW2: shift-add multiplier
-- [ ] HW3: barrel shifter
+- [x] HW3: barrel shifter
 
 <!-- AUTO-SYNC: per-week views below — regenerate via tools/sync_week_docs.py; do not edit by hand below this line -->
 
@@ -312,7 +312,7 @@ After all reading + HW, you should answer these without looking:
 
 # Week 4 — UVM Architecture & Components
 
-> **Phase 2 — UVM Methodology** · Salemi ch.9–14 · 🟡 In progress (verif drills + ALU UVM TB done; design big-picture HWs + Iron-Rule (a) lint TODO)
+> **Phase 2 — UVM Methodology** · Salemi ch.9–14 · 🟡 In progress (verif drills + ALU UVM TB + barrel shifter done; shift-add multiplier + factory override demo TODO)
 
 The week where the UVM static architecture clicks: factory pattern,
 `uvm_test`, `uvm_component`, `uvm_env`. Sequences, TLM, transactions
@@ -347,7 +347,7 @@ AI + Power     2h   AI: interview Qs on UVM phases; Power: STAR — UVM bug
 ## Iron-Rule deliverables
 
 - [x] **(b)** Gold TB PASS log — Salemi drills ch.9–13 PASS captured.
-- [ ] **(a)** RTL committed — ALU + adders + multiplier + barrel shifter (in progress).
+- [x] **(a)** RTL committed and lint-clean — ALU + adders + barrel shifter (multiplier still TODO).
 - [x] **(b)** Gold TB PASS log — ALU UVM TB random + directed (`sim/connector_alu_*_pass.log`).
 - [x] **(c)** `verification_report.md` — UVM env walkthrough, factory override flip evidence, bug log.
 
@@ -533,10 +533,17 @@ Multi-cycle multiplier using FSM (IDLE → COMPUTE → DONE). WIDTH cycles
 per multiply. Test corner cases: 0×N, 1×N, MAX×MAX, plus 100 random
 pairs cross-checked against the `*` operator.
 
-### `homework/design/big_picture/barrel_shifter/barrel_shifter.sv` ⬜ TODO
+### `homework/design/big_picture/barrel_shifter/barrel_shifter.sv` ✅ DONE
 
 Single-cycle barrel shifter, `log2(WIDTH)` cascaded MUX layers. SLL /
-SRL / SRA. Test sign-fill on SRA.
+SRL / SRA / ROL / ROR (extended past spec). Pure combinational, no
+FSM. Lint-clean under `verilator --lint-only -Wall`.
+
+Companion file `barrel_shifter_alt.sv` lives in the same folder — an
+alternative implementation using `{d_in, d_in}` concatenation +
+indexed part-select for the rotates instead of the halve-and-OR
+trick. Both synthesise to the same mux cascade; kept as a side-by-side
+reference for the W4-portfolio writeup.
 
 ## Big-picture exercise — Verification
 
@@ -638,11 +645,11 @@ State as of bootstrap (2026-05-03): 48% done per badge.
 - [x] Drill Sutherland ch.10 (ALU SV interface)
 - [x] HW1: ALU DUT (registered, valid handshake)
 - [ ] HW2: shift-add multiplier
-- [ ] HW3: barrel shifter
+- [x] HW3: barrel shifter
 
 ## Iron-Rule deliverables
 
-- [ ] (a) RTL committed and lint-clean (`verilator --lint-only -Wall`)
+- [x] (a) RTL committed and lint-clean (ALU + adders + barrel shifter, `verilator --lint-only -Wall` zero warnings)
 - [x] (b) Gold-TB PASS log captured for verif drills (`sim/uvm_drills_pass.log`)
 - [x] (b) Gold-TB PASS log captured for ALU TB
   (`sim/connector_alu_random_pass.log`,

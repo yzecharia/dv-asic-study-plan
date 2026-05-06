@@ -31,11 +31,11 @@ State as of bootstrap (2026-05-03): 48% done per badge.
 - [x] Drill Sutherland ch.10 (ALU SV interface)
 - [x] HW1: ALU DUT (registered, valid handshake)
 - [ ] HW2: shift-add multiplier
-- [ ] HW3: barrel shifter
+- [x] HW3: barrel shifter
 
 ## Iron-Rule deliverables
 
-- [ ] (a) RTL committed and lint-clean (`verilator --lint-only -Wall`)
+- [x] (a) RTL committed and lint-clean (ALU + adders + barrel shifter, `verilator --lint-only -Wall` zero warnings)
 - [x] (b) Gold-TB PASS log captured for verif drills (`sim/uvm_drills_pass.log`)
 - [x] (b) Gold-TB PASS log captured for ALU TB
   (`sim/connector_alu_random_pass.log`,
