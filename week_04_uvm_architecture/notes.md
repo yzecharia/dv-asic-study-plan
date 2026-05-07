@@ -472,3 +472,107 @@ Five rules in this skeleton:
   keyword is redundant. Canonical: `virtual tinyalu_bfm bfm;`.
 - I omitted the `= null` default on the `parent` argument, which
   breaks the standard factory creation pattern.
+
+## Self-check answers — UVM ch.9–13
+
+Captured from senior-mentor review on 2026-05-07 after a first pass
+that scored 1.5/6 cleanly. The corrected versions below are the
+"interview-grade" form — re-read before any UVM interview.
+
+### Q1 — `uvm_object` vs `uvm_component`
+
+|                | `uvm_component`                                                       | `uvm_object`                                                                |
+|----------------|-----------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| Lifetime       | persistent — exists for the entire simulation                         | transient — created and destroyed on demand                                 |
+| Hierarchy      | yes — has a parent and a name in the component tree                   | none                                                                        |
+| Phases         | yes — `build_phase`, `connect_phase`, `run_phase`, `report_phase`, …  | none                                                                        |
+| Typical use    | structural elements (test, env, agent, driver, monitor, scoreboard)   | flow-through data (sequence_item, sequence, config object, reg-model field) |
+
+One-liner: **"components live in a static tree with phases; objects
+flow through that tree as data."**
+
+### Q2 — `type_id::create()` vs `new()`
+
+`type_id::create()` goes through the UVM **factory** — a registry of
+types that maps "requested class" → "actual class to construct."
+Default is identity; `set_type_override` changes the right-hand side.
+
+`new()` skips the factory entirely and constructs the literal class
+you asked for, ignoring any overrides.
+
+The override mechanism *only* works because components were created
+via `type_id::create`. Replace with `new()` and `set_type_override`
+silently does nothing.
+
+This week's `factory_override_demo` is the proof: env's
+`slow_driver::type_id::create("driver_h", this)` returns a real
+`fast_driver` when fast_test installs the override. The handle is
+typed `slow_driver`; the runtime object is `fast_driver`.
+Polymorphism + factory = override works.
+
+### Q3 — Which UVM phases does Salemi ch.12 actually USE (vs just name)
+
+**`build_phase` and `run_phase`** — only those two are demonstrated.
+The chapter names five (build, connect, end_of_elaboration, run,
+report); the others are placeholders until later chapters.
+
+### Q4 — Which class installs the factory override — `uvm_test` or `uvm_env`?
+
+**`uvm_test`**. Three reasons:
+
+1. **Phase ordering.** `build_phase` runs **top-down** through the
+   component tree. The test's `build_phase` fires *before* the env's.
+   The override has to be in the factory before the env calls
+   `type_id::create()`, otherwise the env builds the wrong type.
+
+2. **Separation of concerns.** Env defines *structure*; test defines
+   *behavior*. Overrides are a behavior choice → they belong with
+   the test.
+
+3. **`+UVM_TESTNAME` swapping.** Different tests install different
+   overrides; the env structure stays identical. This is what makes
+   compile-once / run-many actually useful.
+
+### Q5 — What does `uvm_config_db` do, and why does ch.11's `top` need it?
+
+`uvm_config_db` is a **hierarchically-scoped key/value store**. Keys
+are tuples of `(scope, type, field_name)`; scope can be wildcard
+`"*"` or a specific component path; values can be anything (virtual
+interface handles, config objects, parameters, switches).
+
+Why `top` needs it:
+
+- `top` is the **static SV world** — modules and interfaces, wired
+  at elaboration. It has the actual `tinyalu_bfm bfm()` instance.
+- UVM components are **dynamic objects** on the heap. They cannot
+  directly reference a static-world interface; they need a `virtual`
+  handle.
+- `uvm_config_db` is the **bridge**. `top` calls `set` with the
+  virtual interface; components call `get` in their `build_phase`
+  to retrieve it.
+
+One-liner: **"config_db is the static-to-dynamic handoff for
+interfaces, plus a general-purpose parameter store."**
+
+### Q6 — Why is the abstract-base-class + factory-override pattern useful?
+
+Four reasons, increasing in depth:
+
+1. **Decouple stimulus from env structure.** The env never changes.
+   Only the test classes change. Adding test #50 doesn't require
+   touching env code.
+2. **Open-closed extension.** New behavior = new subclass + a
+   one-line `set_type_override`. You extend the env's behavior
+   *without modifying* the env.
+3. **Coverage closure scales linearly.** Chasing a missing bin?
+   Write a constrained subclass that hits it. Doesn't perturb the
+   env or any other test.
+4. **Inheritance + late binding.** The handle is typed as the base
+   class; the actual runtime object can be any subclass. The factory
+   picks at build time. Same call site, different runtime type.
+
+The W4 `factory_override_demo` is the clean proof: env declares
+`slow_driver driver_h`, env's `create` call is identical for both
+runs, but `+UVM_TESTNAME=slow_test` produces SLOW: tick × 5 while
+`+UVM_TESTNAME=fast_test` produces FAST: tick × 5. **Same compiled
+snapshot, two opposite behaviors, zero env code edits.**
