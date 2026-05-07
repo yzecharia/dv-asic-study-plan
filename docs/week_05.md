@@ -283,7 +283,7 @@ contention, every input gets granted in a bounded number of cycles.
 
 # Week 5 — Week 5: UVM Communication — Analysis Ports, TLM, Reporting
 
-> **Phase 2 — UVM Methodology** · canonical syllabus: [`docs/week_05.md`](../docs/week_05.md) · ⬜ Not started
+> **Phase 2 — UVM Methodology** · canonical syllabus: [`docs/week_05.md`](../docs/week_05.md) · 🟡 Active (kicked off 2026-05-07)
 
 In W4 you built the static UVM hierarchy (test → env → components,
 each grabbing the BFM directly). This week you make components **talk

@@ -1,6 +1,6 @@
 # Week 4 — UVM Architecture & Components
 
-> **Phase 2 — UVM Methodology** · Salemi ch.9–14 · 🟡 Closing out (all RTL + verif HWs done; cross-cutting tasks remain)
+> **Phase 2 — UVM Methodology** · Salemi ch.9–14 · 🟢 Complete (25/25, badge green; STAR story #1 + AI Q task remain as career-side artefacts but don't gate)
 
 The week where the UVM static architecture clicks: factory pattern,
 `uvm_test`, `uvm_component`, `uvm_env`. Sequences, TLM, transactions

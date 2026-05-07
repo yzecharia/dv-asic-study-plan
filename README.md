@@ -1,8 +1,8 @@
 # DV / RTL Study Plan 2.0 — 20 Weeks, 4 Phases
 
 ![Progress](https://img.shields.io/badge/progress-3%2F20_weeks-brightgreen)
-![Current Week](https://img.shields.io/badge/current_week-4-blue)
-![Week 4 Progress](https://img.shields.io/badge/week_4_progress-100%25-brightgreen)
+![Current Week](https://img.shields.io/badge/current_week-5-blue)
+![Week 5 Progress](https://img.shields.io/badge/week_5_progress-0%25-red)
 ![Phase](https://img.shields.io/badge/phase-2_UVM_Methodology-blue)
 ![Toolchain](https://img.shields.io/badge/toolchain-arm64_native_+_Vivado_Docker_for_UVM-lightgrey)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)
