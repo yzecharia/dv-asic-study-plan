@@ -277,7 +277,7 @@ After all reading + HW, you should answer these without looking:
 - [x] Read Salemi *UVM Primer* ch.12 (uvm_components)
 - [x] Read Salemi *UVM Primer* ch.13 (uvm_environments)
 - [x] Read Salemi *UVM Primer* ch.14 (a new paradigm)
-- [ ] Watched Verification Academy UVM Basics
+- [x] Watched Verification Academy UVM Basics
 - [x] Drill ch.9 (factory pattern — plain SV)
 - [x] Drill ch.10 (OO testbench, no UVM)
 - [x] Drill ch.11 (hello UVM)
@@ -291,7 +291,7 @@ After all reading + HW, you should answer these without looking:
 ### Design Track
 - [x] Read Dally ch.10 (arithmetic circuits)
 - [x] Read Dally ch.12 (fast arithmetic)
-- [ ] Read Sutherland *SV for Design* ch.10 (interfaces)
+- [x] Read Sutherland *SV for Design* ch.10 (interfaces)
 - [x] Drill Dally ch.10 (ripple-carry adder)
 - [x] Drill Dally ch.12 (carry-lookahead adder)
 - [x] Drill Sutherland ch.10 (ALU SV interface)
@@ -629,7 +629,7 @@ State as of bootstrap (2026-05-03): 48% done per badge.
 - [x] Read Salemi *UVM Primer* ch.12 (uvm_components)
 - [x] Read Salemi *UVM Primer* ch.13 (uvm_environments)
 - [x] Read Salemi *UVM Primer* ch.14 (a new paradigm)
-- [ ] Watched Verification Academy UVM Basics
+- [x] Watched Verification Academy UVM Basics
 - [x] Drill ch.9 (factory pattern — plain SV)
 - [x] Drill ch.10 (OO testbench, no UVM)
 - [x] Drill ch.11 (hello UVM)
@@ -644,7 +644,7 @@ State as of bootstrap (2026-05-03): 48% done per badge.
 
 - [x] Read Dally ch.10 (arithmetic circuits)
 - [x] Read Dally ch.12 (fast arithmetic)
-- [ ] Read Sutherland *SV for Design* ch.10 (interfaces)
+- [x] Read Sutherland *SV for Design* ch.10 (interfaces)
 - [x] Drill Dally ch.10 (ripple-carry adder)
 - [x] Drill Dally ch.12 (carry-lookahead adder)
 - [x] Drill Sutherland ch.10 (ALU SV interface)
