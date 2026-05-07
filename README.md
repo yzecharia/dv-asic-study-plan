@@ -64,8 +64,8 @@ Status of every week: [`docs/PROGRESS.md`](docs/PROGRESS.md).
 | 1 | 1 | SV OOP | ✅ Done |
 | 2 | 1 | Constrained Random | ✅ Done |
 | 3 | 1 | Coverage & SVA | ✅ Done |
-| 4 | 2 | UVM Architecture (Salemi 9–14) | 🟡 In progress (verif done, design TODO) |
-| 5 | 2 | UVM Communication (15–19) | ⬜ Not started |
+| 4 | 2 | UVM Architecture (Salemi 9–14) | ✅ Done |
+| 5 | 2 | UVM Communication (15–19) | 🟡 In progress |
 | 6 | 2 | UVM Stimulus (20–23) | ⬜ Not started |
 | 7 | 2 | UVM Full Integration | ⬜ Not started |
 | 8 | 3 | RISC-V Single-Cycle | ⬜ Not started |
@@ -81,7 +81,6 @@ Status of every week: [`docs/PROGRESS.md`](docs/PROGRESS.md).
 | 18 | 4 | DSP II — 2D Image Convolution 🆕 | ⬜ Not started |
 | 19 | 4 | Advanced CDC & Multi-Bit Handshake 🆕 | ⬜ Not started |
 | 20 | 4 | **Capstone: RAL + Multi-UVC + System** 🆕 | ⬜ Not started |
-
 🆕 = new in plan 2.0 vs the 15-week beta.
 
 ---

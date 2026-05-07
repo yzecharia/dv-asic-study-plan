@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
 """
-update_progress_badges.py — recompute the README badges from the docs.
+update_progress_badges.py — recompute the README badges and Progress
+table from the docs.
 
 Reads docs/week_NN.md for the current week (passed as arg or detected from
 the most recently modified docs/week_*.md), counts checked vs total
-checklist items, and rewrites the two dynamic shields.io badges in
-README.md:
+checklist items, and rewrites:
 
-    ![Current Week](https://img.shields.io/badge/current_week-N-blue)
-    ![Week N Progress](https://img.shields.io/badge/week_N_progress-XX%25-COLOR)
+  * Two dynamic shields.io badges:
+        ![Current Week](https://img.shields.io/badge/current_week-N-blue)
+        ![Week N Progress](https://img.shields.io/badge/week_N_progress-XX%25-COLOR)
+
+  * The Progress table status column. Rows are auto-flipped:
+        week < current   → ✅ Done
+        week = current   → 🟡 In progress
+        week > current   → ⬜ Not started
 
 Color buckets for the progress badge:
     0-33%   → red
@@ -61,6 +67,35 @@ def color_for(pct: int) -> str:
     return "red"
 
 
+STATUS_DONE   = "✅ Done"
+STATUS_ACTIVE = "🟡 In progress"
+STATUS_TODO   = "⬜ Not started"
+
+
+def update_progress_table(text: str, current_week: int) -> tuple[str, int]:
+    """Flip the status column of every Progress-table row according to
+    `current_week`. Returns (new_text, n_rows_rewritten)."""
+    n = 0
+    def replace_row(m):
+        nonlocal n
+        week_num = int(m.group(1))
+        phase    = m.group(2)
+        topic    = m.group(3)
+        if   week_num <  current_week: status = STATUS_DONE
+        elif week_num == current_week: status = STATUS_ACTIVE
+        else:                          status = STATUS_TODO
+        n += 1
+        return f"| {week_num} | {phase} | {topic} | {status} |"
+
+    new_text = re.sub(
+        r"^\| (\d+) \| (\d+) \| (.+?) \| .+? \|\s*$",
+        replace_row,
+        text,
+        flags=re.MULTILINE,
+    )
+    return new_text, n
+
+
 def update_readme(week: int, pct: int):
     text = README.read_text()
     color = color_for(pct)
@@ -82,7 +117,10 @@ def update_readme(week: int, pct: int):
         insertion = "\n" + new_week_badge + "\n" + new_pct_badge
         text = text[:anchor.end()] + insertion + text[anchor.end():]
 
+    text, n_rows = update_progress_table(text, week)
+
     README.write_text(text)
+    return n_rows
 
 
 def main():
@@ -95,8 +133,8 @@ def main():
     pct = int(round(100 * done / total)) if total else 0
 
     print(f"Week {week}: {done}/{total} done ({pct}%)")
-    update_readme(week, pct)
-    print(f"Updated badges in {README.relative_to(ROOT)}")
+    n_rows = update_readme(week, pct)
+    print(f"Updated badges in {README.relative_to(ROOT)} ({n_rows} progress-table rows)")
 
 
 if __name__ == "__main__":
