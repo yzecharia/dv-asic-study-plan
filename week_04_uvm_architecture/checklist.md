@@ -18,7 +18,7 @@ State as of bootstrap (2026-05-03): 48% done per badge.
 - [x] Drill ch.13 (abstract base_tester + factory override)
 - [x] HW1: architecture diagram from memory
 - [x] HW2: ALU UVM TB, Salemi-ch.13 style (no sequences)
-- [ ] HW3: standalone factory override demo
+- [x] HW3: standalone factory override demo
 - [ ] Can answer all self-check questions
 
 ## Design track

@@ -285,7 +285,7 @@ After all reading + HW, you should answer these without looking:
 - [x] Drill ch.13 (abstract base_tester + factory override)
 - [x] HW1: architecture diagram from memory
 - [x] HW2: ALU UVM TB, Salemi-ch.13 style (no sequences)
-- [ ] HW3: standalone factory override demo
+- [x] HW3: standalone factory override demo
 - [ ] Can answer all self-check questions
 
 ### Design Track
@@ -312,7 +312,7 @@ After all reading + HW, you should answer these without looking:
 
 # Week 4 — UVM Architecture & Components
 
-> **Phase 2 — UVM Methodology** · Salemi ch.9–14 · 🟡 In progress (verif drills + ALU UVM TB + barrel shifter + shift-add multiplier done; factory override demo + cross-cutting tasks TODO)
+> **Phase 2 — UVM Methodology** · Salemi ch.9–14 · 🟡 Closing out (all RTL + verif HWs done; cross-cutting tasks remain)
 
 The week where the UVM static architecture clicks: factory pattern,
 `uvm_test`, `uvm_component`, `uvm_env`. Sequences, TLM, transactions
@@ -549,7 +549,7 @@ reference for the W4-portfolio writeup.
 
 ## Big-picture exercise — Verification
 
-### `homework/verif/big_picture/factory_override_demo/` ⬜ TODO
+### `homework/verif/big_picture/factory_override_demo/` ✅ DONE
 
 Standalone factory-override demo, decoupled from the ALU TB:
 
@@ -557,12 +557,15 @@ Standalone factory-override demo, decoupled from the ALU TB:
   every 10 time units, 5 times.
 - `fast_driver extends slow_driver` — overrides `run_phase` to print
   `"FAST: tick"` every 1 time unit, 5 times.
-- Two tests, identical except one installs
-  `slow_driver::type_id::set_type_override(fast_driver::get_type())`
-  in `build_phase` and the other doesn't.
+- Two tests, identical except `fast_test::build_phase` installs
+  `slow_driver::type_id::set_type_override(fast_driver::get_type())`;
+  `slow_test::build_phase` doesn't.
 
 Goal: see the override flip behaviour with **zero** changes to env
-code.
+code. Same compile, two `+UVM_TESTNAME=...` runs, opposite output.
+PASS logs at `sim/factory_override_slow_pass.log` (5x SLOW) and
+`sim/factory_override_fast_pass.log` (5x FAST), both with 0 errors
+/ 0 fatals.
 
 ## Self-check questions
 
@@ -634,7 +637,7 @@ State as of bootstrap (2026-05-03): 48% done per badge.
 - [x] Drill ch.13 (abstract base_tester + factory override)
 - [x] HW1: architecture diagram from memory
 - [x] HW2: ALU UVM TB, Salemi-ch.13 style (no sequences)
-- [ ] HW3: standalone factory override demo
+- [x] HW3: standalone factory override demo
 - [ ] Can answer all self-check questions
 
 ## Design track

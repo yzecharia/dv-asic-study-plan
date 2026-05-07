@@ -96,7 +96,7 @@ reference for the W4-portfolio writeup.
 
 ## Big-picture exercise — Verification
 
-### `homework/verif/big_picture/factory_override_demo/` ⬜ TODO
+### `homework/verif/big_picture/factory_override_demo/` ✅ DONE
 
 Standalone factory-override demo, decoupled from the ALU TB:
 
@@ -104,12 +104,15 @@ Standalone factory-override demo, decoupled from the ALU TB:
   every 10 time units, 5 times.
 - `fast_driver extends slow_driver` — overrides `run_phase` to print
   `"FAST: tick"` every 1 time unit, 5 times.
-- Two tests, identical except one installs
-  `slow_driver::type_id::set_type_override(fast_driver::get_type())`
-  in `build_phase` and the other doesn't.
+- Two tests, identical except `fast_test::build_phase` installs
+  `slow_driver::type_id::set_type_override(fast_driver::get_type())`;
+  `slow_test::build_phase` doesn't.
 
 Goal: see the override flip behaviour with **zero** changes to env
-code.
+code. Same compile, two `+UVM_TESTNAME=...` runs, opposite output.
+PASS logs at `sim/factory_override_slow_pass.log` (5x SLOW) and
+`sim/factory_override_fast_pass.log` (5x FAST), both with 0 errors
+/ 0 fatals.
 
 ## Self-check questions
 

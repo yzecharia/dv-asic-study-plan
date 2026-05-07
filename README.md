@@ -2,7 +2,7 @@
 
 ![Progress](https://img.shields.io/badge/progress-3%2F20_weeks-brightgreen)
 ![Current Week](https://img.shields.io/badge/current_week-4-blue)
-![Week 4 Progress](https://img.shields.io/badge/week_4_progress-84%25-orange)
+![Week 4 Progress](https://img.shields.io/badge/week_4_progress-88%25-orange)
 ![Phase](https://img.shields.io/badge/phase-2_UVM_Methodology-blue)
 ![Toolchain](https://img.shields.io/badge/toolchain-arm64_native_+_Vivado_Docker_for_UVM-lightgrey)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)
