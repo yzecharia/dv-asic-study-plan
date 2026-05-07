@@ -30,7 +30,7 @@ State as of bootstrap (2026-05-03): 48% done per badge.
 - [x] Drill Dally ch.12 (carry-lookahead adder)
 - [x] Drill Sutherland ch.10 (ALU SV interface)
 - [x] HW1: ALU DUT (registered, valid handshake)
-- [ ] HW2: shift-add multiplier
+- [x] HW2: shift-add multiplier
 - [x] HW3: barrel shifter
 
 ## Iron-Rule deliverables

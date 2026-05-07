@@ -74,11 +74,13 @@ one regression.
 
 ## Big-picture exercises — Design
 
-### `homework/design/big_picture/shift_add_multiplier/shift_add_multiplier.sv` ⬜ TODO
+### `homework/design/big_picture/shift_add_multiplier/shift_add_multiplier.sv` ✅ DONE
 
 Multi-cycle multiplier using FSM (IDLE → COMPUTE → DONE). WIDTH cycles
 per multiply. Test corner cases: 0×N, 1×N, MAX×MAX, plus 100 random
-pairs cross-checked against the `*` operator.
+pairs cross-checked against the `*` operator. Lint-clean under
+`verilator --lint-only -Wall`. TB passes 107/107 — log at
+`sim/shift_add_multiplier_pass.log`.
 
 ### `homework/design/big_picture/barrel_shifter/barrel_shifter.sv` ✅ DONE
 

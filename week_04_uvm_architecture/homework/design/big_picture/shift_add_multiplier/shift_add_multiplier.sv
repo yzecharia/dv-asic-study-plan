@@ -55,7 +55,7 @@ module shift_add_multiplier #(
         valid_out = 1'b0;
         counter_next = counter;
         case (state)
-            IDLE: begin next_state = valid_in ? COMPUTE : IDLE; counter_next = '0; end
+            IDLE: begin if (valid_in) next_state = COMPUTE; else next_state = IDLE; counter_next = '0; end
             COMPUTE: begin
                 if (iB[counter] == 1'b1)
                     acc_next = acc + ((2*WIDTH)'(iA) << counter);

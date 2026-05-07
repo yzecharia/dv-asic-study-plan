@@ -1,0 +1,2 @@
+SHIFT_ADD_MULTIPLIER_TB PASS  107/107
+shift_add_multiplier_tb.sv:81: $finish called at 10725 (1s)

@@ -296,7 +296,7 @@ After all reading + HW, you should answer these without looking:
 - [x] Drill Dally ch.12 (carry-lookahead adder)
 - [x] Drill Sutherland ch.10 (ALU SV interface)
 - [x] HW1: ALU DUT (registered, valid handshake)
-- [ ] HW2: shift-add multiplier
+- [x] HW2: shift-add multiplier
 - [x] HW3: barrel shifter
 
 <!-- AUTO-SYNC: per-week views below — regenerate via tools/sync_week_docs.py; do not edit by hand below this line -->
@@ -312,7 +312,7 @@ After all reading + HW, you should answer these without looking:
 
 # Week 4 — UVM Architecture & Components
 
-> **Phase 2 — UVM Methodology** · Salemi ch.9–14 · 🟡 In progress (verif drills + ALU UVM TB + barrel shifter done; shift-add multiplier + factory override demo TODO)
+> **Phase 2 — UVM Methodology** · Salemi ch.9–14 · 🟡 In progress (verif drills + ALU UVM TB + barrel shifter + shift-add multiplier done; factory override demo + cross-cutting tasks TODO)
 
 The week where the UVM static architecture clicks: factory pattern,
 `uvm_test`, `uvm_component`, `uvm_env`. Sequences, TLM, transactions
@@ -527,11 +527,13 @@ one regression.
 
 ## Big-picture exercises — Design
 
-### `homework/design/big_picture/shift_add_multiplier/shift_add_multiplier.sv` ⬜ TODO
+### `homework/design/big_picture/shift_add_multiplier/shift_add_multiplier.sv` ✅ DONE
 
 Multi-cycle multiplier using FSM (IDLE → COMPUTE → DONE). WIDTH cycles
 per multiply. Test corner cases: 0×N, 1×N, MAX×MAX, plus 100 random
-pairs cross-checked against the `*` operator.
+pairs cross-checked against the `*` operator. Lint-clean under
+`verilator --lint-only -Wall`. TB passes 107/107 — log at
+`sim/shift_add_multiplier_pass.log`.
 
 ### `homework/design/big_picture/barrel_shifter/barrel_shifter.sv` ✅ DONE
 
@@ -644,7 +646,7 @@ State as of bootstrap (2026-05-03): 48% done per badge.
 - [x] Drill Dally ch.12 (carry-lookahead adder)
 - [x] Drill Sutherland ch.10 (ALU SV interface)
 - [x] HW1: ALU DUT (registered, valid handshake)
-- [ ] HW2: shift-add multiplier
+- [x] HW2: shift-add multiplier
 - [x] HW3: barrel shifter
 
 ## Iron-Rule deliverables
