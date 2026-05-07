@@ -36,6 +36,20 @@ OUT_DIR="$TOP_DIR/build_rtl"
 
 mkdir -p "$OUT_DIR"
 
+add_white_bg() {
+    local svg="$1"
+    [[ -f "$svg" ]] || return 0
+    python3 - "$svg" <<'PYEOF'
+import sys, re
+p = sys.argv[1]
+with open(p) as f:
+    s = f.read()
+s = re.sub(r'(<svg[^>]*?>)', r'\1<rect width="100%" height="100%" fill="white"/>', s, count=1, flags=re.DOTALL)
+with open(p, 'w') as f:
+    f.write(s)
+PYEOF
+}
+
 # Collect every .sv file in the folder so dependencies (e.g. halfadder.sv
 # next to fulladder.sv) compile together. Skip files Yosys cannot
 # synthesize:
@@ -105,10 +119,12 @@ if [[ -f "$OUT_DIR/${TOP_NAME}_gates.json" ]] && command -v netlistsvg >/dev/nul
 fi
 
 if [[ -f "$OUT_DIR/$TOP_NAME.svg" ]]; then
+    add_white_bg "$OUT_DIR/$TOP_NAME.svg"
     echo -e "${GREEN}✓ Hierarchical schematic:${NC} $OUT_DIR/$TOP_NAME.svg"
 fi
 
 if [[ -f "$OUT_DIR/${TOP_NAME}_gates.svg" ]]; then
+    add_white_bg "$OUT_DIR/${TOP_NAME}_gates.svg"
     echo -e "${GREEN}✓ Gate-level schematic:${NC}   $OUT_DIR/${TOP_NAME}_gates.svg"
     open "$OUT_DIR/${TOP_NAME}_gates.svg" 2>/dev/null || true
 else
