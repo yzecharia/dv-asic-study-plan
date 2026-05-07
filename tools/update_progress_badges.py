@@ -7,7 +7,8 @@ Reads docs/week_NN.md for the current week (passed as arg or detected from
 the most recently modified docs/week_*.md), counts checked vs total
 checklist items, and rewrites:
 
-  * Two dynamic shields.io badges:
+  * Three dynamic shields.io badges:
+        ![Progress](https://img.shields.io/badge/progress-M%2F20_weeks-COLOR)
         ![Current Week](https://img.shields.io/badge/current_week-N-blue)
         ![Week N Progress](https://img.shields.io/badge/week_N_progress-XX%25-COLOR)
 
@@ -15,6 +16,9 @@ checklist items, and rewrites:
         week < current   → ✅ Done
         week = current   → 🟡 In progress
         week > current   → ⬜ Not started
+
+  M (overall progress) is the count of weeks with status `< current`
+  (i.e. closed weeks). For current_week=N, M = N-1.
 
 Color buckets for the progress badge:
     0-33%   → red
@@ -96,16 +100,26 @@ def update_progress_table(text: str, current_week: int) -> tuple[str, int]:
     return new_text, n
 
 
+TOTAL_WEEKS = 20
+
+
 def update_readme(week: int, pct: int):
     text = README.read_text()
     color = color_for(pct)
 
-    # Rebuild the two dynamic lines
+    # Overall progress: weeks with status < current are "Done". For
+    # current_week=N, that's N-1 closed weeks. Color is fixed
+    # brightgreen (project-alive indicator, not a completion bucket).
+    closed_weeks = max(0, week - 1)
+
+    new_overall_badge = (f"![Progress](https://img.shields.io/badge/"
+                         f"progress-{closed_weeks}%2F{TOTAL_WEEKS}_weeks-brightgreen)")
     new_week_badge = f"![Current Week](https://img.shields.io/badge/current_week-{week}-blue)"
     new_pct_badge  = (f"![Week {week} Progress]"
                       f"(https://img.shields.io/badge/week_{week}_progress-{pct}%25-{color})")
 
     # Replace existing lines if present, else insert after the Progress badge
+    text, n_o = re.subn(r"!\[Progress\]\([^)]+\)", new_overall_badge, text)
     text, n_w = re.subn(r"!\[Current Week\]\([^)]+\)", new_week_badge, text)
     text, n_p = re.subn(r"!\[Week \d+ Progress\]\([^)]+\)", new_pct_badge, text)
 
