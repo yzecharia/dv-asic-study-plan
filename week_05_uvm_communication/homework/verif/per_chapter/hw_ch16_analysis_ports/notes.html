@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ch.16 — TinyALU Scoreboard via uvm_tlm_analysis_fifo</title>
+<style>
+  :root {
+    --fg: #1a1a1a;
+    --bg: #fafafa;
+    --accent: #0066cc;
+    --muted: #555;
+    --border: #ddd;
+    --code-bg: #f0f0f0;
+    --table-stripe: #f5f5f5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --fg: #e8e8e8;
+      --bg: #1e1e1e;
+      --accent: #6cb6ff;
+      --muted: #aaa;
+      --border: #444;
+      --code-bg: #2a2a2a;
+      --table-stripe: #262626;
+    }
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    max-width: 920px;
+    margin: 2rem auto;
+    padding: 0 1.5rem 4rem;
+    line-height: 1.55;
+    color: var(--fg);
+    background: var(--bg);
+  }
+  h1 { border-bottom: 2px solid var(--accent); padding-bottom: .35rem; }
+  h2 { margin-top: 2.4rem; border-bottom: 1px solid var(--border); padding-bottom: .25rem; }
+  h3 { margin-top: 1.8rem; color: var(--accent); }
+  code {
+    background: var(--code-bg);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 0.92em;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+  }
+  pre {
+    background: var(--code-bg);
+    border-left: 3px solid var(--accent);
+    padding: 0.8rem 1rem;
+    overflow-x: auto;
+    border-radius: 4px;
+    font-size: 0.9em;
+    line-height: 1.45;
+  }
+  pre code { background: none; padding: 0; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+  th, td { border: 1px solid var(--border); padding: 0.5rem 0.75rem; text-align: left; vertical-align: top; }
+  th { background: var(--code-bg); }
+  tr:nth-child(even) td { background: var(--table-stripe); }
+  blockquote {
+    border-left: 3px solid var(--muted);
+    padding-left: 1rem;
+    color: var(--muted);
+    font-style: italic;
+  }
+  .mermaid {
+    background: var(--bg);
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow-x: auto;
+    text-align: center;
+  }
+  .ascii {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.82em;
+    line-height: 1.3;
+    white-space: pre;
+  }
+  .meta {
+    color: var(--muted);
+    font-size: 0.9em;
+    margin-bottom: 1.5rem;
+  }
+  ul li { margin: 0.25rem 0; }
+  .pitfall-symptom { color: var(--muted); }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default',
+    flowchart: { curve: 'basis' }
+  });
+</script>
+</head>
+<body>
+
+<h1>ch.16 — TinyALU Scoreboard via <code>uvm_tlm_analysis_fifo</code></h1>
+
+<p class="meta">Salemi <em>UVM Primer</em> ch.16 (pp. 106–114) · Week 5 anchor for hw_ch16_analysis_ports</p>
+
+<p>The chapter introduces the <strong>canonical UVM scoreboard pattern</strong>: one
+component that consumes two analysis streams of different types, pairs
+them, and compares against a reference model. This note maps the whole
+methodology before you write a line of homework code.</p>
+
+<h2>Why ch.16 is different from ch.15</h2>
+
+<table>
+  <tr>
+    <th></th>
+    <th>ch.15 (dice)</th>
+    <th>ch.16 (TinyALU)</th>
+  </tr>
+  <tr><td>Producers</td><td>1 (<code>dice_roller</code>)</td><td>2 (<code>command_monitor</code>, <code>result_monitor</code>)</td></tr>
+  <tr><td>Consumers</td><td>3</td><td>2 (<code>scoreboard</code>, <code>coverage</code>)</td></tr>
+  <tr><td>Transaction types</td><td>1 (<code>int</code>)</td><td>2 (<code>command_t</code>, <code>result_t</code>)</td></tr>
+  <tr><td>Pattern</td><td>one-to-many broadcast</td><td>two-stream pairing</td></tr>
+  <tr><td>Key new primitive</td><td>none</td><td><code>uvm_tlm_analysis_fifo #(T)</code></td></tr>
+</table>
+
+<p>The scoreboard is a <code>uvm_subscriber #(result_t)</code> <em>and</em> holds a
+<code>uvm_tlm_analysis_fifo #(command_t)</code> field. <strong>Two inputs into one
+component, two different types</strong> — that's the new shape.</p>
+
+<h2>Class diagram (UML)</h2>
+
+<div class="mermaid">
+classDiagram
+    class uvm_component
+    class uvm_subscriber~T~ {
+      &lt;&lt;abstract&gt;&gt;
+      +analysis_export
+      +write(T t)*
+    }
+    class uvm_tlm_analysis_fifo~T~ {
+      +analysis_export
+      +try_get(out T) bit
+      +get(out T) task
+    }
+    class uvm_analysis_port~T~ {
+      +write(T t)
+      +connect(export)
+    }
+
+    class command_monitor {
+      +uvm_analysis_port~command_t~ ap
+      +run_phase()
+    }
+    class result_monitor {
+      +uvm_analysis_port~result_t~ ap
+      +run_phase()
+    }
+    class coverage {
+      +covergroup cg_cmd
+      +write(command_t cmd)
+      +report_phase()
+    }
+    class scoreboard {
+      +uvm_tlm_analysis_fifo~command_t~ cmd_f
+      +write(result_t res)
+      +predicted(command_t cmd) result_t
+    }
+    class env {
+      +command_monitor cmd_mon_h
+      +result_monitor  res_mon_h
+      +coverage        cov_h
+      +scoreboard      sb_h
+      +build_phase()
+      +connect_phase()
+    }
+    class random_test {
+      +run_phase()
+    }
+
+    uvm_component &lt;|-- command_monitor
+    uvm_component &lt;|-- result_monitor
+    uvm_component &lt;|-- env
+    uvm_subscriber &lt;|-- coverage : T=command_t
+    uvm_subscriber &lt;|-- scoreboard : T=result_t
+    uvm_component &lt;|-- uvm_tlm_analysis_fifo : T=command_t
+
+    env *-- command_monitor
+    env *-- result_monitor
+    env *-- coverage
+    env *-- scoreboard
+    scoreboard *-- uvm_tlm_analysis_fifo : cmd_f
+
+    command_monitor --&gt; coverage : ap.connect(cov.export)
+    command_monitor --&gt; uvm_tlm_analysis_fifo : ap.connect(sb.cmd_f.export)
+    result_monitor --&gt; scoreboard : ap.connect(sb.export)
+
+    random_test ..&gt; env : creates
+</div>
+
+<p>The three arrows at the bottom are the <strong>three <code>connect()</code> calls in
+<code>env::connect_phase</code></strong>. Memorise that picture — it's the whole wiring.</p>
+
+<h2>Data flow at run time</h2>
+
+<pre class="ascii">
+                                                                  ┌────────┐
+                                                              ┌──>│coverage│ (covers cmd)
+                                                              │   └────────┘
+              cmd                                             │
+   ┌────────────────────┐    ap.write(cmd)    ┌───────────────┴─────┐
+   │  command_monitor   │ ──────────────────> │ command stream      │
+   └────────────────────┘                     │  (cmd_t broadcasts) │
+                                              └───────────────┬─────┘
+                                                              │
+                                                              ▼
+                                                  ┌────────────────────────┐
+                                                  │ scoreboard.cmd_f       │
+                                                  │ (uvm_tlm_analysis_fifo)│
+                                                  │   queue of command_t   │
+                                                  └─────────┬──────────────┘
+                                                            │ try_get(cmd)
+              res                                           │
+   ┌────────────────────┐    ap.write(res)                  ▼
+   │   result_monitor   │ ──────────────────> ┌───────────────────────┐
+   └────────────────────┘                     │ scoreboard.write(res) │
+                                              │   1. try_get cmd      │
+                                              │   2. exp = predicted  │
+                                              │   3. compare exp vs r │
+                                              │   4. uvm_error on miss│
+                                              └───────────────────────┘
+</pre>
+
+<p><strong>The asymmetry is the point.</strong> Both monitors call <code>.write()</code> on their
+analysis ports, but:</p>
+
+<ul>
+  <li>The <strong>command stream</strong> has <em>two</em> destinations:
+    <ul>
+      <li><code>coverage.analysis_export</code> — direct, immediate write.</li>
+      <li><code>scoreboard.cmd_f.analysis_export</code> — goes into a queue.</li>
+    </ul>
+  </li>
+  <li>The <strong>result stream</strong> has <em>one</em> destination:
+    <ul>
+      <li><code>scoreboard.analysis_export</code> — calls <code>scoreboard.write(result)</code>,
+      which then pulls a queued command via <code>cmd_f.try_get(cmd)</code> to pair it.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>The fifo decouples timing: commands accumulate in <code>cmd_f</code> until the
+matching result arrives. The pairing is <strong>first-in-first-out</strong> — the
+oldest queued command pairs with the next observed result. This works
+for in-order pipelines (TinyALU is in-order). For out-of-order DUTs
+you'd switch to an associative-array map keyed on transaction ID.</p>
+
+<h2>Phase-by-phase skeleton</h2>
+
+<h3>command_monitor — publisher</h3>
+<pre><code>class command_monitor extends uvm_component;
+    `uvm_component_utils(command_monitor)
+    uvm_analysis_port #(command_t) ap;
+    virtual tinyalu_bfm bfm;
+
+    function void build_phase(uvm_phase phase);
+        super.build_phase(phase);
+        ap = new("ap", this);
+        // get bfm from config_db
+    endfunction
+
+    task run_phase(uvm_phase phase);
+        command_t cmd;
+        forever begin
+            bfm.wait_for_command(cmd);
+            ap.write(cmd);
+        end
+    endtask
+endclass</code></pre>
+
+<h3>scoreboard — the new two-input pattern</h3>
+<pre><code>class scoreboard extends uvm_subscriber #(result_t);
+    `uvm_component_utils(scoreboard)
+    uvm_tlm_analysis_fifo #(command_t) cmd_f;     // ← second input
+
+    function void build_phase(uvm_phase phase);
+        super.build_phase(phase);
+        cmd_f = new("cmd_f", this);               // ← MUST construct
+    endfunction
+
+    function result_t predicted(command_t cmd);
+        // reference model: spec-driven expected output
+    endfunction
+
+    function void write(result_t actual);         // result-stream entry
+        command_t cmd;
+        result_t  expected;
+        if (!cmd_f.try_get(cmd))
+            `uvm_fatal("SB", "result without matching command in fifo")
+        expected = predicted(cmd);
+        if (actual !== expected)
+            `uvm_error("SB", $sformatf("op=%s a=%0d b=%0d  exp=%0d  got=%0d",
+                                       cmd.op.name(), cmd.a, cmd.b, expected, actual))
+    endfunction
+endclass</code></pre>
+
+<h3>env — three connect() calls and you're done</h3>
+<pre><code>function void env::connect_phase(uvm_phase phase);
+    super.connect_phase(phase);
+    cmd_mon_h.ap.connect(cov_h.analysis_export);          // cmd → coverage
+    cmd_mon_h.ap.connect(sb_h.cmd_f.analysis_export);     // cmd → scoreboard fifo
+    res_mon_h.ap.connect(sb_h.analysis_export);           // res → scoreboard write
+endfunction</code></pre>
+
+<h2>Pitfalls specific to ch.16</h2>
+
+<table>
+  <tr><th>Pitfall</th><th>Symptom</th></tr>
+  <tr><td>Forgot <code>cmd_f = new(...)</code> in scoreboard's <code>build_phase</code></td><td class="pitfall-symptom">null-pointer fatal on first command write</td></tr>
+  <tr><td>Used <code>get()</code> (blocking task) inside <code>write()</code></td><td class="pitfall-symptom">compile error — <code>write</code> is a function, can't call tasks</td></tr>
+  <tr><td>Connected <code>result_monitor.ap</code> to <code>scoreboard.cmd_f.analysis_export</code></td><td class="pitfall-symptom">type mismatch (result_t vs command_t) — caught at elaboration</td></tr>
+  <tr><td>Connected <code>command_monitor.ap</code> to <code>scoreboard.analysis_export</code> directly</td><td class="pitfall-symptom"><code>write(result_t)</code> gets called with a <code>command_t</code> — type mismatch caught at elab</td></tr>
+  <tr><td>Order-mismatch on out-of-order DUT</td><td class="pitfall-symptom">fifo pairs wrong cmd with wrong result; switch to ID-keyed assoc-array</td></tr>
+  <tr><td><code>cmd_f.try_get</code> returned 0 silently</td><td class="pitfall-symptom">scoreboard saw a result with no matching command — fatal it loudly</td></tr>
+  <tr><td><code>predicted()</code> mutates <code>cmd</code></td><td class="pitfall-symptom">covergroup downstream sees the mutation if cmd was passed by ref; clone first</td></tr>
+  <tr><td>Two scoreboards share one <code>cmd_f</code> instance</td><td class="pitfall-symptom">ownership is wrong; each scoreboard owns its own fifo</td></tr>
+</table>
+
+<h2>What to verify in the homework</h2>
+
+<ol>
+  <li>Every transaction observed by <code>command_monitor</code> reaches <em>both</em> the
+   coverage subscriber <strong>and</strong> the scoreboard's fifo.</li>
+  <li>Every result is paired with a command (no <code>`uvm_fatal</code> from the
+   "result without matching command" check).</li>
+  <li>The reference model in <code>predicted()</code> matches the DUT spec for at
+   least all five ops (ADD/SUB/AND/OR/XOR).</li>
+  <li>Coverage hits all op codes and operand corners (0, max, mid).</li>
+  <li>Pass criterion: <code>UVM_ERROR + UVM_FATAL == 0</code> and a printed banner.</li>
+</ol>
+
+<h2>Cross-links</h2>
+
+<ul>
+  <li><code>docs/concepts/uvm_tlm_analysis_fifo.md</code> — the primitive's full reference.</li>
+  <li><code>docs/concepts/uvm_analysis_ports.md</code> — predictor / pass-through patterns building on this.</li>
+  <li><code>docs/concepts/uvm_scoreboard.md</code> — the role this drill instantiates.</li>
+  <li>Salemi <em>UVM Primer</em> ch.16 <em>Analysis Ports in the Testbench</em>, pp. 106–114.</li>
+</ul>
+
+</body>
+</html>
