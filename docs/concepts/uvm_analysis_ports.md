@@ -144,6 +144,51 @@ A scoreboard needs both *commands* (from `command_monitor`) and *results* (from 
 ### Stand-alone analysis ports without subscribers
 You don't *have* to use `uvm_subscriber`. The lower-level form is `uvm_analysis_imp_decl(...)` — a macro that declares a custom `analysis_imp` you implement manually. Used when you need *multiple* incoming streams of *different types* into the same component (the imp_decl macro mangles the method name so each stream's `write()` is distinct). Salemi never uses this; it's industry-standard for complex agents.
 
+### A subscriber that's also a publisher (predictor / pass-through pattern)
+
+There's no exclusivity rule — a single component can be **both** a subscriber (extends `uvm_subscriber#(T_in)`, implements `write(T_in)`) **and** a publisher (declares its own `uvm_analysis_port #(T_out)`, calls `.write(T_out)` from inside the inherited `write()`). This is one of the most common industry patterns.
+
+```systemverilog
+class predictor extends uvm_subscriber #(command_t);   // observer side
+    `uvm_component_utils(predictor)
+
+    uvm_analysis_port #(predicted_t) ap;               // publisher side
+
+    function new(string name, uvm_component parent);
+        super.new(name, parent);
+    endfunction : new
+
+    function void build_phase(uvm_phase phase);
+        super.build_phase(phase);
+        ap = new("ap", this);                          // construct outgoing port
+    endfunction : build_phase
+
+    function void write(command_t t);                  // inherited contract
+        predicted_t pred;
+        pred = compute_expected(t);                    // run reference model
+        ap.write(pred);                                // re-broadcast as publisher
+    endfunction : write
+
+endclass : predictor
+```
+
+Canonical use cases:
+
+| Use case | What it does |
+|---|---|
+| **Reference model / predictor** | subscribes to commands, runs the spec model, publishes predicted results for the scoreboard to compare against actual results. The W7+ scoreboard pattern. |
+| **Protocol-layer translator** | subscribes at one abstraction (e.g. byte-level), publishes at another (e.g. bit-level). Same component bridges two layers because they share internal state. |
+| **Filter / decimator** | subscribes to a high-rate stream, drops or transforms each, publishes the decimated stream to coarse-grained downstream subscribers. |
+| **Tap / pass-through logger** | subscribes, logs to file, re-publishes the same `t` unchanged. `write(t); ap.write(t);` — note `t` is by reference, so if you mutate it before re-broadcasting, downstream sees the mutation. Clone with `t.clone()` if you need an independent copy. |
+| **Aggregator → escalator** | subscribes to per-event errors during the run, publishes a single `summary_t` in `report_phase` or `extract_phase`. |
+
+If your component needs **multiple input streams *plus*** its own output (e.g. both `command_t` and `result_t` as inputs), `uvm_subscriber#(T)` locks you to one input type. Two ways out:
+
+- **`uvm_analysis_imp_decl(...)`** — declares a custom imp type with a name-mangled `write_X()` per stream. The complex-agent industry default.
+- **Hold a `uvm_tlm_analysis_fifo#(T_secondary)` field** — keep `uvm_subscriber#(T_main)` for the primary input, queue the second stream into the fifo, pull with `try_get()` inside the main `write()`. This is what Salemi reaches for in ch.16's scoreboard (already covered in the *two-input-streams* subsection above).
+
+The graph stays acyclic by construction (analysis ports flow downstream only), so cycles aren't a concern.
+
 ## Pitfalls
 
 | Pitfall | Symptom |
