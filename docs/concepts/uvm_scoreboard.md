@@ -19,7 +19,7 @@ Reference model ──────────► Scoreboard.expected_imp (or a 
                           └── update coverage
 ```
 
-## Two flavours
+## Three flavours
 
 ### 1. In-order with SV queue
 
@@ -51,6 +51,67 @@ endclass
 For protocols where responses can come back out of order (e.g.
 multiple outstanding AXI reads with IDs). Key the expected map by
 transaction ID; lookup on each observed response.
+
+### 3. Subscriber-with-internal-predictor (Salemi ch.16)
+
+The simplest two-stream pattern when the predictor is small enough to
+live *inside* the scoreboard. The scoreboard subscribes to one stream
+directly (typically the *result*, the thing whose arrival triggers
+the compare) and queues the other stream (the *command*) into a
+`uvm_tlm_analysis_fifo`. On every result `write()`, pull the matching
+command, run the predictor, compare.
+
+```systemverilog
+class scoreboard extends uvm_subscriber #(shortint);     // result stream
+    `uvm_component_utils(scoreboard)
+
+    uvm_tlm_analysis_fifo #(command_s) cmd_f;             // command stream
+
+    function void build_phase(uvm_phase phase);
+        super.build_phase(phase);
+        cmd_f = new("cmd_f", this);
+    endfunction
+
+    function void write(shortint actual);
+        command_s cmd;
+        shortint  predicted;
+
+        if (!cmd_f.try_get(cmd))
+            `uvm_fatal("SCB", "result without queued command")
+
+        case (cmd.op)                                    // predictor lives here
+            add_op: predicted = cmd.A + cmd.B;
+            and_op: predicted = cmd.A & cmd.B;
+            xor_op: predicted = cmd.A ^ cmd.B;
+            mul_op: predicted = cmd.A * cmd.B;
+            default: return;                             // skip no_op / rst_op
+        endcase
+
+        if (predicted !== actual)
+            `uvm_error("SCB",
+                $sformatf("MISMATCH op=%s actual=%h predicted=%h",
+                          cmd.op.name(), actual, predicted))
+    endfunction
+endclass
+```
+
+Env wires the two streams differently:
+```systemverilog
+result_monitor_h.ap.connect(scoreboard_h.analysis_export);          // direct
+command_monitor_h.ap.connect(scoreboard_h.cmd_f.analysis_export);   // through fifo
+```
+
+**When to use this flavour:**
+- Predictor is small enough to express inline (combinational on operands, one-line per op).
+- 1:1 ordering between commands and results — every command produces exactly one result, in arrival order.
+- Single-test-class scope — you don't expect to reuse the predictor logic in coverage or other components.
+
+**When to graduate to a separate predictor component (the W7+ pattern):**
+- Predictor is stateful or multi-cycle (e.g. a model with internal pipelines, FIFOs, or memory).
+- More than just the scoreboard wants the predicted value (e.g. coverage closure on prediction-vs-actual mismatch bins).
+- You want to factory-override the predictor independently of the scoreboard.
+
+The graduation move: extract the predictor into its own component that subscribes to the command stream and publishes a *predicted-result* stream on its own `uvm_analysis_port`. Now the scoreboard has two simpler streams (actual + predicted) and just compares them. See `[[uvm_analysis_ports]]` → "predictor / pass-through pattern" for the shape.
 
 ## Analysis port vs analysis FIFO
 
