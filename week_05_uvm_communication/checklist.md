@@ -7,7 +7,7 @@
 - [ ] Read Salemi ch.17 (put/get + tlm_fifo)
 - [ ] Read Salemi ch.18 (tester/driver split)
 - [ ] Read Salemi ch.19 (UVM reporting)
-- [ ] Drill ch.15 (dice roller)
+- [x] Drill ch.15 (dice roller)
 - [ ] Drill ch.16 (analysis port in TB)
 - [ ] Drill ch.17 (producer/consumer + tlm_fifo)
 - [ ] Drill ch.18 (tester/driver split toy)

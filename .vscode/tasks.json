@@ -124,6 +124,28 @@
     },
 
     {
+      "label": "🧹 UVM CLEAN (wipe xsim build artefacts in current folder)",
+      "type": "shell",
+      "command": "${workspaceFolder}/run_xsim_clean.sh",
+      "args": ["${fileDirname}"],
+      "group": "build",
+      "presentation": { "clear": true, "reveal": "always", "group": "xsim" }
+    },
+
+    {
+      "label": "♻️  UVM REBUILD (clean + compile + run — full from-scratch flow)",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "🧹 UVM CLEAN (wipe xsim build artefacts in current folder)",
+        "🔨 UVM COMPILE (snapshot — compile once, auto-include *_pkg.{sv,svh})",
+        "▶️  UVM RUN TEST (against existing snapshot)"
+      ],
+      "group": "build",
+      "presentation": { "clear": false, "reveal": "always", "group": "xsim" },
+      "problemMatcher": []
+    },
+
+    {
       "label": "📈 Update progress badges",
       "type": "shell",
       "command": "python3",
