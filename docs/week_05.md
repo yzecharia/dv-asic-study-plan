@@ -244,7 +244,7 @@ contention, every input gets granted in a bounded number of cycles.
 ## Checklist
 
 ### Verification Track
-- [ ] Read Salemi ch.15 (analysis ports, dice example)
+- [x] Read Salemi ch.15 (analysis ports, dice example)
 - [ ] Read Salemi ch.16 (analysis ports in TinyALU)
 - [ ] Read Salemi ch.17 (put/get + tlm_fifo)
 - [ ] Read Salemi ch.18 (tester/driver split)
