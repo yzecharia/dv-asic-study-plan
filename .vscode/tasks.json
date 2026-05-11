@@ -41,6 +41,37 @@
     },
 
     {
+      "label": "🔬 CHECK (xvlog + xelab on folder, no simulation — full compile-link check)",
+      "type": "shell",
+      "command": "${workspaceFolder}/run_check.sh",
+      "args": ["${file}"],
+      "group": "build",
+      "presentation": { "clear": true, "reveal": "always", "group": "xsim" },
+      "problemMatcher": {
+        "owner": "xvlog",
+        "fileLocation": ["relative", "${workspaceFolder}"],
+        "pattern": {
+          "regexp": "^ERROR:\\s+\\[\\w+ \\d+-\\d+\\]\\s+(.*?)\\s+\\[(.+?):(\\d+)\\]",
+          "message": 1,
+          "file": 2,
+          "line": 3
+        }
+      }
+    },
+
+    {
+      "label": "✅ CHECK + SYNTH (full pre-synthesis check, then yosys schematic)",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "🔬 CHECK (xvlog + xelab on folder, no simulation — full compile-link check)",
+        "🔧 RTL SCHEMATIC (yosys synth + schematic of current file)"
+      ],
+      "group": "build",
+      "presentation": { "clear": false, "reveal": "always", "group": "yosys" },
+      "problemMatcher": []
+    },
+
+    {
       "label": "🔧 RTL SCHEMATIC (yosys synth + schematic of current file)",
       "type": "shell",
       "command": "${workspaceFolder}/run_yosys_rtl.sh",
