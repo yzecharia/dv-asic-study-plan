@@ -5,6 +5,7 @@ Status legend: ⬜ Not started · 🟡 In progress · ✅ Done · 🔍 Needs rev
 Auto-regenerable via `python3 tools/update_progress_badges.py`.
 
 **Last bootstrap:** 2026-05-03 (mirrored from StudyPlan beta SHA `43c98a1`).
+**Last refreshed:** 2026-05-11 — W4 closed (25/25 green), W5 verif ch.15–16 drilled.
 
 ---
 
@@ -40,28 +41,60 @@ Auto-regenerable via `python3 tools/update_progress_badges.py`.
 
 ## Phase 2 — UVM Methodology (W4–W7)
 
-### 🟡 Week 4 — UVM Architecture (Salemi ch.9–14)
+### ✅ Week 4 — UVM Architecture (Salemi ch.9–14)
 - [x] Reading: Salemi ch.9–13
-- [x] Reading: Salemi ch.14 (in progress per latest commits)
+- [x] Reading: Salemi ch.14
+- [x] Reading: Sutherland *SV for Design* ch.10 (interfaces)
+- [x] Reading: Dally ch.10 (arithmetic) + ch.12 (fast arithmetic)
+- [x] Verification Academy UVM Basics watched
 - [x] Verif drill ch.9 — factory pattern (plain SV)
 - [x] Verif drill ch.10 — OO testbench (TinyALU)
 - [x] Verif drill ch.11 — UVM tests (`hello_uvm_test`)
 - [x] Verif drill ch.12 — UVM components (phases)
-- [x] Verif drill ch.13 — UVM environments
-- [x] Verif connector — ALU UVM TB scaffold
-- [ ] Verif big-picture — factory override demo
-- [ ] **Design HW1 — ALU DUT** (Dally ch.10 + Sutherland interfaces)
-- [ ] **Design HW2 — Ripple-carry adder + CLA**
-- [ ] **Design HW3 — Shift-add multiplier + barrel shifter**
-- [ ] Iron Rule (a) RTL committed
-- [ ] Iron Rule (b) Gold TB PASS log
-- [ ] Iron Rule (c) `verification_report.md`
+- [x] Verif drill ch.13 — UVM environments (base_tester + factory override)
+- [x] Verif connector — ALU UVM TB (random + directed tests pass)
+- [x] Verif big-picture — factory override demo (fast + slow tests pass)
+- [x] **Design HW1 — ALU DUT** (registered, valid handshake; Dally ch.10 + Sutherland interfaces)
+- [x] **Design HW2 — Ripple-carry adder + CLA** (+ LCU4)
+- [x] **Design HW3 — Shift-add multiplier + barrel shifter** (TB 107/107)
+- [x] Iron Rule (a) RTL committed and lint-clean
+- [x] Iron Rule (b) Gold TB PASS logs captured (`sim/connector_alu_{random,directed}_pass.log`, `sim/factory_override_{fast,slow}_pass.log`, `sim/shift_add_multiplier_pass.log`, plus drill logs)
+- [x] Iron Rule (c) `verification_report.md` written
+- [x] Self-check questions answered (badge 100% — closed 2026-05-03 in commit `296d025`)
 
-### ⬜ Week 5 — UVM Communication (Salemi ch.15–19)
-- [ ] Reading: Salemi ch.15–19
-- [ ] Verif: analysis ports, TLM 1.0, reporting
-- [ ] Design: Dual-port RAM, RR arbiter, valid/ready handshake
-- [ ] Iron Rule (a)/(b)/(c)
+### 🟡 Week 5 — UVM Communication (Salemi ch.15–19)
+
+**Verification track**
+- [x] Reading: Salemi ch.15 (analysis ports, dice example)
+- [x] Reading: Salemi ch.16 (analysis ports in TinyALU)
+- [ ] Reading: Salemi ch.17 (put/get + tlm_fifo)
+- [ ] Reading: Salemi ch.18 (tester/driver split)
+- [ ] Reading: Salemi ch.19 (UVM reporting)
+- [x] Drill ch.15 — dice-roller analysis port (PASS log `sim/dice_test_pass.log`)
+- [x] Drill ch.16 — analysis-port broadcast on TinyALU (PASS log `sim/analysis_test_pass.log`)
+- [ ] Drill ch.17 — producer/consumer + `tlm_fifo`
+- [ ] Drill ch.18 — tester/driver split toy
+- [ ] Drill ch.19 — reporting + verbosity
+- [ ] HW1 — full analysis path on ALU TB (extends W4 HW2)
+- [ ] HW2 — tester/driver split on ALU TB (extends HW1)
+- [ ] HW3 — reporting polish (extends HW2)
+
+**Design track**
+- [ ] Reading: Dally ch.16 (datapath sequential) — learning material dropped, read in progress
+- [ ] Reading: Dally ch.24 (interconnect / handshake)
+- [ ] Reading: Sutherland *SV for Design* ch.5 (arrays, structs, unions)
+- [ ] Reading: Cummings async FIFO paper (theory only)
+- [ ] Drill Dally ch.16 — shift register (stub committed, RTL TODO)
+- [ ] Drill Dally ch.16 §16.3 — vending machine (problem statement committed on `claude/vending-machine-problem-fJ0KF`, RTL TODO)
+- [ ] Drill Dally ch.24 — valid/ready handshake (stub committed, RTL TODO)
+- [ ] Drill Sutherland ch.5 — packed struct port (stub committed, RTL TODO)
+- [ ] HW1 — true dual-port RAM (stub committed, RTL TODO)
+- [ ] HW2 — round-robin arbiter (stub committed, RTL TODO)
+
+**Iron-Rule deliverables**
+- [ ] (a) RTL committed and lint-clean — design files are 0-byte stubs
+- [🟡] (b) Gold TB PASS logs — verif drills ch.15/16 captured; design drills outstanding
+- [🟡] (c) `verification_report.md` — exists with ch.15 + ch.16 sections; ch.17–19 + HW sections outstanding
 
 ### ⬜ Week 6 — UVM Stimulus (Salemi ch.20–23)
 - [ ] Reading: Salemi ch.20–23 + Rosenberg ch.4
