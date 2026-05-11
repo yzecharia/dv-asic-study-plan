@@ -8,7 +8,7 @@
 - [ ] Read Salemi ch.18 (tester/driver split)
 - [ ] Read Salemi ch.19 (UVM reporting)
 - [x] Drill ch.15 (dice roller)
-- [ ] Drill ch.16 (analysis port in TB)
+- [x] Drill ch.16 (analysis port in TB)
 - [ ] Drill ch.17 (producer/consumer + tlm_fifo)
 - [ ] Drill ch.18 (tester/driver split toy)
 - [ ] Drill ch.19 (reporting + verbosity)

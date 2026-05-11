@@ -90,7 +90,7 @@ flows through UVM ports.
   prints its summary in `report_phase`.
 
 - **Drill ch.16 — Analysis port in a TB**
-  *File:* `homework/verif/per_chapter/hw_ch16_analysis_in_tb/analysis_tb.sv`
+  *Folder:* `homework/verif/per_chapter/hw_ch16_analysis_ports/` (split into `analysis_pkg.svh`, `producer.svh`, `printer_a.svh`, `printer_b.svh`, `analysis_test.svh`, `top.sv`)
   Build a tiny `producer` `uvm_component` that fires 5 `command_s`
   structs through an `analysis_port`, and two
   `uvm_subscriber #(command_s)`s that just print what they receive.
@@ -250,7 +250,7 @@ contention, every input gets granted in a bounded number of cycles.
 - [ ] Read Salemi ch.18 (tester/driver split)
 - [ ] Read Salemi ch.19 (UVM reporting)
 - [x] Drill ch.15 (dice roller)
-- [ ] Drill ch.16 (analysis port in TB)
+- [x] Drill ch.16 (analysis port in TB)
 - [ ] Drill ch.17 (producer/consumer)
 - [ ] Drill ch.18 (tester/driver split toy)
 - [ ] Drill ch.19 (reporting + verbosity)
@@ -430,7 +430,7 @@ bash ../run_yosys_rtl.sh <rtl_file>.sv
 - [ ] Read Salemi ch.18 (tester/driver split)
 - [ ] Read Salemi ch.19 (UVM reporting)
 - [x] Drill ch.15 (dice roller)
-- [ ] Drill ch.16 (analysis port in TB)
+- [x] Drill ch.16 (analysis port in TB)
 - [ ] Drill ch.17 (producer/consumer + tlm_fifo)
 - [ ] Drill ch.18 (tester/driver split toy)
 - [ ] Drill ch.19 (reporting + verbosity)
