@@ -504,6 +504,112 @@ module cheatsheet_ch5;
 
 
     // ========================================================================
+    //  VISUAL REFERENCE — common array shapes side-by-side
+    // ========================================================================
+    //
+    // Quick lookup card for "what does this declaration actually store?"
+    // Three shapes, increasing packed-dim count, each with a layout diagram
+    // and a "what ops are legal" line.
+
+
+    // ---- Shape 1: int a1 [7:0][1023:0] ------------------------------------
+    //   2-D UNPACKED. Each cell is a scalar int (32-bit, 2-state).
+    //
+    //         ← inner unpacked [1023:0] →
+    //         j=0     j=1     j=2    …    j=1023
+    //       ┌──────┬──────┬──────┬───┬──────┐
+    //  i=0 →│ int  │ int  │ int  │ … │ int  │   a1[0]
+    //  i=1 →│ int  │ int  │ int  │ … │ int  │   a1[1]
+    //   ⋮   │  ⋮   │  ⋮   │  ⋮   │ … │  ⋮   │
+    //  i=7 →│ int  │ int  │ int  │ … │ int  │   a1[7]
+    //       └──────┴──────┴──────┴───┴──────┘
+    //
+    //   Total: 8 × 1024 × 32 = 262,144 bits.
+    //   Legal:    a1[i][j] = one int;  a1[i] = entire row;  a1 = ... = all
+    //   Illegal:  a1[1:3]  (slice across unpacked);  a1 << 1  (vector op)
+    //   Use for: software-style int arrays (counters, indices, scoreboard
+    //            keys). Use logic [N-1:0] mem [DEPTH] instead for RTL RAM.
+
+    int a1 [7:0][1023:0];
+
+
+    // ---- Shape 2: logic [31:0] data1 [5][1024] ----------------------------
+    //   1 PACKED + 2 UNPACKED. Each cell is a 32-bit vector.
+    //   CANONICAL RAM idiom: outer unpacked = address space, packed = word.
+    //
+    //         ← inner unpacked [0:1023] →
+    //         j=0      j=1      j=2     …    j=1023
+    //       ┌────────┬────────┬────────┬───┬────────┐
+    //  i=0 →│[31:0]  │[31:0]  │[31:0]  │ … │[31:0]  │   data1[0]
+    //  i=1 →│[31:0]  │[31:0]  │[31:0]  │ … │[31:0]  │   data1[1]
+    //   ⋮   │  ⋮     │  ⋮     │  ⋮     │ … │  ⋮     │
+    //  i=4 →│[31:0]  │[31:0]  │[31:0]  │ … │[31:0]  │   data1[4]
+    //       └────────┴────────┴────────┴───┴────────┘
+    //         each cell = ONE 32-bit packed vector (4-state, slice-able)
+    //
+    //   Total: 5 × 1024 × 32 = 163,840 bits ≈ 20 KB.
+    //   Legal:    data1[i][j] = full word,
+    //             data1[i][j][7:0] = byte slice,
+    //             data1[i][j] << 4 = vector shift on one cell,
+    //             data1[i][j] + 1 = vector arithmetic on one cell.
+    //   Illegal:  data1[1:3]  (slice across unpacked dims).
+    //   Use for: single-banked RAMs, register files, lookup tables.
+    //   Synthesis tools infer block RAM from this exact shape.
+
+    logic [31:0] data1 [5][1024];
+
+
+    // ---- Shape 3: logic [7:0][31:0] data2 [5][1024] -----------------------
+    //   2 PACKED + 2 UNPACKED. Each cell is itself a 2-D packed array
+    //   (8 sub-words × 32 bits = 256 bits per cell).
+    //   CACHE-LINE / SIMD register-file idiom.
+    //
+    //         ← inner unpacked [0:1023] →
+    //         j=0       j=1       j=2      …    j=1023
+    //       ┌─────────┬─────────┬─────────┬───┬─────────┐
+    //  i=0 →│ 256-bit │ 256-bit │ 256-bit │ … │ 256-bit │   data2[0]
+    //  i=1 →│ 256-bit │ 256-bit │ 256-bit │ … │ 256-bit │   data2[1]
+    //   ⋮   │   ⋮     │   ⋮     │   ⋮     │ … │   ⋮     │
+    //  i=4 →│ 256-bit │ 256-bit │ 256-bit │ … │ 256-bit │   data2[4]
+    //       └─────────┴─────────┴─────────┴───┴─────────┘
+    //         each cell = 2-D packed array [7:0][31:0]
+    //
+    //   Inside ONE cell:
+    //     bit#:   255 ─── 224 │ 223 ─── 192 │ … │ 31 ─── 0
+    //     slot:    [7]        │   [6]       │ … │  [0]
+    //
+    //   Total: 5 × 1024 × 256 = 1,310,720 bits ≈ 160 KB.
+    //   Legal:    data2[i][j]           = full 256-bit row,
+    //             data2[i][j][k]        = one 32-bit sub-word,
+    //             data2[i][j][k][m:n]   = bit slice within sub-word,
+    //             data2[i][j][3:1]      = 3 consecutive sub-words (96 bits).
+    //   Illegal:  data2[1:3]  (slice across unpacked dims).
+    //   Use for: cache (W ways × S sets × L words/line × W bits/word),
+    //            SIMD register file (lanes × entries × elements × bits),
+    //            multi-word packet buffers.
+
+    logic [7:0][31:0] data2 [5][1024];
+
+
+    // ---- Decision table: shape ⇄ use case ---------------------------------
+    //
+    //   Use case                                Shape
+    //   --------------------------------------  ------------------------------
+    //   software int counters / indices         int  a [N]
+    //   single RAM (1 word per address)         logic [W-1:0] mem [DEPTH]
+    //   multi-bank RAM (B banks × DEEP × WIDE)  logic [W-1:0] mem [B][DEPTH]
+    //   cache (W ways, S sets, L words/line)    logic [L-1:0][LW-1:0] cache [W][S]
+    //   SIMD reg file (lanes, regs, w-per-lane) logic [V-1:0][W-1:0]  vrf  [REGS]
+    //
+    //   Rule of thumb:
+    //     - Packed dims (BEFORE name) describe ONE cell's internal bit layout.
+    //       You can slice/shift/arithmetic these.
+    //     - Unpacked dims (AFTER name) describe the ADDRESS structure of
+    //       the storage. You index these one element at a time.
+    //     - Index from outer (leftmost) to inner: unpacked first, then packed.
+
+
+    // ========================================================================
     //  SECTION 5.3.9 — User-defined types with arrays
     // ========================================================================
 
