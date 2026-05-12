@@ -10,16 +10,6 @@ module simple_alu_tb;
 
     simple_alu dut (cmd, res);
 
-    function command_t specific_command(alu_op_t op, logic [7:0] a, b, logic [3:0] id, logic valid);
-        return '{
-            op: op,
-            a: a,
-            b: b,
-            id: id,
-            valid: valid
-        };
-    endfunction : specific_command
-
     function command_t randomize_command();
         return '{
             op: alu_op_t'($urandom_range(0,7)),
