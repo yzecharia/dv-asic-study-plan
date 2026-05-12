@@ -26,11 +26,9 @@ GitHub portfolio piece), so RTL quality matters.
 
 ### Reading — Design
 
-- **Pong P. Chu *FPGA Prototyping* ch.7** ⭐ — UART is **ch.7** in
-  Chu (not ch.8 — earlier versions of this doc had it wrong). Chu
-  walks through baud-rate generator → RX FSM with oversampling →
-  TX FSM → optional FIFO buffering. This is the canonical
-  textbook treatment.
+- **Pong P. Chu *FPGA Prototyping* ch.7** ⭐ — Chu walks through
+  baud-rate generator → RX FSM with oversampling → TX FSM → optional
+  FIFO buffering. This is the canonical textbook treatment.
 - **Pong Chu ch.4** — regular sequential circuits (counter, shift
   register, FIFO buffer); the building blocks Chu uses in ch.7.
 - **Pong Chu ch.5** — FSM coding patterns; the coding style Chu
@@ -39,8 +37,7 @@ GitHub portfolio piece), so RTL quality matters.
   registers, shift registers — the underlying primitives.
 - **Sutherland *SV for Design* ch.10 — Interfaces**: bundle the
   UART signals (TX, RX, baud-tick, parity-error, ready) in a
-  proper SV interface with `modport`s for `dut`/`tb`. (Note:
-  ch.10 is interfaces — earlier drafts cited the wrong chapter.)
+  proper SV interface with `modport`s for `dut`/`tb`.
 - **Sutherland *SV for Design* ch.8 — FSM modeling**: same FSM
   coding style as Chu, in modern SV.
 - **Cliff Cummings** *"Coding And Scripting Techniques For FSM

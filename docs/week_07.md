@@ -56,9 +56,7 @@ producing a clean, end-to-end testbench you fully understand.
   in W6; build it now
 - **Sutherland *SV for Design* (2nd ed) ch.6 — Procedural Blocks**:
   `always_comb` vs `always_ff` vs `always_latch`, when each is the
-  right tool. (Note: previous drafts of this doc cited "ch.9" or
-  "ch.13"; the correct chapter is ch.6. The book also has no ch.13
-  — *SV for Design* ends at ch.12.)
+  right tool.
 - **Sutherland *RTL Modeling with SystemVerilog* ch.7-8** — separate
   book, deeper synthesis-aware coding patterns for
   combinational and sequential logic. Use as a tie-breaker reference

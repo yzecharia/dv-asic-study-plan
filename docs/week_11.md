@@ -49,8 +49,7 @@ Sutherland still apply (interfaces, structs, FSMs).
   written.
 - **Sutherland *SV for Design* ch.9 — Design Hierarchy**:
   parameterized modules + `generate`. AXI-Lite is naturally
-  parameterized on `ADDR_WIDTH` and `DATA_WIDTH`. (Note:
-  parameterization is ch.9, not ch.11 — earlier draft was wrong.)
+  parameterized on `ADDR_WIDTH` and `DATA_WIDTH`.
 - **Sutherland *SV for Design* ch.8 — FSM Modeling**: the SPI
   master FSM and the AXI write/read FSMs.
 - **Dally & Harting ch.24 — Interconnect**: covers the

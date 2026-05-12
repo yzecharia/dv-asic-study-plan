@@ -28,7 +28,7 @@ Concept notes to skim/update:
 |---|---|
 | Dally & Harting ch.10 — Arithmetic Circuits | Ripple-carry adder, subtractor, comparator, shift-add multiplier. |
 | Dally & Harting ch.12 — Fast Arithmetic | CLA, Wallace trees, barrel shifters. |
-| Sutherland *SV for Design* (2e) ch.10 — Interfaces | `interface`, `modport`, `clocking`. The Sutherland *SV for Design* book interfaces chapter is **ch.10** — earlier drafts of this plan said ch.4-5; that was wrong. |
+| Sutherland *SV for Design* (2e) ch.10 — Interfaces | `interface`, `modport`, `clocking`. |
 | Cummings *Synthesis Coding Styles for Efficient Designs* (SNUG-2012) | Synthesis-friendly RTL idioms for the ALU. |
 
 Concept notes: [[concepts/adders_carry_chain]], [[concepts/multipliers]],

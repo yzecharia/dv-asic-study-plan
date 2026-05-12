@@ -34,10 +34,8 @@ Goals after this week:
 - **Sutherland *RTL Modeling with SystemVerilog* (this is a
   different Sutherland book — *not* *SV for Design*) ch.7-8** —
   combinational + sequential RTL coding rules for synthesis.
-  This is the book that replaces the (incorrect) "SV for Design
-  ch.13" citation that appeared in earlier drafts of this plan.
-  *SV for Design* has only 12 chapters; the synthesis-style guide
-  lives in the *RTL Modeling* book.
+  *SV for Design* ends at ch.12; the synthesis-style guide lives
+  in the *RTL Modeling* book.
 - **Sutherland *SV for Design* ch.6 — Procedural Blocks**: the
   `always_comb` / `always_ff` / `always_latch` rules every
   synthesizer interprets unambiguously.

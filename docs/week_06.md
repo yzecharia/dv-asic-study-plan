@@ -59,9 +59,7 @@ The HW below respects that order — don't try to skip ahead.
 - **Dally & Harting ch.25 — Memory Systems**: SRAM organization,
   byte enables, banking
 - **Sutherland *SV for Design* ch.9 — Design Hierarchy**:
-  parameterized modules and `generate` blocks. (Note: the earlier
-  reference to "ch.11 — generate" was wrong; ch.11 is the ATM
-  worked example, not generate constructs.)
+  parameterized modules and `generate` blocks.
 - **Cliff Cummings** *"Asynchronous FIFO Design"* (theory follow-up
   — build is W7)
 
@@ -221,8 +219,7 @@ Build on HW2. Apply Salemi's 6 conversion steps to the full ALU TB:
 - **Drill Sutherland ch.9 — Parameterized + generate**
   *Folder:* `homework/design/per_chapter/hw_sutherland_ch9_generate/`
   Parameterized N-bit register file using a `generate for` block.
-  Verify with TB at WIDTH=8/32, DEPTH=16/128. (Note: generate is
-  ch.9 in *SV for Design*, not ch.11.)
+  Verify with TB at WIDTH=8/32, DEPTH=16/128.
 
 - **Drill Dally ch.25 — Memory bank with byte enable**
   *Folder:* `homework/design/per_chapter/hw_dally_ch25_memory_bank/`

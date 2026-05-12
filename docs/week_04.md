@@ -52,8 +52,7 @@ fully.
   Wallace trees, barrel shifters
 - **Dally & Harting ch.13 — Arithmetic Examples**: worked designs
 - **Sutherland *SV for Design* (2nd ed) ch.10 — Interfaces**: `interface`,
-  `modport`, port direction, `clocking` block. (The *SV for Design*
-  book has 12 chapters total — interfaces live in ch.10, not ch.4-5.)
+  `modport`, port direction, `clocking` block.
 - **Cliff Cummings** *"Synthesis Coding Styles for Efficient Designs"*
 
 ### Tool Setup
@@ -201,9 +200,7 @@ Goal: see the override flip behavior with zero changes to the env code.
 - **Drill Sutherland ch.10 — ALU SV interface**
   *Folder:* `homework/design/per_chapter/hw_sutherland_ch10_interfaces/`
   Write `alu_if` with `modport dut`, `modport tb`, `modport monitor`,
-  and a `clocking` block. (Note: the Sutherland *SV for Design* book's
-  Interfaces chapter is ch.10 — not ch.4-5 as earlier drafts of this
-  doc claimed.)
+  and a `clocking` block.
 
 ### Main HWs
 
@@ -395,7 +392,7 @@ Concept notes to skim/update:
 |---|---|
 | Dally & Harting ch.10 — Arithmetic Circuits | Ripple-carry adder, subtractor, comparator, shift-add multiplier. |
 | Dally & Harting ch.12 — Fast Arithmetic | CLA, Wallace trees, barrel shifters. |
-| Sutherland *SV for Design* (2e) ch.10 — Interfaces | `interface`, `modport`, `clocking`. The Sutherland *SV for Design* book interfaces chapter is **ch.10** — earlier drafts of this plan said ch.4-5; that was wrong. |
+| Sutherland *SV for Design* (2e) ch.10 — Interfaces | `interface`, `modport`, `clocking`. |
 | Cummings *Synthesis Coding Styles for Efficient Designs* (SNUG-2012) | Synthesis-friendly RTL idioms for the ALU. |
 
 Concept notes: [[concepts/adders_carry_chain]], [[concepts/multipliers]],

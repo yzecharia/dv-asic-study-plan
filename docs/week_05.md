@@ -61,9 +61,8 @@ flows through UVM ports.
   handshakes belong (you previewed them in W3 from external sources;
   now they have a textbook home)
 - **Sutherland *SV for Design* ch.5 — Arrays, Structures, Unions**:
-  this is the **correct** chapter for packed/unpacked structs.
-  (Earlier drafts of this doc said ch.7 — wrong; ch.7 is procedural
-  statements.)
+  packed/unpacked structs, packed/unpacked arrays, unions,
+  `foreach`, array query functions, `$bits`.
 - **Cliff Cummings** *"Asynchronous FIFO Design"* — read for theory
   this week; you build it in W7
 
@@ -202,8 +201,7 @@ debug. Verify behavior under `+UVM_VERBOSITY=UVM_HIGH` and
 - **Drill Sutherland ch.5 — Packed struct port**
   *Folder:* `homework/design/per_chapter/hw_sutherland_ch5_structs/`
   Build a small RTL block whose port is a packed `struct`. Bundle
-  5+ signals cleanly. (Note: structs are in Sutherland *SV for
-  Design* ch.5, not ch.7.)
+  5+ signals cleanly.
 
 ### Main HWs
 
