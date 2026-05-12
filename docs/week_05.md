@@ -264,7 +264,7 @@ contention, every input gets granted in a bounded number of cycles.
 - [ ] Read Cummings async FIFO paper (theory only — build is W7)
 - [x] Drill Dally ch.16 (shift register)
 - [ ] Drill Dally ch.24 (valid/ready handshake)
-- [ ] Drill Sutherland ch.5 (packed struct port)
+- [x] Drill Sutherland ch.5 (packed struct port)
 - [ ] HW1: dual-port RAM
 - [ ] HW2: round-robin arbiter
 
@@ -445,7 +445,7 @@ bash ../run_yosys_rtl.sh <rtl_file>.sv
 - [ ] Read Cummings async FIFO paper (theory only — build is W7)
 - [x] Drill Dally ch.16 (shift register)
 - [ ] Drill Dally ch.24 (valid/ready handshake)
-- [ ] Drill Sutherland ch.5 (packed struct port)
+- [x] Drill Sutherland ch.5 (packed struct port)
 - [ ] HW1: true dual-port RAM
 - [ ] HW2: round-robin arbiter
 
