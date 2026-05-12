@@ -50,7 +50,7 @@ RED='\033[0;31m'
 NC='\033[0m'
 
 # ── Plugin probe — fail fast with install instructions if slang is missing ──
-if ! yosys -q -p "plugin -i slang; quit" >/dev/null 2>&1; then
+if ! yosys -q -p "plugin -i slang" >/dev/null 2>&1; then
     echo -e "${RED}✗ yosys-slang plugin not loaded${NC}"
     echo ""
     echo "Install instructions (macOS, Homebrew Yosys):"
@@ -65,7 +65,7 @@ if ! yosys -q -p "plugin -i slang; quit" >/dev/null 2>&1; then
     echo "  make install         # installs slang.so next to yosys plugins"
     echo ""
     echo "  # 3. Verify"
-    echo "  yosys -p 'plugin -i slang; quit'"
+    echo "  yosys -p 'plugin -i slang'"
     echo ""
     echo "Reference: https://github.com/povik/yosys-slang"
     echo ""
