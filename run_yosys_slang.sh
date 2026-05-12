@@ -131,22 +131,48 @@ echo -e "${CYAN}  Files:${NC}      ${ALL_FILES[*]##*/}"
 echo -e "${CYAN}  Output:${NC}     $OUT_DIR/"
 echo ""
 
-# Hierarchical view via slang frontend.
-# The slang plugin replaces 'read_verilog' with 'read_slang', which handles
-# the full SV-2017 grammar that Yosys's built-in parser can't.
+# Gate-level synthesis flow via slang frontend.
+#
+#   plugin -i slang      load the slang plugin
+#   read_slang ...       slang front-end parses SV (handles packages, structs,
+#                        struct ports — the things the built-in Verilog parser
+#                        can't)
+#   hierarchy -top X     pick the elaboration root
+#   proc                 lower always_comb / case / if-else to behavioral form
+#   flatten              inline every submodule into the top — strips
+#                        hierarchy boundaries
+#   opt                  constant-fold, dead-code remove
+#   techmap              map operators (+, <<, &, mux) to a generic gate
+#                        library (AND, OR, XOR, NOT, MUX) so netlistsvg can
+#                        render real gate symbols
+#   opt                  one more pass to clean up the gate-level result
+#   write_json           emit the gate netlist for netlistsvg to render
 yosys -q -l "$OUT_DIR/$TOP_NAME.log" -p "
     plugin -i slang;
     read_slang ${ALL_FILES[*]};
     hierarchy -top $TOP_NAME;
     proc;
+    flatten;
     opt;
-    show -format svg -prefix $OUT_DIR/$TOP_NAME -colors 1 -viewer false $TOP_NAME;
+    techmap;
+    opt;
+    write_json $OUT_DIR/${TOP_NAME}_gates.json;
 "
+
+# Render the gate netlist with netlistsvg — produces a proper schematic
+# with AND/OR/XOR/MUX/REG symbols, not labeled boxes.
+if [[ -f "$OUT_DIR/${TOP_NAME}_gates.json" ]] && command -v netlistsvg >/dev/null; then
+    netlistsvg "$OUT_DIR/${TOP_NAME}_gates.json" \
+        -o "$OUT_DIR/$TOP_NAME.svg" 2>/dev/null || true
+fi
 
 if [[ -f "$OUT_DIR/$TOP_NAME.svg" ]]; then
     add_white_bg "$OUT_DIR/$TOP_NAME.svg"
-    echo -e "${GREEN}✓ Hierarchical schematic:${NC} $OUT_DIR/$TOP_NAME.svg"
+    echo -e "${GREEN}✓ Gate-level schematic:${NC} $OUT_DIR/$TOP_NAME.svg"
     open "$OUT_DIR/$TOP_NAME.svg" 2>/dev/null || true
+else
+    echo -e "${RED}✗ Schematic not produced — check $OUT_DIR/$TOP_NAME.log${NC}"
+    exit 1
 fi
 
 echo -e "\n${GREEN}✓ Done${NC}"
