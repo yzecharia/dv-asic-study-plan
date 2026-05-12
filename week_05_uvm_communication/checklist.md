@@ -19,11 +19,11 @@
 
 ## Design track
 
-- [ ] Read Dally ch.16 (datapath sequential)
+- [x] Read Dally ch.16 (datapath sequential)
 - [ ] Read Dally ch.24 (interconnect / handshake)
 - [ ] Read Sutherland *SV for Design* ch.5 (arrays, structs, unions)
 - [ ] Read Cummings async FIFO paper (theory only — build is W7)
-- [ ] Drill Dally ch.16 (shift register)
+- [x] Drill Dally ch.16 (shift register)
 - [ ] Drill Dally ch.24 (valid/ready handshake)
 - [ ] Drill Sutherland ch.5 (packed struct port)
 - [ ] HW1: true dual-port RAM

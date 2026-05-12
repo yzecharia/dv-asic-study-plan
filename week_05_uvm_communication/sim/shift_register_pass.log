@@ -1,0 +1,2 @@
+PASS: 110 / 110 checks passed
+shift_register_tb.sv:98: $finish called at 1146 (1s)
