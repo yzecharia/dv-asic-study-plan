@@ -238,9 +238,26 @@ module cheatsheet_ch5;
 
 
     // ---- 5.2.2 tagged union (partial synth) --------------------------------
-    // [COMMERCIAL ONLY] - many open-source tools don't support 'tagged'
+    //
+    // A tagged union wraps a union with an automatic "I last wrote member X"
+    // tracker. The compiler enforces at runtime that reads use the same
+    // member that was last written. It's SV's version of a "sum type" /
+    // "variant type" — like Rust's enum, C++'s std::variant, Swift enums.
+    //
+    // Three things to know:
+    //   1. Writes MUST use `tagged <member_name> <value>` form.
+    //   2. Reads through a different member trigger a RUNTIME error.
+    //   3. There is NO way to query the tag — it's an assertion mechanism,
+    //      not a queryable runtime type field. Track intent with a parallel
+    //      enum if you need to branch on the current type.
+    //
+    // [COMMERCIAL ONLY] - Verilator, iverilog, Yosys all reject the 'tagged'
+    //                     keyword. VCS / Questa / Xcelium support it.
+    //                     Uncomment the example below to try it on a
+    //                     commercial simulator.
 
     /*
+    // -------- simple example: int OR real, with runtime tag checking -------
     typedef union tagged {
         int  i;
         real r;
@@ -249,10 +266,52 @@ module cheatsheet_ch5;
     tag_union_t U_tag;
 
     initial begin
-        U_tag = tagged i 5;     // store 5 in i, set implicit tag
-        $display("%0d", U_tag.i);   // OK
-        // $display("%f", U_tag.r); // RUNTIME ERROR — tag mismatch
+        U_tag = tagged i 5;             // store 5 in i, set implicit tag = i
+        $display("%0d", U_tag.i);       // OK — tag matches
+        // $display("%f", U_tag.r);     // RUNTIME ERROR — tag mismatch
+        U_tag = tagged r 3.1415;        // overwrite, tag = r
+        U_tag.r = 2.71;                 // OK — tag is r, direct write allowed
+        // U_tag.i = 10;                // RUNTIME ERROR — tag is r, not i
     end
+
+    // -------- killer use case: instruction with variant operand layouts ----
+    typedef enum {ADD_OP, SUB_OP, JMP_OP, NOP_OP} opcode_t;
+
+    typedef struct { int reg_a, reg_b, reg_dst; } alu_op_t;
+    typedef struct { int target_addr;            } jmp_op_t;
+
+    typedef union tagged {
+        alu_op_t  alu;
+        jmp_op_t  jmp;
+    } operands_u;
+
+    typedef struct {
+        opcode_t   op;
+        operands_u operands;
+    } instr_t;
+
+    instr_t inst;
+
+    initial begin
+        // ADD: operands take the alu shape
+        inst.op       = ADD_OP;
+        inst.operands = tagged alu '{reg_a:1, reg_b:2, reg_dst:3};
+        // process(inst.operands.alu);   // legal
+
+        // JMP: same union, different shape — tag tracks the change
+        inst.op       = JMP_OP;
+        inst.operands = tagged jmp '{target_addr:'h1000};
+        // process(inst.operands.jmp);   // legal
+        // process(inst.operands.alu);   // RUNTIME ERROR — tag is jmp
+    end
+
+    // -------- tagged + packed: members may differ in width ---------------
+    typedef union tagged packed {
+        logic [15:0] short_word;
+        logic [31:0] word;
+        logic [63:0] long_word;
+    } sized_word_t;
+    // Storage = max(16, 32, 64) + tag bits.
     */
 
 

@@ -52,11 +52,123 @@ d_out = data.r;          // RUNTIME ERROR — tag mismatch
 
 The compiler adds an implicit hidden "tag" member that records which named member was last written. Reading through a different member triggers a runtime check.
 
-- Catches the "wrote one, read another" bug at runtime instead of producing garbage.
-- The `tagged <name> <value>` syntax is required for writes (the `=` direct write to a member also works, but it must match the current tag).
-- **Synthesizability is spotty.** The standard says yes; most synth tools accept the construct but RAL/sequence libraries don't always handle it. Don't bet a design on it without checking your tool.
+### What problem it solves
 
-When you reach for it: when modeling a value that legitimately has multiple representations and you want the simulator to police access patterns (e.g. variant types in high-level TB code).
+A plain union stores raw bits and lets you reinterpret them through any member. If you wrote through `data.i` and then read `data.r`, the simulator hands back whatever bit pattern `5` looks like as a real — garbage, but no error. This is the source of an entire class of silent bugs in protocol stacks and instruction decoders, where a value's "type" is implicit in the surrounding context.
+
+A tagged union closes that loophole. It enforces a simple invariant: **the member you read through must match the member you last wrote through.** Violations are caught at simulation time, not in a debugger three weeks later.
+
+### Why this matters — it's a "sum type" / "variant type"
+
+This is the SystemVerilog equivalent of constructs from other languages:
+
+| Language | Equivalent |
+|---|---|
+| Rust | `enum` with associated values |
+| Haskell / ML | Algebraic data types |
+| C++17+ | `std::variant` |
+| Swift | `enum` with associated values |
+| TypeScript | Discriminated unions |
+
+Reach for a tagged union when a single value can **legitimately be one of several distinct types at different moments**, and you want the language to track which one is currently valid.
+
+### The killer use case — instructions with variant operand layouts
+
+```systemverilog
+typedef enum {ADD, SUB, JMP, NOP} opcode_t;
+
+typedef struct { int reg_a, reg_b, reg_dst; } alu_op_t;
+typedef struct { int target_addr;           } jmp_op_t;
+
+union tagged {
+    alu_op_t  alu;
+    jmp_op_t  jmp;
+} operands_u;
+
+typedef struct {
+    opcode_t   op;
+    operands_u operands;
+} instr_t;
+
+instr_t inst;
+
+// ADD instruction — operands take the alu shape
+inst.op       = ADD;
+inst.operands = tagged alu '{reg_a:1, reg_b:2, reg_dst:3};
+
+// JMP instruction — operands take the jmp shape, same union
+inst.op       = JMP;
+inst.operands = tagged jmp '{target_addr:'h1000};
+
+// later: decode an instruction
+case (inst.op)
+    ADD, SUB: process_alu(inst.operands.alu);   // tag must be alu
+    JMP:      jump_to    (inst.operands.jmp);    // tag must be jmp
+endcase
+
+// catches the bug if op and operands get out of sync:
+$display(inst.operands.alu.reg_a);    // RUNTIME ERROR if last write was tagged jmp
+```
+
+Without the tag, an ADD instruction whose `operands` were set with the jmp shape would silently misinterpret `target_addr` as `reg_a`, and you'd debug for hours wondering why register 4096 keeps getting clobbered. With the tag, the simulator stops you at the bad read.
+
+### Writing — must use the `tagged` keyword
+
+```systemverilog
+data = tagged i 5;        // store 5 in i, set tag to "i"
+data = tagged r 3.14;     // store 3.14 in r, change tag to "r"
+data.i = 7;               // direct write — allowed ONLY if current tag is "i"
+data.r = 1.5;             // RUNTIME ERROR if current tag is "i"
+```
+
+The form `tagged <member_name> <value>` is **required** to set the tag. After that, direct member-name writes (`data.i = 7`) are legal only when they match the current tag.
+
+### Reading — the tag check
+
+```systemverilog
+d_int  = data.i;          // legal only if tag is "i"
+d_real = data.r;          // legal only if tag is "r"
+```
+
+The simulator silently inserts a check `assert(current_tag == member_being_read)` at every read. Mismatch → runtime error.
+
+There is no "test the tag" syntax in standard SV — you can't query the tag directly. The pattern is: maintain a parallel enum (like `opcode_t` above) that mirrors the union's intent, and use that for control-flow decisions. The hidden tag is the runtime *check*; your visible enum is the runtime *intent*.
+
+### Combined with `packed` — different widths allowed
+
+```systemverilog
+union tagged packed {
+    logic [15:0] short_word;
+    logic [31:0] word;
+    logic [63:0] long_word;
+} data_word;
+```
+
+This is the **only** union form where members can be different bit-widths. Storage = `max(member_widths)` bits + tag bits. When you `data_word = tagged word 32'hDEADBEEF`, the storage is sized for the 64-bit max, the value goes into the bottom 32 bits, and the tag remembers "this is a word."
+
+### Synthesis status
+
+**Partial / tool-dependent.** This is the key honest caveat:
+
+- The SystemVerilog standard (IEEE 1800-2017 §7.3.2) says tagged unions are synthesizable.
+- Most commercial simulators (VCS, Questa, Xcelium) accept the syntax.
+- **Most open-source tools reject it outright** — Verilator and iverilog don't support `tagged` at all.
+- Synthesis tools that accept the syntax often produce inefficient hardware (the tag bits cost storage, and the runtime checks must either be discarded — losing the safety — or implemented as extra logic).
+- UVM RAL and most sequence libraries don't model tagged-union fields well.
+
+**Practical rule:** treat tagged unions as a **simulation-time variant-type tool** for TB code and abstract models. If you need a variant in synthesizable RTL, use a `packed` (non-tagged) union plus a separate enum field for the intent — equivalent semantics, universal tool support.
+
+### Gotcha — there's no clean way to query the tag
+
+```systemverilog
+// Wishful syntax — DOES NOT EXIST in standard SV:
+// if (data.tag == i) ...
+// case (tagof(data)) ...
+```
+
+Tagged unions check the tag on read but don't expose it for inspection. If you need to branch on which type is currently stored, you must track that intent in a separate field. This makes the construct less useful than `std::variant` in C++ (which provides `std::holds_alternative<T>(v)` and pattern matching). Treat the tag as **an assertion mechanism**, not a queryable runtime type field.
+
+When you reach for it: when modeling a value that legitimately has multiple representations and you want the simulator to police access patterns (e.g. variant types in high-level TB code). When you DON'T: in synthesizable RTL with cross-tool portability requirements.
 
 ## Flavor 3 — Packed unions (Sutherland §5.2.3, pp. 109–111)
 
