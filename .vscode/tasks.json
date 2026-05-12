@@ -81,6 +81,15 @@
     },
 
     {
+      "label": "🔧 RTL SCHEMATIC (yosys-slang — full SV: packages, structs, etc.)",
+      "type": "shell",
+      "command": "${workspaceFolder}/run_yosys_slang.sh",
+      "args": ["${file}"],
+      "group": "build",
+      "presentation": { "clear": true, "reveal": "always", "group": "yosys" }
+    },
+
+    {
       "label": "📁 SIM FOLDER (xsim, all *.sv siblings — multi-file class TBs)",
       "type": "shell",
       "command": "${workspaceFolder}/run_xsim_folder.sh",
