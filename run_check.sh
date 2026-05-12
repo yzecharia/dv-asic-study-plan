@@ -10,9 +10,16 @@
 # Usage:
 #     ./run_check.sh <file.sv>
 #
-# Auto-includes every *.sv file in the same folder as <file.sv>, so designs
-# split across multiple files (DFF + Mux + Arb + top) all elaborate together.
+# Auto-includes every *.svh file (packages / headers — analyzed first) and
+# every *.sv file in the same folder as <file.sv>, so designs split across
+# multiple files (DFF + Mux + Arb + top + pkg) all elaborate together.
+# Both extensions are optional; missing files don't trigger errors.
 # Top module name is inferred from <file.sv> (first `module` keyword).
+#
+# Note: if a *.svh file is also `include`d inside a *.sv file, you may get
+# "duplicate definition" errors. Either rename it to *.sv and import it as a
+# package, or stop `include`ing it. Modern SV prefers import over `include
+# for packages.
 # ============================================================================
 set -euo pipefail
 
@@ -41,18 +48,26 @@ fi
 TARGET_ABS="$(cd "$(dirname "$TARGET_FILE")" && pwd)/$(basename "$TARGET_FILE")"
 PROJECT_DIR="$(dirname "$TARGET_ABS")"
 
-# Glob every *.sv file in the same folder. Put the target last so its top
-# module is the natural elaboration root.
-SIBLINGS=()
+# Glob every *.svh file first (packages / defines — must be analyzed
+# before consumer modules), then every *.sv file. Put the target last
+# so its top module is the natural elaboration root.
+SVH_FILES=()
+SV_SIBLINGS=()
 shopt -s nullglob
+for f in "$PROJECT_DIR"/*.svh; do
+    SVH_FILES+=("$(basename "$f")")
+done
 for f in "$PROJECT_DIR"/*.sv; do
     if [[ "$f" != "$TARGET_ABS" ]]; then
-        SIBLINGS+=("$(basename "$f")")
+        SV_SIBLINGS+=("$(basename "$f")")
     fi
 done
 shopt -u nullglob
 
-REL_FILES=("${SIBLINGS[@]}" "$(basename "$TARGET_ABS")")
+REL_FILES=()
+[[ ${#SVH_FILES[@]}    -gt 0 ]] && REL_FILES+=("${SVH_FILES[@]}")
+[[ ${#SV_SIBLINGS[@]}  -gt 0 ]] && REL_FILES+=("${SV_SIBLINGS[@]}")
+REL_FILES+=("$(basename "$TARGET_ABS")")
 
 # Infer top module: first `module <name>` in the target file. Fallback: filename.
 TOP_MODULE=$(grep -m1 -E '^[[:space:]]*module[[:space:]]' "$TARGET_ABS" \
