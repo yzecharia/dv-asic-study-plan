@@ -10,10 +10,21 @@
 # Usage:
 #     ./run_check.sh <file.sv>
 #
-# Auto-includes every *.svh file (packages / headers — analyzed first) and
-# every *.sv file in the same folder as <file.sv>, so designs split across
-# multiple files (DFF + Mux + Arb + top + pkg) all elaborate together.
-# Both extensions are optional; missing files don't trigger errors.
+# Auto-includes every *.svh and *.sv file in the same folder as <file.sv>,
+# so designs split across multiple files (DFF + Mux + Arb + top + pkg) all
+# elaborate together. Both extensions are optional.
+#
+# COMPILE ORDER (handles cross-file dependencies — packages first):
+#   1. Files containing 'package <name>;' declarations (regardless of
+#      .sv vs .svh extension or filename alphabetic order)
+#   2. Other *.svh files (typically `define-only headers)
+#   3. Other *.sv files (excluding the target)
+#   4. The target itself last — its top module is the elaboration root.
+#
+# This means an interface in alu_if.svh can `import alu_pkg::*` even if
+# alu_pkg.svh sorts AFTER it alphabetically. The script detects the
+# 'package' keyword and pulls those files to the front.
+#
 # Top module name is inferred from <file.sv> (first `module` keyword).
 #
 # Note: if a *.svh file is also `include`d inside a *.sv file, you may get
@@ -48,23 +59,33 @@ fi
 TARGET_ABS="$(cd "$(dirname "$TARGET_FILE")" && pwd)/$(basename "$TARGET_FILE")"
 PROJECT_DIR="$(dirname "$TARGET_ABS")"
 
-# Glob every *.svh file first (packages / defines — must be analyzed
-# before consumer modules), then every *.sv file. Put the target last
-# so its top module is the natural elaboration root.
+# Compile order (handles cross-file dependencies — packages first):
+#   1. Files containing 'package <name>;' declarations (any extension)
+#   2. Other *.svh files (typically `define-only headers)
+#   3. Other *.sv files (excluding the target)
+#   4. The target itself last (its top module is the elaboration root)
+#
+# Detection: grep each candidate for ^\s*package\s+<id>\s*;
+# This makes alphabetical filename ordering irrelevant — e.g. alu_if.svh
+# can safely `import alu_pkg::*` even though alu_pkg.* sorts later.
+PKG_FILES=()
 SVH_FILES=()
 SV_SIBLINGS=()
 shopt -s nullglob
-for f in "$PROJECT_DIR"/*.svh; do
-    SVH_FILES+=("$(basename "$f")")
-done
-for f in "$PROJECT_DIR"/*.sv; do
-    if [[ "$f" != "$TARGET_ABS" ]]; then
+for f in "$PROJECT_DIR"/*.svh "$PROJECT_DIR"/*.sv; do
+    [[ "$f" == "$TARGET_ABS" ]] && continue
+    if grep -qE '^[[:space:]]*package[[:space:]]+[A-Za-z_][A-Za-z0-9_]*[[:space:]]*;' "$f"; then
+        PKG_FILES+=("$(basename "$f")")
+    elif [[ "$f" == *.svh ]]; then
+        SVH_FILES+=("$(basename "$f")")
+    else
         SV_SIBLINGS+=("$(basename "$f")")
     fi
 done
 shopt -u nullglob
 
 REL_FILES=()
+[[ ${#PKG_FILES[@]}    -gt 0 ]] && REL_FILES+=("${PKG_FILES[@]}")
 [[ ${#SVH_FILES[@]}    -gt 0 ]] && REL_FILES+=("${SVH_FILES[@]}")
 [[ ${#SV_SIBLINGS[@]}  -gt 0 ]] && REL_FILES+=("${SV_SIBLINGS[@]}")
 REL_FILES+=("$(basename "$TARGET_ABS")")
