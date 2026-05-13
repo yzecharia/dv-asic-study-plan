@@ -40,7 +40,7 @@ Auto-regenerable via `python3 tools/update_progress_badges.py`.
 
 ## Phase 2 — UVM Methodology (W4–W7)
 
-### 🟡 Week 4 — UVM Architecture (Salemi ch.9–14)
+### ✅ Week 4 — UVM Architecture (Salemi ch.9–14)
 - [x] Reading: Salemi ch.9–13
 - [x] Reading: Salemi ch.14 (in progress per latest commits)
 - [x] Verif drill ch.9 — factory pattern (plain SV)
@@ -57,7 +57,7 @@ Auto-regenerable via `python3 tools/update_progress_badges.py`.
 - [ ] Iron Rule (b) Gold TB PASS log
 - [ ] Iron Rule (c) `verification_report.md`
 
-### ⬜ Week 5 — UVM Communication (Salemi ch.15–19)
+### 🟡 Week 5 — UVM Communication (Salemi ch.15–19)
 - [ ] Reading: Salemi ch.15–19
 - [ ] Verif: analysis ports, TLM 1.0, reporting
 - [ ] Design: Dual-port RAM, RR arbiter, valid/ready handshake
