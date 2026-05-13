@@ -90,11 +90,37 @@ REL_FILES=()
 [[ ${#SV_SIBLINGS[@]}  -gt 0 ]] && REL_FILES+=("${SV_SIBLINGS[@]}")
 REL_FILES+=("$(basename "$TARGET_ABS")")
 
-# Infer top module: first `module <name>` in the target file. Fallback: filename.
-TOP_MODULE=$(grep -m1 -E '^[[:space:]]*module[[:space:]]' "$TARGET_ABS" \
-    | sed -E 's/^[[:space:]]*module[[:space:]]+(automatic[[:space:]]+|static[[:space:]]+)?([a-zA-Z_][a-zA-Z0-9_]*).*/\2/')
-if [[ -z "$TOP_MODULE" ]]; then
-    TOP_MODULE=$(basename "$TARGET_ABS" .sv)
+# Infer elaboration top module. Priority:
+#   1. $TOP_MODULE env var (manual override)
+#   2. First *_tb_top.sv / *_top.sv sibling's module name
+#      (a module with interface ports can't be elaborated on its own;
+#       the *_top file is the wrapper that connects the interface)
+#   3. First `module <name>` in the target file
+#   4. Fallback: target file's basename
+extract_top_from_file() {
+    # Tolerant of empty files / files with no `module` line — returns "" then.
+    # `|| true` defangs `set -e`; `2>/dev/null` mutes "No such file" if absent.
+    { grep -m1 -E '^[[:space:]]*module[[:space:]]' "$1" 2>/dev/null \
+        | sed -E 's/^[[:space:]]*module[[:space:]]+(automatic[[:space:]]+|static[[:space:]]+)?([a-zA-Z_][a-zA-Z0-9_]*).*/\2/'; } || true
+}
+
+if [[ -n "${TOP_MODULE:-}" ]]; then
+    : # caller-specified, leave alone
+else
+    TOP_MODULE=""
+    shopt -s nullglob
+    for f in "$PROJECT_DIR"/*_tb_top.sv "$PROJECT_DIR"/*_top.sv; do
+        TOP_MODULE="$(extract_top_from_file "$f")"
+        [[ -n "$TOP_MODULE" ]] && break
+    done
+    shopt -u nullglob
+
+    if [[ -z "$TOP_MODULE" ]]; then
+        TOP_MODULE="$(extract_top_from_file "$TARGET_ABS")"
+    fi
+    if [[ -z "$TOP_MODULE" ]]; then
+        TOP_MODULE=$(basename "$TARGET_ABS" .sv)
+    fi
 fi
 
 # Build the docker command — xvlog every file, then xelab with the inferred top.
