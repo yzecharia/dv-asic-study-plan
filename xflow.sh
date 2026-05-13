@@ -118,6 +118,11 @@ scan_folder() {
     local target_abs="$1"
     local project_dir="$2"
 
+    local target_is_pkg=0
+    if grep -qE '^[[:space:]]*package[[:space:]]+[A-Za-z_][A-Za-z0-9_]*[[:space:]]*;' "$target_abs"; then
+        target_is_pkg=1
+    fi
+
     local pkg_files=() svh_files=() sv_siblings=()
     shopt -s nullglob
     for f in "$project_dir"/*.svh "$project_dir"/*.sv; do
@@ -133,10 +138,12 @@ scan_folder() {
     shopt -u nullglob
 
     REL_FILES=()
+    [[ $target_is_pkg -eq 1 ]] && REL_FILES+=("$(basename "$target_abs")")
     [[ ${#pkg_files[@]}    -gt 0 ]] && REL_FILES+=("${pkg_files[@]}")
     [[ ${#svh_files[@]}    -gt 0 ]] && REL_FILES+=("${svh_files[@]}")
     [[ ${#sv_siblings[@]}  -gt 0 ]] && REL_FILES+=("${sv_siblings[@]}")
-    REL_FILES+=("$(basename "$target_abs")")
+    [[ $target_is_pkg -eq 0 ]] && REL_FILES+=("$(basename "$target_abs")")
+    return 0
 }
 
 # Choose the elaboration top. Precedence:
