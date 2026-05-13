@@ -3,22 +3,33 @@
 update_progress_badges.py — recompute the README badges and Progress
 table from the docs.
 
-Reads docs/week_NN.md for the current week (passed as arg or detected from
-the most recently modified docs/week_*.md), counts checked vs total
-checklist items, and rewrites:
+Reads docs/week_NN.md for the current week (passed as arg or auto-
+detected as the lowest-numbered week with an incomplete checklist),
+counts checked vs total checklist items, and rewrites:
 
   * Three dynamic shields.io badges:
         ![Progress](https://img.shields.io/badge/progress-M%2F20_weeks-COLOR)
         ![Current Week](https://img.shields.io/badge/current_week-N-blue)
         ![Week N Progress](https://img.shields.io/badge/week_N_progress-XX%25-COLOR)
 
-  * The Progress table status column. Rows are auto-flipped:
+  * The Progress table status column in README.md.
+
+  * The per-week status heading emojis in docs/PROGRESS.md.
+
+Rows / headings are auto-flipped according to:
         week < current   → ✅ Done
         week = current   → 🟡 In progress
         week > current   → ⬜ Not started
 
   M (overall progress) is the count of weeks with status `< current`
   (i.e. closed weeks). For current_week=N, M = N-1.
+
+Current-week detection: walk docs/week_01.md → docs/week_20.md, count
+checked vs unchecked items in each (stopping at the AUTO-SYNC marker
+if present), and return the lowest-numbered week that has at least one
+unchecked item. If all 20 are 100%, returns TOTAL_WEEKS. This replaces
+the earlier mtime-based heuristic, which broke whenever sync_week_docs
+touched every week file in alphabetical order.
 
 Color buckets for the progress badge:
     0-33%   → red
@@ -37,16 +48,27 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
 README = ROOT / "README.md"
+PROGRESS_DOC = DOCS / "PROGRESS.md"
+TOTAL_WEEKS = 20
 
 
-def latest_week() -> int:
-    """Pick the most recently modified docs/week_NN.md as 'current'."""
-    weeks = sorted(DOCS.glob("week_*.md"),
-                   key=lambda p: p.stat().st_mtime, reverse=True)
-    if not weeks:
-        sys.exit("ERROR: no docs/week_*.md files found")
-    m = re.search(r"week_(\d+)\.md", weeks[0].name)
-    return int(m.group(1))
+def detect_current_week() -> int:
+    """Return the lowest-numbered week with an incomplete checklist.
+
+    Falls back to TOTAL_WEEKS if every week is 100% done.
+    Skips weeks whose docs/week_NN.md is missing or has zero checkboxes
+    (treats them as "no signal" rather than "done").
+    """
+    for week in range(1, TOTAL_WEEKS + 1):
+        week_path = DOCS / f"week_{week:02d}.md"
+        if not week_path.exists():
+            continue
+        done, total = count_checklist(week_path)
+        if total == 0:
+            continue
+        if done < total:
+            return week
+    return TOTAL_WEEKS
 
 
 def count_checklist(week_path: Path) -> tuple[int, int]:
@@ -100,7 +122,37 @@ def update_progress_table(text: str, current_week: int) -> tuple[str, int]:
     return new_text, n
 
 
-TOTAL_WEEKS = 20
+def update_progress_doc(week: int) -> int:
+    """Flip the per-week heading emojis in docs/PROGRESS.md.
+
+    Headings look like `### <EMOJI> Week N — Title`. Rewrites the emoji
+    according to the same week<current/=current/>current rule used for
+    the README's Progress table. Returns the number of headings rewritten.
+    Silently no-ops if PROGRESS.md is missing.
+    """
+    if not PROGRESS_DOC.exists():
+        return 0
+    text = PROGRESS_DOC.read_text()
+    n = 0
+    def replace_heading(m):
+        nonlocal n
+        week_num = int(m.group(1))
+        title    = m.group(2)
+        if   week_num <  week: emoji = "✅"
+        elif week_num == week: emoji = "🟡"
+        else:                  emoji = "⬜"
+        n += 1
+        return f"### {emoji} Week {week_num} — {title}"
+
+    new_text = re.sub(
+        r"^### (?:✅|🟡|⬜|🚫|🔍) Week (\d+) — (.+?)$",
+        replace_heading,
+        text,
+        flags=re.MULTILINE,
+    )
+    if new_text != text:
+        PROGRESS_DOC.write_text(new_text)
+    return n
 
 
 def update_readme(week: int, pct: int):
@@ -138,7 +190,7 @@ def update_readme(week: int, pct: int):
 
 
 def main():
-    week = int(sys.argv[1]) if len(sys.argv) > 1 else latest_week()
+    week = int(sys.argv[1]) if len(sys.argv) > 1 else detect_current_week()
     week_path = DOCS / f"week_{week:02d}.md"
     if not week_path.exists():
         sys.exit(f"ERROR: {week_path} not found")
@@ -149,6 +201,9 @@ def main():
     print(f"Week {week}: {done}/{total} done ({pct}%)")
     n_rows = update_readme(week, pct)
     print(f"Updated badges in {README.relative_to(ROOT)} ({n_rows} progress-table rows)")
+    n_headings = update_progress_doc(week)
+    if n_headings:
+        print(f"Updated headings in {PROGRESS_DOC.relative_to(ROOT)} ({n_headings} week headings)")
 
 
 if __name__ == "__main__":
