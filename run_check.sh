@@ -98,12 +98,15 @@ if [[ -z "$TOP_MODULE" ]]; then
 fi
 
 # Build the docker command — xvlog every file, then xelab with the inferred top.
+# `-L uvm` is always passed so files that `import uvm_pkg::*` or use
+# UVM macros compile. It's harmless when no UVM references exist — just
+# an extra library reference at link time.
 XVLOG_CMDS=""
 for f in "${REL_FILES[@]}"; do
-    XVLOG_CMDS+="xvlog --sv /work/$f && "
+    XVLOG_CMDS+="xvlog --sv -L uvm /work/$f && "
 done
 
-CHECK_CMD="${XVLOG_CMDS}xelab ${TOP_MODULE} -s check_snap --debug off; EXIT=\$?; rm -rf /work/xsim.dir /work/xvlog.pb /work/xvlog.log /work/xelab.pb /work/xelab.log /work/.Xil 2>/dev/null; exit \$EXIT"
+CHECK_CMD="${XVLOG_CMDS}xelab -L uvm ${TOP_MODULE} -s check_snap --debug off; EXIT=\$?; rm -rf /work/xsim.dir /work/xvlog.pb /work/xvlog.log /work/xelab.pb /work/xelab.log /work/.Xil 2>/dev/null; exit \$EXIT"
 
 echo -e "${CYAN}╔══════════════════════════════════════════════════════╗${NC}"
 echo -e "${CYAN}║  ${YELLOW}Syntax + elaboration check (xvlog + xelab)${CYAN}          ║${NC}"
