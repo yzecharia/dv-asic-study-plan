@@ -12,7 +12,7 @@
 - [ ] Drill ch.17 (producer/consumer + tlm_fifo)
 - [ ] Drill ch.18 (tester/driver split toy)
 - [ ] Drill ch.19 (reporting + verbosity)
-- [ ] HW1: full analysis path on ALU TB (extends W4 HW2)
+- [x] HW1: full analysis path on ALU TB (extends W4 HW2)
 - [ ] HW2: tester/driver split on ALU TB (extends HW1)
 - [ ] HW3: reporting polish (extends HW2)
 - [ ] Can answer all self-check questions
