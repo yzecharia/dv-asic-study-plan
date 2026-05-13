@@ -3,12 +3,12 @@
   "tasks": [
 
     {
-      "label": "🔍 Lint (xvlog syntax check on current file)",
+      "label": "🔍 LINT (xvlog only — syntax check, no elaboration)",
       "type": "shell",
-      "command": "${workspaceFolder}/xvlog_lint.sh",
-      "args": ["${file}"],
+      "command": "${workspaceFolder}/xflow.sh",
+      "args": ["lint", "${file}"],
       "group": "build",
-      "presentation": { "clear": true, "reveal": "always" },
+      "presentation": { "clear": true, "reveal": "always", "group": "xsim" },
       "problemMatcher": {
         "owner": "xvlog",
         "fileLocation": ["relative", "${workspaceFolder}"],
@@ -22,32 +22,13 @@
     },
 
     {
-      "label": "🌊 SIM (xsim run on current file, auto-includes *_pkg.sv siblings)",
+      "label": "🔬 CHECK (syntax + elaboration, no simulation)",
       "type": "shell",
-      "command": "${workspaceFolder}/run_xsim_auto.sh",
-      "args": ["${file}"],
+      "command": "${workspaceFolder}/xflow.sh",
+      "args": ["check", "${file}"],
       "group": { "kind": "build", "isDefault": true },
       "presentation": { "clear": true, "reveal": "always", "group": "xsim" },
       "problemMatcher": {
-        "owner": "xsim",
-        "fileLocation": ["relative", "${workspaceFolder}"],
-        "pattern": {
-          "regexp": "^ERROR:\\s+\\[\\w+ \\d+-\\d+\\]\\s+(.*?)\\s+\\[(.+?):(\\d+)\\]",
-          "message": 1,
-          "file": 2,
-          "line": 3
-        }
-      }
-    },
-
-    {
-      "label": "🔬 CHECK (xvlog + xelab on folder, no simulation — full compile-link check)",
-      "type": "shell",
-      "command": "${workspaceFolder}/run_check.sh",
-      "args": ["${file}"],
-      "group": "build",
-      "presentation": { "clear": true, "reveal": "always", "group": "xsim" },
-      "problemMatcher": {
         "owner": "xvlog",
         "fileLocation": ["relative", "${workspaceFolder}"],
         "pattern": {
@@ -60,28 +41,7 @@
     },
 
     {
-      "label": "✅ CHECK + SYNTH (full pre-synthesis check, then yosys schematic)",
-      "dependsOrder": "sequence",
-      "dependsOn": [
-        "🔬 CHECK (xvlog + xelab on folder, no simulation — full compile-link check)",
-        "🔧 RTL SCHEMATIC (yosys synth + schematic of current file)"
-      ],
-      "group": "build",
-      "presentation": { "clear": false, "reveal": "always", "group": "yosys" },
-      "problemMatcher": []
-    },
-
-    {
-      "label": "🔧 RTL SCHEMATIC (yosys synth + schematic of current file)",
-      "type": "shell",
-      "command": "${workspaceFolder}/run_yosys_rtl.sh",
-      "args": ["${file}"],
-      "group": "build",
-      "presentation": { "clear": true, "reveal": "always", "group": "yosys" }
-    },
-
-    {
-      "label": "🔧 RTL SCHEMATIC (yosys-slang — full SV: packages, structs, etc.)",
+      "label": "🔧 SCHEMATIC (yosys + slang gate-level schematic)",
       "type": "shell",
       "command": "${workspaceFolder}/run_yosys_slang.sh",
       "args": ["${file}"],
@@ -90,10 +50,9 @@
     },
 
     {
-      "label": "📁 SIM FOLDER (xsim, all *.sv siblings — multi-file class TBs)",
+      "label": "🌊 SIM (one-shot: compile + run, cleans up after)",
       "type": "shell",
-      "command": "${workspaceFolder}/run_xsim_folder.sh",
-      "args": ["${file}"],
+      "command": "UVM_TESTNAME=${input:uvmTestName} SV_SEED=${input:svSeed} UVM_VERBOSITY=${input:uvmVerbosity} ${workspaceFolder}/xflow.sh sim ${file}",
       "group": "build",
       "presentation": { "clear": true, "reveal": "always", "group": "xsim" },
       "problemMatcher": {
@@ -109,9 +68,10 @@
     },
 
     {
-      "label": "🧪 SIM UVM (xsim + -L uvm + UVM_TESTNAME plusarg)",
+      "label": "🔨 COMPILE (build snapshot, keep for reuse)",
       "type": "shell",
-      "command": "UVM_TESTNAME=${input:uvmTestName} SV_SEED=${input:svSeed} ${workspaceFolder}/run_xsim_auto.sh ${file}",
+      "command": "${workspaceFolder}/xflow.sh",
+      "args": ["compile", "${file}"],
       "group": "build",
       "presentation": { "clear": true, "reveal": "always", "group": "xsim" },
       "problemMatcher": {
@@ -127,10 +87,9 @@
     },
 
     {
-      "label": "🔨 UVM COMPILE (snapshot — compile once, auto-include *_pkg.{sv,svh})",
+      "label": "▶️  RUN (test against existing snapshot)",
       "type": "shell",
-      "command": "${workspaceFolder}/run_xsim_uvm_compile_auto.sh",
-      "args": ["${file}"],
+      "command": "UVM_VERBOSITY=${input:uvmVerbosity} SV_SEED=${input:svSeed} ${workspaceFolder}/xflow.sh run ${input:uvmTestName} ${fileDirname}",
       "group": "build",
       "presentation": { "clear": true, "reveal": "always", "group": "xsim" },
       "problemMatcher": {
@@ -146,25 +105,7 @@
     },
 
     {
-      "label": "▶️  UVM RUN TEST (against existing snapshot)",
-      "type": "shell",
-      "command": "UVM_VERBOSITY=${input:uvmVerbosity} SV_SEED=${input:svSeed} ${workspaceFolder}/run_xsim_uvm_test.sh ${input:uvmTestName} ${fileDirname}",
-      "group": "build",
-      "presentation": { "clear": true, "reveal": "always", "group": "xsim" },
-      "problemMatcher": {
-        "owner": "xsim",
-        "fileLocation": ["relative", "${workspaceFolder}"],
-        "pattern": {
-          "regexp": "^ERROR:\\s+\\[\\w+ \\d+-\\d+\\]\\s+(.*?)\\s+\\[(.+?):(\\d+)\\]",
-          "message": 1,
-          "file": 2,
-          "line": 3
-        }
-      }
-    },
-
-    {
-      "label": "🧹 UVM CLEAN (wipe xsim build artefacts in current folder)",
+      "label": "🧹 CLEAN (wipe xsim build artefacts)",
       "type": "shell",
       "command": "${workspaceFolder}/run_xsim_clean.sh",
       "args": ["${fileDirname}"],
@@ -173,12 +114,12 @@
     },
 
     {
-      "label": "♻️  UVM REBUILD (clean + compile + run — full from-scratch flow)",
+      "label": "♻️  REBUILD (clean + compile + run — fresh snapshot)",
       "dependsOrder": "sequence",
       "dependsOn": [
-        "🧹 UVM CLEAN (wipe xsim build artefacts in current folder)",
-        "🔨 UVM COMPILE (snapshot — compile once, auto-include *_pkg.{sv,svh})",
-        "▶️  UVM RUN TEST (against existing snapshot)"
+        "🧹 CLEAN (wipe xsim build artefacts)",
+        "🔨 COMPILE (build snapshot, keep for reuse)",
+        "▶️  RUN (test against existing snapshot)"
       ],
       "group": "build",
       "presentation": { "clear": false, "reveal": "always", "group": "xsim" },
@@ -186,7 +127,7 @@
     },
 
     {
-      "label": "📈 Update progress badges",
+      "label": "📈 BADGES (update progress shields)",
       "type": "shell",
       "command": "python3",
       "args": ["${workspaceFolder}/tools/update_progress_badges.py"],
@@ -199,19 +140,19 @@
     {
       "id": "uvmTestName",
       "type": "promptString",
-      "description": "UVM test name (e.g. random_test). Leave empty if no run_test() in code.",
+      "description": "UVM test name (e.g. random_test). Empty for non-UVM TBs.",
       "default": ""
     },
     {
       "id": "svSeed",
       "type": "promptString",
-      "description": "SV random seed (leave empty for default)",
+      "description": "SV random seed (empty = default)",
       "default": ""
     },
     {
       "id": "uvmVerbosity",
       "type": "pickString",
-      "description": "UVM verbosity (leave empty for default UVM_MEDIUM)",
+      "description": "UVM verbosity (empty = default UVM_MEDIUM)",
       "options": ["", "UVM_NONE", "UVM_LOW", "UVM_MEDIUM", "UVM_HIGH", "UVM_FULL", "UVM_DEBUG"],
       "default": ""
     }
