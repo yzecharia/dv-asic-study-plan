@@ -1,8 +1,8 @@
 # DV / RTL Study Plan 2.0 — 20 Weeks, 4 Phases
 
-![Progress](https://img.shields.io/badge/progress-19%2F20_weeks-brightgreen)
-![Current Week](https://img.shields.io/badge/current_week-20-blue)
-![Week 20 Progress](https://img.shields.io/badge/week_20_progress-0%25-red)
+![Progress](https://img.shields.io/badge/progress-4%2F20_weeks-brightgreen)
+![Current Week](https://img.shields.io/badge/current_week-5-blue)
+![Week 5 Progress](https://img.shields.io/badge/week_5_progress-39%25-yellow)
 ![Phase](https://img.shields.io/badge/phase-2_UVM_Methodology-blue)
 ![Toolchain](https://img.shields.io/badge/toolchain-arm64_native_+_Vivado_Docker_for_UVM-lightgrey)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)
@@ -65,22 +65,22 @@ Status of every week: [`docs/PROGRESS.md`](docs/PROGRESS.md).
 | 2 | 1 | Constrained Random | ✅ Done |
 | 3 | 1 | Coverage & SVA | ✅ Done |
 | 4 | 2 | UVM Architecture (Salemi 9–14) | ✅ Done |
-| 5 | 2 | UVM Communication (15–19) | ✅ Done |
-| 6 | 2 | UVM Stimulus (20–23) | ✅ Done |
-| 7 | 2 | UVM Full Integration | ✅ Done |
-| 8 | 3 | RISC-V Single-Cycle | ✅ Done |
-| 9 | 3 | RISC-V Pipeline + Hazards | ✅ Done |
-| 10 | 3 | UART | ✅ Done |
-| 11 | 3 | SPI + AXI-Lite | ✅ Done |
-| 12 | 4 | **Portfolio: UART-UVM** | ✅ Done |
-| 13 | 4 | **Portfolio: FIFO-UVM + RISC-V CPU** | ✅ Done |
-| 14 | 4 | Advanced UVM — RAL + Multi-UVC | ✅ Done |
-| 15 | 4 | Design Closure — Synthesis / PPA / FPGA | ✅ Done |
-| 16 | 4 | Signed & Fixed-Point Arithmetic 🆕 | ✅ Done |
-| 17 | 4 | DSP I — 1D FIR Filter 🆕 | ✅ Done |
-| 18 | 4 | DSP II — 2D Image Convolution 🆕 | ✅ Done |
-| 19 | 4 | Advanced CDC & Multi-Bit Handshake 🆕 | ✅ Done |
-| 20 | 4 | **Capstone: RAL + Multi-UVC + System** 🆕 | 🟡 In progress |
+| 5 | 2 | UVM Communication (15–19) | 🟡 In progress |
+| 6 | 2 | UVM Stimulus (20–23) | ⬜ Not started |
+| 7 | 2 | UVM Full Integration | ⬜ Not started |
+| 8 | 3 | RISC-V Single-Cycle | ⬜ Not started |
+| 9 | 3 | RISC-V Pipeline + Hazards | ⬜ Not started |
+| 10 | 3 | UART | ⬜ Not started |
+| 11 | 3 | SPI + AXI-Lite | ⬜ Not started |
+| 12 | 4 | **Portfolio: UART-UVM** | ⬜ Not started |
+| 13 | 4 | **Portfolio: FIFO-UVM + RISC-V CPU** | ⬜ Not started |
+| 14 | 4 | Advanced UVM — RAL + Multi-UVC | ⬜ Not started |
+| 15 | 4 | Design Closure — Synthesis / PPA / FPGA | ⬜ Not started |
+| 16 | 4 | Signed & Fixed-Point Arithmetic 🆕 | ⬜ Not started |
+| 17 | 4 | DSP I — 1D FIR Filter 🆕 | ⬜ Not started |
+| 18 | 4 | DSP II — 2D Image Convolution 🆕 | ⬜ Not started |
+| 19 | 4 | Advanced CDC & Multi-Bit Handshake 🆕 | ⬜ Not started |
+| 20 | 4 | **Capstone: RAL + Multi-UVC + System** 🆕 | ⬜ Not started |
 🆕 = new in plan 2.0 vs the 15-week beta.
 
 ---
