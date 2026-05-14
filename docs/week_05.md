@@ -249,7 +249,7 @@ contention, every input gets granted in a bounded number of cycles.
 - [ ] Read Salemi ch.19 (UVM reporting)
 - [x] Drill ch.15 (dice roller)
 - [x] Drill ch.16 (analysis port in TB)
-- [ ] Drill ch.17 (producer/consumer)
+- [x] Drill ch.17 (producer/consumer)
 - [ ] Drill ch.18 (tester/driver split toy)
 - [ ] Drill ch.19 (reporting + verbosity)
 - [x] HW1: full analysis path on ALU TB
@@ -429,7 +429,7 @@ bash ../run_yosys_rtl.sh <rtl_file>.sv
 - [ ] Read Salemi ch.19 (UVM reporting)
 - [x] Drill ch.15 (dice roller)
 - [x] Drill ch.16 (analysis port in TB)
-- [ ] Drill ch.17 (producer/consumer + tlm_fifo)
+- [x] Drill ch.17 (producer/consumer + tlm_fifo)
 - [ ] Drill ch.18 (tester/driver split toy)
 - [ ] Drill ch.19 (reporting + verbosity)
 - [x] HW1: full analysis path on ALU TB (extends W4 HW2)
