@@ -112,7 +112,11 @@ extract_top_from_file() {
 }
 
 # Scan a folder and populate REL_FILES with the right compile order:
-#   packages → other .svh → other .sv → target last.
+#   packages → other .sv → target last.
+# Non-package .svh siblings are SKIPPED — they're treated as include-only
+# headers (Salemi convention: classes/components live in .svh files that
+# get `\`include`d inside a package, and have no standalone imports). They
+# stay on disk so xvlog can resolve `\`include` directives from the package.
 # Globals set: REL_FILES (array, basenames).
 scan_folder() {
     local target_abs="$1"
@@ -123,14 +127,14 @@ scan_folder() {
         target_is_pkg=1
     fi
 
-    local pkg_files=() svh_files=() sv_siblings=()
+    local pkg_files=() sv_siblings=()
     shopt -s nullglob
     for f in "$project_dir"/*.svh "$project_dir"/*.sv; do
         [[ "$f" == "$target_abs" ]] && continue
         if grep -qE '^[[:space:]]*package[[:space:]]+[A-Za-z_][A-Za-z0-9_]*[[:space:]]*;' "$f"; then
             pkg_files+=("$(basename "$f")")
         elif [[ "$f" == *.svh ]]; then
-            svh_files+=("$(basename "$f")")
+            continue
         else
             sv_siblings+=("$(basename "$f")")
         fi
@@ -140,7 +144,6 @@ scan_folder() {
     REL_FILES=()
     [[ $target_is_pkg -eq 1 ]] && REL_FILES+=("$(basename "$target_abs")")
     [[ ${#pkg_files[@]}    -gt 0 ]] && REL_FILES+=("${pkg_files[@]}")
-    [[ ${#svh_files[@]}    -gt 0 ]] && REL_FILES+=("${svh_files[@]}")
     [[ ${#sv_siblings[@]}  -gt 0 ]] && REL_FILES+=("${sv_siblings[@]}")
     [[ $target_is_pkg -eq 0 ]] && REL_FILES+=("$(basename "$target_abs")")
     return 0
