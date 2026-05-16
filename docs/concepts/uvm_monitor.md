@@ -1,12 +1,17 @@
 # UVM Monitor (`uvm_monitor`)
 
-**Category**: UVM · **Used in**: every UVM week from W4 onward · **Type**: authored
+**Category**: UVM · **Used in**: every UVM week from W4 onward; W5 ch.18 (`command_monitor.svh` + `result_monitor.svh`) · **Type**: authored
 
 The monitor watches the interface, reconstructs **abstract
 transactions** from pin activity, and publishes them on a
 `uvm_analysis_port`. Multiple subscribers (scoreboard, coverage,
 logger) attach to the same port and each gets an independent copy.
 The monitor must be **passive** — it never drives a signal.
+
+HW2's `command_monitor.svh` and `result_monitor.svh` are **Style B**
+below — BFM-callback monitors that own a `uvm_analysis_port` and
+expose a `write_to_monitor()` method the BFM's `always` block calls.
+Style A is the production pin-sampling form. Both are covered here.
 
 ## Position
 
@@ -171,8 +176,11 @@ The monitor here has **no `run_phase`**. The "sampling" happens in the BFM's `al
 
 ## Reading
 
-- Salemi *UVM Primer* ch.16 (Using Analysis Ports in a Testbench),
-  pp. 106–114.
+- Salemi *UVM Primer* ch.16 (Using Analysis Ports in a Testbench —
+  the BFM-callback `command_monitor`/`result_monitor`, Figures
+  104–108), pp. 106–114.
+- Salemi ch.18 (Put and Get Ports in Action — the same two monitors,
+  unchanged by the tester/driver split), pp. 123–129.
 - Salemi ch.22 (UVM Agents — monitor section), pp. 154–164.
 - IEEE 1800.2-2020 §F.7 — `uvm_monitor` class.
 
