@@ -10,7 +10,7 @@
 - [x] Drill ch.15 (dice roller)
 - [x] Drill ch.16 (analysis port in TB)
 - [x] Drill ch.17 (producer/consumer + tlm_fifo)
-- [ ] Drill ch.18 (tester/driver split toy)
+- [x] Drill ch.18 (tester/driver split toy)
 - [ ] Drill ch.19 (reporting + verbosity)
 - [x] HW1: full analysis path on ALU TB (extends W4 HW2)
 - [ ] HW2: tester/driver split on ALU TB (extends HW1)
