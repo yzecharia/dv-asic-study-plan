@@ -3,7 +3,7 @@ module alu_tb_top;
     `include "uvm_macros.svh"
 
     import alu_pkg::*;
-    
+
     logic clk, reset_n;
 
     alu_if aluif (.clk(clk), .reset_n(reset_n));
