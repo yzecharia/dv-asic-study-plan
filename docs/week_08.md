@@ -35,10 +35,13 @@ into a working CPU.
   to decompose the control unit into small, independently
   verifiable FSMs. (The single-cycle CPU's "FSM" is trivial — just
   a decoder — but ch.17 sets you up for W9's pipeline control.)
+  *(Further reading: Harris & Harris ch.3 §3.4.4 — factoring state
+  machines.)*
 - **Dally & Harting ch.18 — Microcode**: hardwired vs micro-coded
   control; understand the tradeoff.
 - **Dally & Harting ch.8 — Combinational Building Blocks**: decoders
-  + arbiters; the decoder section is directly applicable.
+  + arbiters; the decoder section is directly applicable. *(Further
+  reading: Harris & Harris ch.2 §2.8 — multiplexers & decoders.)*
 - **Sutherland *SV for Design* ch.6 — Procedural Blocks, Tasks &
   Functions**: `always_comb`, `always_ff`; the right way to code
   the decoder and the register file.

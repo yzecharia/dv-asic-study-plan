@@ -29,10 +29,12 @@ into hand-waving.
 
 - **Dally & Harting ch.10 — Arithmetic Circuits** ⭐ — two's
   complement, signed addition with overflow detection, sign
-  extension semantics.
+  extension semantics. *(Further reading: Harris & Harris ch.5
+  §5.2 — arithmetic circuits, adders & ALU.)*
 - **Dally & Harting ch.11 — Fixed- and Floating-Point Numbers** ⭐ —
   §11.2 fixed-point representation: Q-format, resolution — the basis
-  for the Q4.12 MAC.
+  for the Q4.12 MAC. *(Further reading: Harris & Harris ch.5 §5.3 —
+  fixed- & floating-point number systems.)*
 - **Dally & Harting ch.12 — Fast Arithmetic Circuits** — partial
   products, Wallace/Dadda trees, §12.2 Booth recoding (the
   Booth-multiplier stretch).

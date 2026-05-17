@@ -35,6 +35,8 @@ GitHub portfolio piece), so RTL quality matters.
   uses for UART RX/TX.
 - **Dally & Harting ch.16 — Datapath Sequential Logic**:
   registers, shift registers — the underlying primitives.
+  *(Further reading: Harris & Harris ch.5 §5.4 — counters & shift
+  registers; ch.9 §9.3.5 online — serial I/O.)*
 - **Sutherland *SV for Design* ch.10 — Interfaces**: bundle the
   UART signals (TX, RX, baud-tick, parity-error, ready) in a
   proper SV interface with `modport`s for `dut`/`tb`.

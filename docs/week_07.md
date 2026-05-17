@@ -43,11 +43,15 @@ producing a clean, end-to-end testbench you fully understand.
 ### Reading — Design
 
 - **Dally & Harting ch.15 — Timing Constraints** ⭐ — setup/hold,
-  clock skew, slack equation. Read before Design HW3.
+  clock skew, slack equation. Read before Design HW3. *(Further
+  reading: Harris & Harris ch.3 §3.5 — timing of sequential logic.)*
 - **Dally & Harting ch.28 — Metastability and Synchronization
-  Failure** — the physics; MTBF; why 1 FF isn't enough
+  Failure** — the physics; MTBF; why 1 FF isn't enough. *(Further
+  reading: Harris & Harris ch.3 §3.5.4 + §3.5.6 — metastability,
+  resolution time.)*
 - **Dally & Harting ch.29 — Synchronizer Design** — 2-FF
-  synchronizers, pulse synchronizers, gray-code crossings
+  synchronizers, pulse synchronizers, gray-code crossings.
+  *(Further reading: Harris & Harris ch.3 §3.5.5 — synchronizers.)*
 - **Cliff Cummings** *"Clock Domain Crossing (CDC) Design &
   Verification Techniques Using SystemVerilog"* (SNUG 2008) ⭐ —
   cited in nearly every CDC interview question

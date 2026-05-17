@@ -56,7 +56,8 @@ flows through UVM ports.
 ### Reading — Design
 
 - **Dally & Harting ch.16 — Datapath Sequential Logic**: registers,
-  pipelines, datapath control
+  pipelines, datapath control. *(Further reading: Harris & Harris
+  ch.5 §5.4 — counters & shift registers.)*
 - **Dally & Harting ch.22 — Interface and System-Level Timing**: §22.1
   is where valid/ready flow control belongs (you previewed it in W3
   from external sources; now it has a textbook home)

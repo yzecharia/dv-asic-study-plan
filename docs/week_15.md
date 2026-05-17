@@ -27,10 +27,15 @@ Goals after this week:
 
 - **Dally & Harting ch.15 — Timing Constraints** ⭐ — clock
   period, setup/hold, slack. The textbook anchor for this week.
+  *(Further reading: Harris & Harris ch.3 §3.5 — timing of
+  sequential logic.)*
 - **Dally & Harting ch.15 §15.1–15.2 — Propagation/Contamination
   Delay & the D Flip-Flop**: setup/hold from first principles.
+  *(Further reading: Harris & Harris ch.2 §2.9 — propagation/
+  contamination delay; ch.3 §3.2 — the D flip-flop.)*
 - **Dally & Harting ch.5 §5.7 — Power Dissipation in CMOS Circuits**
-  *(optional skim)* — dynamic vs static power.
+  *(optional skim)* — dynamic vs static power. *(Further reading:
+  Harris & Harris ch.1 §1.8 — power consumption.)*
 - **Sutherland *RTL Modeling with SystemVerilog* (this is a
   different Sutherland book — *not* *SV for Design*) ch.7-8** —
   combinational + sequential RTL coding rules for synthesis.

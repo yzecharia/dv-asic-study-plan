@@ -31,6 +31,8 @@ RTL idioms, and the SVA together.
   (relevant for TB-side CDC).
 - **Dally & Harting ch.28 — Metastability and Synchronization
   Failure**: thin treatment but has the metastability picture.
+  *(Further reading: Harris & Harris ch.3 §3.5.4–3.5.6 —
+  metastability, synchronizers, resolution time.)*
 
 ### Concept notes
 

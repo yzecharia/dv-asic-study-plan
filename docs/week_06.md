@@ -57,7 +57,8 @@ The HW below respects that order — don't try to skip ahead.
 ### Reading — Design
 
 - **Dally & Harting ch.25 — Memory Systems**: SRAM organization,
-  byte enables, banking
+  byte enables, banking. *(Further reading: Harris & Harris ch.5
+  §5.5 — memory arrays, SRAM/DRAM; ch.8 for caches.)*
 - **Sutherland *SV for Design* ch.9 — Design Hierarchy**:
   parameterized modules and `generate` blocks.
 - **Cliff Cummings** *"Asynchronous FIFO Design"* (theory follow-up
