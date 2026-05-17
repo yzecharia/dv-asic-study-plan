@@ -235,13 +235,28 @@ Build on HW2. Apply Salemi's 6 conversion steps to the full ALU TB:
 
 ### Main HWs
 
-#### HW1: Direct-mapped cache structure
-*Folder:* `homework/design/connector/hw1_direct_mapped_cache/`
+#### HW1: True dual-port RAM
+*Folder:* `homework/design/connector/hw1_dual_port_ram/`
 
-Structural skeleton of a direct-mapped cache: address →
-{tag, index, offset}, tag array, data array, hit/miss output. No
-replacement policy needed (direct-mapped). Combines memory +
-parameterization + addressing.
+Parameterized true dual-port RAM — port A and port B each read and
+write independently on the same clock. This is the canonical Dally
+ch.25 memory block: an SRAM-style storage array behind two
+independent access ports.
+
+- Parameterize `DATA_WIDTH` and `DEPTH`
+  (`ADDR_WIDTH = $clog2(DEPTH)`).
+- Each port has `addr`, `wr_en`, `wr_data`, and a registered
+  `rd_data`.
+- Document the **read-during-write** behavior — when one port
+  writes an address the other port reads the same cycle, does the
+  read return the old data (read-first), the new data
+  (write-first), or undefined? This is a real RTL design decision;
+  state your choice and why.
+- Bonus: add a per-byte write strobe (`wr_strb`), reusing the
+  pattern from the ch.25 memory-bank drill.
+
+This DPRAM is the storage element your W7 async FIFO wraps — build
+it cleanly here.
 
 #### HW2: Async FIFO theory
 *Folder:* `homework/design/connector/hw2_async_fifo_theory/`
@@ -251,6 +266,21 @@ block diagram, identify each clock domain crossing, choose
 gray-code width, and **predict** the full/empty conditions
 algebraically. The actual RTL build happens in W7; this is the
 design doc for it.
+
+### Stretch (optional)
+
+- **Stretch — Direct-mapped cache structure**
+  *Folder:* `homework/design/big_picture/direct_mapped_cache/`
+  Structural skeleton of a direct-mapped cache: address →
+  `{tag, index, offset}`, tag array, data array, hit/miss output.
+  No replacement policy (direct-mapped). Builds the ch.25 memory
+  arrays into an addressed structure.
+
+  Honest note: cache *organization* — hierarchy, hit/miss policy —
+  isn't in the W6 reading. Dally ch.25 covers SRAM arrays, not
+  cache architecture (that's Harris & Harris ch.8). It sits here as
+  a stretch for exactly that reason: a natural "go further with
+  memory" exercise, but outside the assigned chapters.
 
 ---
 
@@ -293,8 +323,9 @@ design doc for it.
 - [ ] Drill Sutherland ch.9 (param register file via generate)
 - [ ] Drill Dally ch.25 (memory bank with byte enable)
 - [ ] Drill Cummings (async FIFO theory write-up)
-- [ ] HW1: direct-mapped cache structure
+- [ ] HW1: true dual-port RAM
 - [ ] HW2: async FIFO design doc
+- [ ] Stretch: direct-mapped cache structure (optional)
 
 <!-- AUTO-SYNC: per-week views below — regenerate via tools/sync_week_docs.py; do not edit by hand below this line -->
 

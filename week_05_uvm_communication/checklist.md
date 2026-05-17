@@ -26,7 +26,7 @@
 - [x] Drill Dally ch.16 (shift register)
 - [ ] Drill Dally ch.22 (valid/ready handshake)
 - [x] Drill Sutherland ch.5 (packed struct port)
-- [ ] HW1: true dual-port RAM
+- [ ] HW1: pipelined MAC unit
 - [ ] HW2: round-robin arbiter
 
 ## Iron-Rule deliverables
@@ -51,7 +51,7 @@ Session 2   Drill ch.16, read Sutherland ch.5, drill struct port.
 Session 3   Finish HW1 verif. Read Salemi ch.17+18, drill ch.17.
             Read Dally ch.22, drill valid/ready handshake.
 Session 4   Drill ch.18. HW2 verif (tester/driver split).
-            HW1 design (true dual-port RAM).
+            HW1 design (pipelined MAC unit).
 Session 5   Read Salemi ch.19, drill ch.19, HW3 verif (reporting polish).
             HW2 design (round-robin arbiter). Self-check Qs.
 ```

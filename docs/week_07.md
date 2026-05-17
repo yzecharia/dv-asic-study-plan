@@ -247,7 +247,7 @@ module async_fifo #(
 );
 ```
 Implements the Cummings-paper design exactly:
-1. Dual-port RAM for storage (your W5 design HW1 generalizes).
+1. Dual-port RAM for storage (your W6 design HW1 generalizes).
 2. Binary write-pointer in `wr_clk` domain, binary read-pointer in
    `rd_clk` domain.
 3. Both pointers gray-code-encoded for crossing

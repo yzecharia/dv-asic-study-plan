@@ -206,14 +206,57 @@ debug. Verify behavior under `+UVM_VERBOSITY=UVM_HIGH` and
 
 ### Main HWs
 
-#### HW1: True dual-port RAM
-*Folder:* `homework/design/connector/hw1_dual_port_ram/`
+#### HW1: Pipelined multiply-accumulate (MAC) unit
+*Folder:* `homework/design/connector/hw1_pipelined_mac/`
 
-Parameterized DPRAM (port A + port B, each can read & write
-independently). Combines sequential logic + handshake + struct
-port. Document the read-during-write behavior choice
-(write-first / read-first / undefined) — this is a real RTL
-design decision.
+A 2-stage pipelined MAC with a valid/ready streaming interface and
+a packed-`struct` command port. This is the W5 design "brick" — it
+exercises every chapter you read this week: Dally ch.16 (pipelining
+a datapath, pipeline control), Dally ch.22 §22.1 (valid/ready flow
+control across a multi-stage pipe), and Sutherland ch.5 (the packed
+struct port).
+
+```systemverilog
+typedef struct packed {
+    logic signed [W-1:0] a;
+    logic signed [W-1:0] b;
+    logic                clear_acc;  // 1 = start a fresh accumulation
+} mac_cmd_t;
+
+module pipelined_mac #(
+    parameter int W     = 16,
+    parameter int ACC_W = 2*W + 4     // product width + guard bits
+)(
+    input  logic                    clk, rst_n,
+    // upstream (producer) — valid/ready
+    input  logic                    in_valid,
+    output logic                    in_ready,
+    input  mac_cmd_t                 in_cmd,
+    // downstream (consumer) — valid/ready
+    output logic                    out_valid,
+    input  logic                    out_ready,
+    output logic signed [ACC_W-1:0]  acc
+);
+```
+
+- **Stage 1** registers the operands and computes `a * b`.
+- **Stage 2** registers the product and updates the accumulator:
+  `acc <= clear_acc ? product : acc + product`. The output is
+  registered — 2-cycle latency.
+
+The point of the exercise is the **flow control**, not the
+arithmetic. `in_ready` / `out_valid` must stay correct when the
+consumer stalls (`out_ready` low mid-stream). Decide — and write it
+into a header comment — whether you stall the whole pipe or add a
+skid buffer, and why. (W17's FIR forces the same decision; build
+the muscle now.)
+
+Acceptance criteria:
+- `verilator --lint-only -Wall` clean.
+- Directed TB: stream a known operand sequence, check `acc` against
+  a hand-computed reference.
+- Back-pressure TB: drop `out_ready` mid-stream — confirm not one
+  MAC is dropped or double-counted.
 
 #### HW2: Round-robin arbiter
 *Folder:* `homework/design/connector/hw2_round_robin_arbiter/`
@@ -266,7 +309,7 @@ contention, every input gets granted in a bounded number of cycles.
 - [x] Drill Dally ch.16 (shift register)
 - [ ] Drill Dally ch.22 (valid/ready handshake)
 - [x] Drill Sutherland ch.5 (packed struct port)
-- [ ] HW1: dual-port RAM
+- [ ] HW1: pipelined MAC unit
 - [ ] HW2: round-robin arbiter
 
 <!-- AUTO-SYNC: per-week views below — regenerate via tools/sync_week_docs.py; do not edit by hand below this line -->
@@ -447,7 +490,7 @@ bash ../run_yosys_rtl.sh <rtl_file>.sv
 - [x] Drill Dally ch.16 (shift register)
 - [ ] Drill Dally ch.22 (valid/ready handshake)
 - [x] Drill Sutherland ch.5 (packed struct port)
-- [ ] HW1: true dual-port RAM
+- [ ] HW1: pipelined MAC unit
 - [ ] HW2: round-robin arbiter
 
 ## Iron-Rule deliverables
@@ -472,7 +515,7 @@ Session 2   Drill ch.16, read Sutherland ch.5, drill struct port.
 Session 3   Finish HW1 verif. Read Salemi ch.17+18, drill ch.17.
             Read Dally ch.22, drill valid/ready handshake.
 Session 4   Drill ch.18. HW2 verif (tester/driver split).
-            HW1 design (true dual-port RAM).
+            HW1 design (pipelined MAC unit).
 Session 5   Read Salemi ch.19, drill ch.19, HW3 verif (reporting polish).
             HW2 design (round-robin arbiter). Self-check Qs.
 ```

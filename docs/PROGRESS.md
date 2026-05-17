@@ -60,13 +60,13 @@ Auto-regenerable via `python3 tools/update_progress_badges.py`.
 ### 🟡 Week 5 — UVM Communication (Salemi ch.15–19)
 - [ ] Reading: Salemi ch.15–19
 - [ ] Verif: analysis ports, TLM 1.0, reporting
-- [ ] Design: Dual-port RAM, RR arbiter, valid/ready handshake
+- [ ] Design: Pipelined MAC, RR arbiter, valid/ready handshake
 - [ ] Iron Rule (a)/(b)/(c)
 
 ### ⬜ Week 6 — UVM Stimulus (Salemi ch.20–23)
 - [ ] Reading: Salemi ch.20–23 + Rosenberg ch.4
 - [ ] Verif: transactions, agents, sequences
-- [ ] Design: parameterised register file, async FIFO theory, direct-mapped cache
+- [ ] Design: parameterised register file, async FIFO theory, dual-port RAM
 - [ ] Iron Rule (a)/(b)/(c)
 
 ### ⬜ Week 7 — UVM Full Testbench Integration

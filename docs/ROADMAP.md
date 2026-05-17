@@ -39,8 +39,8 @@ flowchart TD
 | W2 | CRV | Counter, Sync FIFO | LinkedIn headline iterate |
 | W3 | Coverage + SVA | FSMs, arbiter, shift reg | Resume bullet — Phase 1 |
 | W4 | UVM arch (Salemi 9–14) | ALU, adders, multiplier, barrel shifter | STAR — UVM bug story |
-| W5 | UVM TLM (Salemi 15–19) | Dual-port RAM, RR arbiter | LinkedIn — UVM milestone |
-| W6 | UVM stimulus (Salemi 20–23) | Param regfile, async FIFO theory | Elevator pitch — UVM agent |
+| W5 | UVM TLM (Salemi 15–19) | Pipelined MAC, RR arbiter | LinkedIn — UVM milestone |
+| W6 | UVM stimulus (Salemi 20–23) | Dual-port RAM, async FIFO theory | Elevator pitch — UVM agent |
 | W7 | UVM full integration | Async FIFO RTL, CDC | Resume bullet — UVM env |
 | W8 | (light) | RISC-V single-cycle CPU | LinkedIn — RISC-V learning |
 | W9 | (light) | RISC-V pipeline + hazards | Mock interview — pipeline hazards |
