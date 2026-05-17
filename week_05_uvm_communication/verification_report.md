@@ -1,7 +1,8 @@
 # Week 5 — Verification Report
 
 Per-drill verification artifacts for Salemi *UVM Primer* ch.15–19. Each
-chapter's drill gets its own section as it lands. The W5 anchor in
+chapter's drill — and each connector HW (HW1, HW2) — gets its own
+section as it lands. The W5 anchor in
 chapter 15 is the dice-roller — first introduction to
 `uvm_analysis_port` + `uvm_subscriber` (Observer pattern). No real DUT;
 the "DUT" is the analysis fan-out itself.
@@ -138,4 +139,235 @@ cd week_05_uvm_communication/homework/verif/per_chapter/hw_ch15_tlm_basics
 ../../../../../run_xsim_uvm_test.sh dice_test
 
 # or: VS Code → Tasks: Run Task → ♻️ UVM REBUILD
+```
+
+---
+
+## HW1 — Analysis path on the ALU TB
+
+**Block under verification**: the 4-operation ALU DUT from W4
+(`OP_ADD`/`OP_AND`/`OP_XOR`/`OP_MUL`; single-issue, in-order;
+ADD/AND/XOR single-cycle, MUL three-cycle). The W4 HW2 testbench is
+refactored to the Salemi ch.16 analysis-path pattern — coverage and
+scoreboard no longer peek at the BFM directly; they subscribe to
+analysis ports.
+
+**Testbench**: `homework/verif/connector/hw1_alu_analysis_path/` —
+`alu_pkg` includes the `alu_classes/` hierarchy; `alu_if` carries the
+BFM; `alu_tb_top` generates clk/reset and calls `run_test()`.
+
+```
+   base_tester ── bfm.send_op ──▶ DUT
+                                   │  (BFM always blocks, edge-detected)
+                       ┌───────────┴────────────┐
+                command_monitor            result_monitor
+                    │ ap (uvm_analysis_port)        │ ap
+            ┌───────┴────────┐                      │
+            ▼                ▼                      ▼
+        coverage   scoreboard.cmd_fifo     scoreboard.analysis_export
+                   (uvm_tlm_analysis_fifo)
+```
+
+### What was verified
+
+- **DUT functional correctness** — `random_test` (1000 random
+  commands) and `add_test` (1000 ADD commands). The scoreboard's
+  `predict()` recomputes the expected result and compares against the
+  DUT; every command matched.
+- **Analysis-path fan-out** — `command_monitor`/`result_monitor`
+  broadcast via `uvm_analysis_port`; `coverage` and `scoreboard`
+  subscribe via `uvm_subscriber`. One `ap.write()` reaches every
+  subscriber in connect order, in zero simulation time.
+- **Two-input scoreboard pairing** — a result triggers `write()`; the
+  matching command is pulled from a `uvm_tlm_analysis_fifo` with
+  `try_get`. In-order single-issue means FIFO order == issue order;
+  verified because no `try_get` ever returned a mismatch.
+- **BFM edge detection** — the `new_command`/`new_result` one-shot
+  latches fire exactly once per rising edge of `start`/`done`, even
+  though `start` is held high across the 3-cycle MUL. A multi-fire bug
+  would have stuffed phantom commands into the FIFO and the scoreboard
+  would have errored — it did not.
+- **Coverage** — `cg_alu`: `cp_op`, `cp_a`, `cp_b` (5 bins each),
+  `cp_a_eq_b`, `cp_carry`, and `cross_op_a_b`.
+
+### Results
+
+| Test | Cmds | UVM_ERROR | UVM_FATAL | Scoreboard | `cg_alu` inst cov | Log |
+|---|---|---|---|---|---|---|
+| `random_test` | 1000 | 0 | 0 | **PASS 1000/1000** | **89.67 %** | `sim/hw1_alu_analysis_path_random_test_pass.log` |
+| `add_test`    | 1000 | 0 | 0 | **PASS 1000/1000** | **73.50 %** | `sim/hw1_alu_analysis_path_add_test_pass.log` |
+
+Pass criterion: `UVM_ERROR + UVM_FATAL == 0` and scoreboard `fail == 0`.
+
+### Holes / known limitations
+
+- **`cross_op_a_b` not closed** — 4×5×5 = 100 cross bins; 1000 random
+  commands leave ~10 % unhit. Random stimulus cannot saturate the
+  corner cross-bins — closing them needs directed stimulus, not more
+  iterations.
+- **`add_test` 73.50 % is expected-lower** — ADD-only stimulus
+  collapses `cp_op` to one of four bins and the cross to a quarter.
+  Not a gap; the number is correct for the stimulus.
+- **Reset exercised once** — asserted at time 0, never re-applied
+  mid-traffic. No reset-recovery test.
+- **No illegal-stimulus test** — the tester always honours the
+  wait-for-`done` contract; a `start`-during-busy case is never
+  driven, so the DUT's command-drop behaviour is unverified.
+- **In-order assumption is implicit** — the scoreboard's FIFO pairing
+  assumes single-issue order; correct for this DUT, but guarded by a
+  comment, not an assertion.
+
+### Self-critique on the design
+
+The refactor cleanly stratifies the testbench: the BFM owns the
+protocol, monitors are dumb broadcasters, subscribers are leaf
+consumers — each layer has exactly one job. The weak spot is coverage
+signoff: 89.67 % with a large cross that random stimulus structurally
+cannot close. A real signoff adds constrained/directed stimulus aimed
+at the unhit cross-bins, or trims the cross to the bins that carry
+verification value. The scoreboard's reliance on FIFO order should be
+an explicit SVA assertion, not a comment.
+
+### Bug log (HW1)
+
+Four traps, all silent-failure class — the code compiles and runs and
+produces wrong results without raising an error:
+
+- **BFM latch lifetime** — `new_command` declared inside the `always`
+  block gets automatic lifetime on some simulators, re-zeroing every
+  activation; the edge detector never holds. Moved to interface scope
+  (static). → `docs/concepts/bfm_edge_detector.md`
+- **`cp_carry` width truncation** — `cmd.a + cmd.b > 8'hFF` evaluates
+  the `+` at 8-bit self-determined width; the carry is dropped *inside*
+  the expression and the `carry` bin is unreachable. Fixed with
+  `{1'b0, ...}` zero-extension to 9 bits.
+  → `docs/concepts/sv_expression_width_context.md`
+- **First-cycle X-propagation** — `logic start` defaults to `X`; `!X`
+  is falsy, so the detector never arms and the first command vanishes.
+  Fixed with `initial start = 1'b0;`.
+- **NBA collision** — the tester driving `start <= 0` then
+  `start <= 1` in one timestep loses the `0` (last write wins); the
+  BFM never sees a falling edge. Fixed with a clocking-block wait
+  between iterations.
+
+Full implementation-session Q&A: `hw1_qa.md`.
+
+### Run commands
+
+```bash
+UVM_TESTNAME=random_test ./xflow.sh sim \
+  week_05_uvm_communication/homework/verif/connector/hw1_alu_analysis_path/alu_tb_top.sv
+UVM_TESTNAME=add_test ./xflow.sh sim \
+  week_05_uvm_communication/homework/verif/connector/hw1_alu_analysis_path/alu_tb_top.sv
+```
+
+---
+
+## HW2 — Tester/driver split (ch.18)
+
+**Block under verification**: the same ALU DUT, re-verified through the
+Salemi ch.18 architecture. HW1's analysis path is retained unchanged;
+the monolithic tester is split into a stimulus-only `base_tester`
+(generates `command_t`, `put`s into a `uvm_tlm_fifo`) and a `driver`
+(`get`s commands, calls the BFM `send_op` task).
+
+**Testbench**: `homework/verif/per_chapter/hw_ch18_put_get/`
+
+```
+ random_tester / add_tester                            driver
+   uvm_put_port ─put─▶ uvm_tlm_fifo #(command_t) ─get─▶ uvm_get_port
+                          (env, depth 1)                   │ aluif.send_op
+                                                           ▼
+                                                          DUT
+                                          ┌─ BFM always blocks (HW1 path) ─┐
+                                   command_monitor                  result_monitor
+                                          ↓                                ↓
+                                coverage / scoreboard.cmd_f            scoreboard
+```
+
+### What was verified
+
+- **The ch.18 stimulus split** — the tester is now purely
+  transactional: no virtual interface, no clock awareness. The driver
+  owns the vif and all protocol timing. Both tests passing with the
+  split in place confirms the `send_op` BFM task and the put/get
+  plumbing are correct.
+- **Interthread transfer via `uvm_tlm_fifo`** — the tester `put`s, the
+  driver `get`s; the depth-1 fifo backpressures the tester so stimulus
+  is generated eagerly but applied at DUT pace. No command is lost or
+  duplicated — the scoreboard would catch either.
+- **Factory override path** — `random_test` runs the env-default
+  `random_tester`; `add_test` installs `random_tester → add_tester`.
+  Override correctness was confirmed *by the coverage delta* (see Bug
+  log).
+- **Reset ownership** — the driver waits `@(cb iff cb.reset_n)` before
+  its `forever get` loop; the tester is reset-agnostic, exactly as a
+  transactional component should be.
+- **DUT correctness at scale** — 10000 random + 10000 ADD commands,
+  scoreboard 10000/10000 PASS on each run.
+
+### Results
+
+| Test | Cmds | UVM_ERROR | UVM_FATAL | Scoreboard | `cg_alu` inst cov | Log |
+|---|---|---|---|---|---|---|
+| `random_test` | 10000 | 0 | 0 | **PASS 10000/10000** | **94.50 %** | `sim/hw_ch18_put_get_random_test_pass.log` |
+| `add_test`    | 10000 | 0 | 0 | **PASS 10000/10000** | **74.33 %** | `sim/hw_ch18_put_get_add_test_pass.log` |
+
+### Holes / known limitations
+
+- **`cross_op_a_b` still not closed** — 94.50 % at 10000 random
+  commands. The 5.5 % gap is the same un-closable corner cross-bins as
+  HW1; ten-times-more random stimulus does not close them.
+- **`add_test` 74.33 %** — correct for ADD-only stimulus (`cp_op` at
+  25 %, cross at ~¼). This number is the *evidence* that the factory
+  override fires.
+- **Stimulus fifo depth fixed at 1** — strict ping-pong
+  tester↔driver. A deeper fifo allowing real tester run-ahead is not
+  exercised.
+- **Single reset** — same as HW1; no mid-test reset.
+
+### Self-critique on the design
+
+The tester/driver split is the right abstraction — `uvm_tlm_fifo`
+decouples *what stimulus* from *how it is applied*, which is exactly
+what `uvm_sequence`/`uvm_sequencer` formalise later. But the headline
+94.50 % (vs HW1's 89.67 %) is **not better verification — it is a
+longer run**: same covergroup, same un-closable cross, ten-times the
+random samples. Honest signoff is directed stimulus for the cross
+corners, not more iterations. The sharper lesson is the `add_test`
+override bug: a test that passes 10000/10000 while silently exercising
+the wrong stimulus — the *only* tell was coverage. Pass count proves
+the DUT did not break; coverage proves *what was actually tested*.
+They are not interchangeable.
+
+### Bug log (HW2)
+
+- **Pure-virtual syntax** — `pure virtual <type> function name()` is
+  wrong; the `function` keyword precedes the return type.
+  → `docs/concepts/uvm_tester_component.md`
+- **Null `uvm_tlm_fifo` handles** — `env.cmd_f` and `scoreboard.cmd_f`
+  were declared but never constructed; `connect_phase` dereferenced
+  null and crashed the xsim kernel at time 0. Fixed with
+  `new("cmd_f", this)` in each `build_phase`.
+  → `docs/concepts/uvm_put_get_tlm_fifo.md`
+- **Factory override mistargeted** — `add_test` overrode `base_tester`,
+  but `env` creates `random_tester`; the override never fired and
+  `add_test` silently ran random stimulus. Identical 94.50 % coverage
+  was the tell. Fixed by overriding `random_tester`.
+  → `docs/concepts/uvm_factory_config_db.md`
+- **Stale `xsim.dir`** — "Failed to compile generated C file" from a
+  leftover snapshot; a clean rebuild resolves it.
+- **`xflow.sh` `.svh` regression (HW1 collateral)** — the
+  Salemi-convention fix (skip non-package `.svh` from standalone
+  compile) broke HW1, whose interface was `alu_if.svh`. Resolved by
+  renaming HW1's interface to `alu_if.sv` — `.sv` = compilation unit,
+  `.svh` = include-only.
+
+### Run commands
+
+```bash
+UVM_TESTNAME=random_test ./xflow.sh sim \
+  week_05_uvm_communication/homework/verif/per_chapter/hw_ch18_put_get/alu_tb_top.sv
+UVM_TESTNAME=add_test ./xflow.sh sim \
+  week_05_uvm_communication/homework/verif/per_chapter/hw_ch18_put_get/alu_tb_top.sv
 ```

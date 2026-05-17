@@ -33,7 +33,7 @@
 
 - [ ] (a) RTL committed and lint-clean (`verilator --lint-only -Wall`)
 - [ ] (b) Gold-TB PASS log captured to `sim/<topic>_pass.log`
-- [ ] (c) `verification_report.md` written
+- [x] (c) `verification_report.md` written
 
 ## Cross-cutting weekly tasks
 
