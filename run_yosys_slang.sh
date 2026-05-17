@@ -38,8 +38,18 @@ fi
 
 TOP_ABS="$(cd "$(dirname "$TOP_FILE")" && pwd)/$(basename "$TOP_FILE")"
 TOP_DIR="$(dirname "$TOP_ABS")"
-TOP_NAME="$(basename "$TOP_FILE" .sv)"
 OUT_DIR="$TOP_DIR/build_rtl"
+
+# Top-module name: the first `module` declared INSIDE the target file — not
+# the filename. A filename that doesn't match its module name (a typo, a
+# version suffix, etc.) would otherwise make `hierarchy -top` fail with a
+# cryptic "Module not found" and no schematic. Fall back to the filename
+# only if the file has no module declaration.
+TOP_NAME="$(grep -m1 -E '^[[:space:]]*module[[:space:]]+[A-Za-z_]' "$TOP_ABS" \
+    | sed -E 's/^[[:space:]]*module[[:space:]]+([A-Za-z_][A-Za-z0-9_]*).*/\1/')"
+if [[ -z "$TOP_NAME" ]]; then
+    TOP_NAME="$(basename "$TOP_FILE" .sv)"
+fi
 
 mkdir -p "$OUT_DIR"
 
