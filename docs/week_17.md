@@ -23,8 +23,11 @@ do you pay one extra cycle for a faster Fmax, or hold latency tight?
 
 ### Reading — Design
 
-- **Dally & Harting ch.12 — Fast Arithmetic** — pipelined adder/multiplier
-  scaffold.
+- **Dally & Harting ch.13 §13.3 — FIR Filter** ⭐ — the worked FIR
+  example: tap structure and the multiply-accumulate datapath.
+- **Dally & Harting ch.23 — Pipelines** — pipelining an arithmetic
+  datapath (§23.3 pipelines a ripple-carry adder); retiming the
+  FIR's MAC chain.
 - **Smith *Scientist & Engineer's Guide to DSP*** ([dspguide.com](https://www.dspguide.com)):
   - ch.14 — Introduction to digital filters
   - ch.15 — Moving average filters
@@ -146,7 +149,8 @@ LUT/FF/Fmax. Document trade-off in `notes.md`.
 
 ### Design Track
 
-- [ ] Read Dally ch.12 (pipelined arithmetic)
+- [ ] Read Dally ch.13 §13.3 (FIR filter)
+- [ ] Read Dally ch.23 (pipelines / retiming)
 - [ ] Drill — single FIR tap
 - [ ] Connector — 8-tap symmetric FIR
 - [ ] Big-picture — pipelined retiming + Yosys before/after

@@ -27,10 +27,10 @@ Goals after this week:
 
 - **Dally & Harting ch.15 — Timing Constraints** ⭐ — clock
   period, setup/hold, slack. The textbook anchor for this week.
-- **Dally & Harting ch.14 — Sequential Logic**: setup/hold from
-  first principles.
-- **Dally & Harting ch.5-6 — CMOS / Power** *(optional skim)* —
-  dynamic vs static power.
+- **Dally & Harting ch.15 §15.1–15.2 — Propagation/Contamination
+  Delay & the D Flip-Flop**: setup/hold from first principles.
+- **Dally & Harting ch.5 §5.7 — Power Dissipation in CMOS Circuits**
+  *(optional skim)* — dynamic vs static power.
 - **Sutherland *RTL Modeling with SystemVerilog* (this is a
   different Sutherland book — *not* *SV for Design*) ch.7-8** —
   combinational + sequential RTL coding rules for synthesis.
@@ -186,7 +186,7 @@ question in interviews.
 - **Stretch — Power analysis**
   Run Vivado's power estimator on your pipelined CPU. Identify
   dominant power consumer (clock tree? memories? logic?).
-  Touches Dally ch.5-6.
+  Touches Dally ch.5 §5.7.
 
 ---
 
@@ -208,9 +208,9 @@ question in interviews.
 ## Checklist
 
 ### Design Track
-- [ ] Read Dally ch.14 (sequential logic / setup-hold)
+- [ ] Read Dally ch.15 §15.1-15.2 (delay model / D flip-flop)
 - [ ] Read Dally ch.15 (timing constraints) ⭐
-- [ ] *(Optional)* Read Dally ch.5-6 (CMOS / power)
+- [ ] *(Optional)* Read Dally ch.5 §5.7 (CMOS power)
 - [ ] Read Sutherland *RTL Modeling* ch.7-8 (combinational +
   sequential synthesis coding)
 - [ ] Read Sutherland *SV for Design* ch.6 (procedural blocks)

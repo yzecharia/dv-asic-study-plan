@@ -27,10 +27,15 @@ into hand-waving.
 
 ### Reading — Design
 
-- **Dally & Harting ch.10 — Number Systems** ⭐ — two's complement,
-  signed addition with overflow detection, sign extension semantics.
-- **Dally & Harting ch.11 — Multipliers** — partial products,
-  Wallace/Dadda trees, Booth encoding.
+- **Dally & Harting ch.10 — Arithmetic Circuits** ⭐ — two's
+  complement, signed addition with overflow detection, sign
+  extension semantics.
+- **Dally & Harting ch.11 — Fixed- and Floating-Point Numbers** ⭐ —
+  §11.2 fixed-point representation: Q-format, resolution — the basis
+  for the Q4.12 MAC.
+- **Dally & Harting ch.12 — Fast Arithmetic Circuits** — partial
+  products, Wallace/Dadda trees, §12.2 Booth recoding (the
+  Booth-multiplier stretch).
 - **Sutherland *RTL Modeling with SystemVerilog* — Arithmetic
   operators chapter** — synthesis behaviour of `*`, `+`, `-`,
   `signed` casts.
@@ -161,8 +166,9 @@ pip3 install numpy
 
 ### Design Track
 
-- [ ] Read Dally ch.10 (numbers)
-- [ ] Read Dally ch.11 (multipliers)
+- [ ] Read Dally ch.10 (arithmetic / signed)
+- [ ] Read Dally ch.11 (fixed-point numbers)
+- [ ] Read Dally ch.12 (fast arithmetic / Booth)
 - [ ] Read Sutherland RTL Modeling — arithmetic operators ch.
 - [ ] Drill 1 — signed adder with overflow flag
 - [ ] Drill 2 — Q4.12 round-and-saturate function module

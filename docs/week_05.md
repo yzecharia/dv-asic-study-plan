@@ -57,9 +57,9 @@ flows through UVM ports.
 
 - **Dally & Harting ch.16 — Datapath Sequential Logic**: registers,
   pipelines, datapath control
-- **Dally & Harting ch.24 — Interconnect**: this is where valid/ready
-  handshakes belong (you previewed them in W3 from external sources;
-  now they have a textbook home)
+- **Dally & Harting ch.22 — Interface and System-Level Timing**: §22.1
+  is where valid/ready flow control belongs (you previewed it in W3
+  from external sources; now it has a textbook home)
 - **Sutherland *SV for Design* ch.5 — Arrays, Structures, Unions**:
   packed/unpacked structs, packed/unpacked arrays, unions,
   `foreach`, array query functions, `$bits`.
@@ -192,11 +192,11 @@ debug. Verify behavior under `+UVM_VERBOSITY=UVM_HIGH` and
   Parameterized shift register with serial-in/serial-out and
   parallel-load.
 
-- **Drill Dally ch.24 — Valid/ready handshake**
-  *Folder:* `homework/design/per_chapter/hw_dally_ch24_handshake/`
+- **Drill Dally ch.22 — Valid/ready handshake**
+  *Folder:* `homework/design/per_chapter/hw_dally_ch22_handshake/`
   Producer/consumer pair with valid/ready. Test back-pressure: drop
   `ready` mid-stream. (You've seen this in W3 from external sources;
-  Dally ch.24 is its proper textbook home.)
+  Dally ch.22 §22.1 is its proper textbook home.)
 
 - **Drill Sutherland ch.5 — Packed struct port**
   *Folder:* `homework/design/per_chapter/hw_sutherland_ch5_structs/`
@@ -259,11 +259,11 @@ contention, every input gets granted in a bounded number of cycles.
 
 ### Design Track
 - [x] Read Dally ch.16 (datapath sequential)
-- [ ] Read Dally ch.24 (interconnect / handshake)
+- [ ] Read Dally ch.22 (interface timing / handshake)
 - [x] Read Sutherland ch.5 (arrays, structs, unions)
 - [ ] Read Cummings async FIFO paper (theory only — build is W7)
 - [x] Drill Dally ch.16 (shift register)
-- [ ] Drill Dally ch.24 (valid/ready handshake)
+- [ ] Drill Dally ch.22 (valid/ready handshake)
 - [x] Drill Sutherland ch.5 (packed struct port)
 - [ ] HW1: dual-port RAM
 - [ ] HW2: round-robin arbiter
@@ -440,11 +440,11 @@ bash ../run_yosys_rtl.sh <rtl_file>.sv
 ## Design track
 
 - [x] Read Dally ch.16 (datapath sequential)
-- [ ] Read Dally ch.24 (interconnect / handshake)
+- [ ] Read Dally ch.22 (interface timing / handshake)
 - [x] Read Sutherland *SV for Design* ch.5 (arrays, structs, unions)
 - [ ] Read Cummings async FIFO paper (theory only — build is W7)
 - [x] Drill Dally ch.16 (shift register)
-- [ ] Drill Dally ch.24 (valid/ready handshake)
+- [ ] Drill Dally ch.22 (valid/ready handshake)
 - [x] Drill Sutherland ch.5 (packed struct port)
 - [ ] HW1: true dual-port RAM
 - [ ] HW2: round-robin arbiter
@@ -469,7 +469,7 @@ Session 1   Read Salemi ch.15+16, drill ch.15.
 Session 2   Drill ch.16, read Sutherland ch.5, drill struct port.
             Start HW1 verif (full analysis path on ALU TB).
 Session 3   Finish HW1 verif. Read Salemi ch.17+18, drill ch.17.
-            Read Dally ch.24, drill valid/ready handshake.
+            Read Dally ch.22, drill valid/ready handshake.
 Session 4   Drill ch.18. HW2 verif (tester/driver split).
             HW1 design (true dual-port RAM).
 Session 5   Read Salemi ch.19, drill ch.19, HW3 verif (reporting polish).

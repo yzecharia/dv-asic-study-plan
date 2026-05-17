@@ -30,9 +30,9 @@ incremental pipeline-correctness milestones.
 - **Harris & Harris ch.7.7** ⭐ — hazards: data hazards, forwarding,
   load-use stall, control hazards, branch prediction.
 - **Harris & Harris ch.7.8** — performance analysis (CPI, throughput).
-- **Dally & Harting ch.16 — Datapath Sequential Logic**: pipeline
-  registers, forwarding muxes — the design building blocks behind
-  Harris ch.7.5.
+- **Dally & Harting ch.23 — Pipelines**: basic pipelining, pipeline
+  registers, and pipeline stalls (§23.4) — the methodology and
+  building blocks behind Harris ch.7.5.
 - **Sutherland *SV for Design* ch.6 — Procedural Blocks**:
   `always_ff` for pipeline registers; how to avoid latch inference
   between stages.
@@ -144,7 +144,7 @@ failures.
 
 ### Drills (per-hazard-type warmups)
 
-- **Drill — Pipeline register module (Harris ch.7.5, Dally ch.16,
+- **Drill — Pipeline register module (Harris ch.7.5, Dally ch.23,
   Sutherland ch.5+ch.6)**
   *Folder:* `homework/design/per_chapter/hw_pipe_register/`
   One generic `pipe_reg #(type T)` parameterized on the bundle
@@ -270,7 +270,7 @@ After this, all hazard regression tests in VHW1 pass.
 - [ ] Read Harris ch.7.5 (pipelined uarch)
 - [ ] Read Harris ch.7.7 (hazards)
 - [ ] Read Harris ch.7.8 (perf analysis)
-- [ ] Read Dally ch.16 (datapath sequential)
+- [ ] Read Dally ch.23 (pipelines / stalls)
 - [ ] Read Sutherland ch.5 (structs for pipeline bundles)
 - [ ] Read Sutherland ch.6 (always_ff for pipe registers)
 - [ ] Drill: pipe_reg module

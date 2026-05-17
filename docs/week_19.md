@@ -29,8 +29,8 @@ RTL idioms, and the SVA together.
   if not in local library.
 - **Sutherland *SystemVerilog for Design* — Clocking blocks chapter**
   (relevant for TB-side CDC).
-- **Dally & Harting ch.28 — Synchronous to Asynchronous**: thin
-  treatment but has the metastability picture.
+- **Dally & Harting ch.28 — Metastability and Synchronization
+  Failure**: thin treatment but has the metastability picture.
 
 ### Concept notes
 

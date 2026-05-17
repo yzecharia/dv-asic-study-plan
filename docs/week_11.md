@@ -52,10 +52,11 @@ Sutherland still apply (interfaces, structs, FSMs).
   parameterized on `ADDR_WIDTH` and `DATA_WIDTH`.
 - **Sutherland *SV for Design* ch.8 — FSM Modeling**: the SPI
   master FSM and the AXI write/read FSMs.
-- **Dally & Harting ch.24 — Interconnect**: covers the
-  valid/ready handshake pattern that every AXI channel uses. The
-  textbook home for handshake protocols even though AXI itself
-  isn't there.
+- **Dally & Harting ch.22 — Interface and System-Level Timing**:
+  §22.1 covers the valid/ready handshake pattern that every AXI
+  channel uses — the textbook home for handshake protocols even
+  though AXI itself isn't there. (ch.24 Interconnect covers the
+  bus / memory-map side; the AMBA spec is AXI-specific.)
 
 ### Tool Setup
 
@@ -165,10 +166,10 @@ Wraps your `axi_lite_slave` (DHW3). Tests:
   8-bit shift register with parallel-load + serial-out (MOSI),
   serial-in (MISO) → parallel-out. Clocked by SCLK.
 
-- **Drill — AXI handshake skeleton (Dally ch.24, AMBA spec)**
+- **Drill — AXI handshake skeleton (Dally ch.22 §22.1, AMBA spec)**
   *Folder:* `homework/design/per_chapter/hw_axi_handshake/`
   Tiny producer + consumer wired with valid/ready. Test
-  back-pressure: drop `ready` mid-stream. (Dally ch.24 covers
+  back-pressure: drop `ready` mid-stream. (Dally ch.22 §22.1 covers
   this generically; the AMBA spec adds the AXI-specific
   stability rules.)
 
@@ -301,7 +302,7 @@ write-enable). Use the AXI write/read FSM drills.
 - [ ] Read Sutherland ch.8 (FSM)
 - [ ] Read Sutherland ch.9 (parameterization, generate)
 - [ ] Read Sutherland ch.10 (interfaces)
-- [ ] Read Dally ch.24 (interconnect / handshakes)
+- [ ] Read Dally ch.22 (interface timing / valid-ready handshake)
 - [ ] Drill: SPI master FSM
 - [ ] Drill: SPI shift register
 - [ ] Drill: AXI handshake skeleton
