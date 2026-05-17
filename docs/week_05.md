@@ -253,7 +253,7 @@ contention, every input gets granted in a bounded number of cycles.
 - [x] Drill ch.18 (tester/driver split toy)
 - [ ] Drill ch.19 (reporting + verbosity)
 - [x] HW1: full analysis path on ALU TB
-- [ ] HW2: tester/driver split on ALU TB
+- [x] HW2: tester/driver split on ALU TB
 - [ ] HW3: reporting polish
 - [ ] Can answer all self-check questions
 
@@ -433,7 +433,7 @@ bash ../run_yosys_rtl.sh <rtl_file>.sv
 - [x] Drill ch.18 (tester/driver split toy)
 - [ ] Drill ch.19 (reporting + verbosity)
 - [x] HW1: full analysis path on ALU TB (extends W4 HW2)
-- [ ] HW2: tester/driver split on ALU TB (extends HW1)
+- [x] HW2: tester/driver split on ALU TB (extends HW1)
 - [ ] HW3: reporting polish (extends HW2)
 - [ ] Can answer all self-check questions
 
